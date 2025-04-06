@@ -1,0 +1,17 @@
+{
+  "name": "frontend",
+  "version": "1.0.0",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "build": "concurrently \"wsrun --parallel build\"",
+    "start": "concurrently \"wsrun --parallel preview\""
+  },
+  "workspaces": [
+    "*"
+  ],
+  "devDependencies": {
+    "concurrently": "^8.2.2",
+    "wsrun": "^5.2.3"
+  }
+}

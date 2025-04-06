@@ -1,0 +1,72 @@
+# === GLOBAL (aplica para todo o projeto) ===
+*.log
+*.tmp
+*.bak
+*.swp
+*.swo
+*.swn
+*.DS_Store
+Thumbs.db
+.env
+.env.*
+
+# IDEs
+.idea/
+.vscode/
+*.iml
+*.classpath
+*.project
+*.settings/
+
+# OS-specific
+.DS_Store
+ehthumbs.db
+Icon?
+__MACOSX/
+
+# === BACKEND (Java + Maven) ===
+backend/**/target/
+backend/**/.mvn/
+backend/**/build/
+backend/**/dependency-reduced-pom.xml
+backend/**/.classpath
+backend/**/.project
+backend/**/.settings/
+backend/**/*.iml
+backend/**/logs/
+
+# Wrapper scripts (se não quiser versionar)
+mvnw
+mvnw.cmd
+
+# === FRONTEND (Vue.js / Node.js) ===
+frontend/**/node_modules/
+frontend/**/dist/
+frontend/**/build/
+frontend/**/.cache/
+frontend/**/.output/
+frontend/**/coverage/
+frontend/**/.vitepress/
+frontend/**/.nuxt/
+frontend/**/.next/
+
+# === Docker / Compose (se tiver) ===
+docker-compose.override.yml
+*.local.yml
+*.env.local
+.docker/
+
+# === Test / Coverage ===
+**/coverage/
+**/reports/
+**/.nyc_output/
+**/jest-cache/
+**/.mocha/
+
+# === Logs ===
+**/npm-debug.log*
+**/yarn-debug.log*
+**/yarn-error.log*
+**/pnpm-debug.log*
+**/.log/
+
