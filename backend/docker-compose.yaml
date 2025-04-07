@@ -1,0 +1,26 @@
+version: '3'
+services:
+  # #################
+  # Backend services
+  # #################
+  ms_auth:
+    container_name: ms_auth
+    build:
+      context: ./ms_auth
+    restart: on-failure
+    ports:
+      - "8000:8000"
+    networks:
+      - pi_net
+  ms_user:
+    container_name: ms_user
+    build:
+      context: ./ms_user
+    restart: on-failure
+    ports:
+      - "8001:8001"
+    networks:
+      - pi_net
+networks:
+  pi_net:
+    driver: bridge

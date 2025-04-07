@@ -1,4 +1,4 @@
-<!-- pom.xml do módulo ms_auth -->
+<!-- pom.xml do módulo ms_user -->
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
@@ -9,7 +9,7 @@
         <version>1.0.0</version>
     </parent>
 
-    <artifactId>ms_auth</artifactId>
+    <artifactId>ms_user</artifactId>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -53,7 +53,7 @@
                         <manifest>
                             <addClasspath>true</addClasspath>
                             <packageName>com.pi</packageName>
-                            <mainClass>com.pi.Auth</mainClass>
+                            <mainClass>com.pi.User</mainClass>
                             <classpathPrefix>dependency-pi-jars/</classpathPrefix>
                         </manifest>
                         <manifestEntries>

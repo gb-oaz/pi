@@ -1,0 +1,10 @@
+credentials:
+  username: pi
+  password: pi
+  authorities: app
+
+jwt:
+  private:
+    key: classpath:private.key
+  public:
+    key: classpath:public.pub

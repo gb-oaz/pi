@@ -1,33 +1,33 @@
 package com.pi;
 
-import com.pi.core_auth.utils.constants.Router;
+import com.pi.core_user.utils.constants.Router;
 
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
-import io.swagger.v3.oas.models.security.SecurityScheme;
 import io.swagger.v3.oas.models.info.Contact;
 import io.swagger.v3.oas.models.info.Info;
+import io.swagger.v3.oas.models.security.SecurityScheme;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springdoc.core.models.GroupedOpenApi;
-import org.springframework.boot.SpringApplication;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 
 @SpringBootApplication
-public class Auth {
-    private static final Logger LOG = LoggerFactory.getLogger(Auth.class);
+public class User {
+    private static final Logger LOG = LoggerFactory.getLogger(User.class);
 
-    @Value("${microservice.auth.routes.info.title}") String title;
-    @Value("${microservice.auth.routes.info.version}") String version;
-    @Value("${microservice.auth.routes.info.description}") String description;
-    @Value("${microservice.auth.routes.info.contact.email}") String email;
+    @Value("${microservice.user.routes.info.title}") String title;
+    @Value("${microservice.user.routes.info.version}") String version;
+    @Value("${microservice.user.routes.info.description}") String description;
+    @Value("${microservice.user.routes.info.contact.email}") String email;
 
     public static void main(String[] args) {
-        SpringApplication.run(Auth.class, args);
-        LOG.info("AUTH MICROSERVICE - RUNNING");
+        SpringApplication.run(User.class, args);
+        LOG.info("USER MICROSERVICE - RUNNING");
     }
 
     @Bean

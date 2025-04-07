@@ -1,11 +1,11 @@
 server:
-  port: 8000
+  port: 8001
 
 microservice:
-  auth:
-    name: auth
+  user:
+    name: User
     version: v1
-    description: Responsible for user management, authentication and authorization
+    description: Responsible for user management
     routes:
       info:
         title: Info API

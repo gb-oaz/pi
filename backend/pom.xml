@@ -19,6 +19,7 @@
         <module>core</module>
 
         <module>ms_auth</module>
+        <module>ms_user</module>
     </modules>
 
 </project>

@@ -7,8 +7,8 @@ WORKDIR /app
 # Copie o arquivo DEPENDENCIAS da aplicação para o contêiner
 COPY target/ /app
 
-# Exponha a porta que a aplicação vai usar (por exemplo, 8000)
-EXPOSE 8000
+# Exponha a porta que a aplicação vai usar (por exemplo, 8001)
+EXPOSE 8001
 
 # Comando para executar a aplicação
 ENTRYPOINT java -jar -Dspring.profiles.active=prod /app/*.jar
