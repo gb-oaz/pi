@@ -10,6 +10,7 @@ import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
 import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
 
+import com.pi.core_auth.core.enums.CommandType;
 import com.pi.core_auth.core.utils.constants.Router;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -48,7 +49,7 @@ public class GlobalSecurityConfig {
                     authorize.requestMatchers(HttpMethod.GET, "/docs/**").permitAll();
                     // MS_AUTH
                     authorize.requestMatchers(HttpMethod.GET, com.pi.core_auth.core.utils.constants.Router.SERVER_INFO).permitAll();
-                    authorize.requestMatchers(HttpMethod.POST, Router.POST_ANONYMOUS_TOKEN + "/**").permitAll();
+                    authorize.requestMatchers(HttpMethod.POST, Router.POST_ANONYMOUS_TOKEN + "/" + CommandType.POST_ANONYMOUS_TOKEN.name()).permitAll();
 
                     // MS_USER
                     authorize.requestMatchers(HttpMethod.GET, com.pi.core_user.utils.constants.Router.SERVER_INFO).permitAll();
@@ -58,8 +59,8 @@ public class GlobalSecurityConfig {
                 .csrf(csrf -> {
                     csrf.ignoringRequestMatchers(com.pi.core_auth.core.utils.constants.Router.SERVER_INFO);
                     csrf.ignoringRequestMatchers(com.pi.core_user.utils.constants.Router.SERVER_INFO);
-                    csrf.ignoringRequestMatchers(Router.POST_ANONYMOUS_TOKEN + "/**");
-                    csrf.ignoringRequestMatchers(Router.POST_SIGN_IN_TOKEN + "/**");
+                    csrf.ignoringRequestMatchers(Router.POST_ANONYMOUS_TOKEN + "/" + CommandType.POST_ANONYMOUS_TOKEN.name());
+                    csrf.ignoringRequestMatchers(Router.POST_SIGN_IN_TOKEN + "/" + CommandType.POST_SIGN_IN_TOKEN.name());
                 })
                 .httpBasic(Customizer.withDefaults())
                 .oauth2ResourceServer(oauth2 -> oauth2
