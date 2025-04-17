@@ -10,6 +10,7 @@ import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
 import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
 
+import com.pi.core_auth.core.utils.constants.Router;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -46,18 +47,26 @@ public class GlobalSecurityConfig {
                     // SWAGGER - REDDOCs
                     authorize.requestMatchers(HttpMethod.GET, "/docs/**").permitAll();
                     // MS_AUTH
-                    authorize.requestMatchers(HttpMethod.GET, com.pi.core_auth.utils.constants.Router.SERVER_INFO).permitAll();
+                    authorize.requestMatchers(HttpMethod.GET, com.pi.core_auth.core.utils.constants.Router.SERVER_INFO).permitAll();
+                    authorize.requestMatchers(HttpMethod.POST, Router.POST_ANONYMOUS_TOKEN + "/**").permitAll();
+
                     // MS_USER
                     authorize.requestMatchers(HttpMethod.GET, com.pi.core_user.utils.constants.Router.SERVER_INFO).permitAll();
                     // OTHER REQUESTS
                     authorize.anyRequest().authenticated();
                 })
                 .csrf(csrf -> {
-                    csrf.ignoringRequestMatchers(com.pi.core_auth.utils.constants.Router.SERVER_INFO);
+                    csrf.ignoringRequestMatchers(com.pi.core_auth.core.utils.constants.Router.SERVER_INFO);
                     csrf.ignoringRequestMatchers(com.pi.core_user.utils.constants.Router.SERVER_INFO);
+                    csrf.ignoringRequestMatchers(Router.POST_ANONYMOUS_TOKEN + "/**");
+                    csrf.ignoringRequestMatchers(Router.POST_SIGN_IN_TOKEN + "/**");
                 })
                 .httpBasic(Customizer.withDefaults())
-                .oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()))
+                .oauth2ResourceServer(oauth2 -> oauth2
+                        .jwt(jwt -> jwt.decoder(jwtDecoder()))
+                        .accessDeniedHandler(new BearerTokenAccessDeniedHandler())
+                        .authenticationEntryPoint(new BearerTokenAuthenticationEntryPoint())
+                )
                 .sessionManagement((session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .exceptionHandling((exceptions) -> exceptions
                         .authenticationEntryPoint(new BearerTokenAuthenticationEntryPoint())

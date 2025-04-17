@@ -1,6 +1,6 @@
 package com.pi;
 
-import com.pi.core_auth.utils.constants.Router;
+import com.pi.core_auth.core.utils.constants.Router;
 
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
@@ -41,6 +41,23 @@ public class Auth {
                 .pathsToMatch(paths)
                 .build();
     }
+
+    @Bean
+    public GroupedOpenApi infoAuthResources() {
+        String[] paths = { "/auth/v1/**" };
+        var info = new Info()
+                .title("2 - MS Auth v1")
+                .version("1.0.0")
+                .description("This microservice is fundamental for manipulation account and credentials.")
+                .contact(new Contact().email(email));
+
+        return GroupedOpenApi.builder()
+                .group("2 - MS Auth v1")
+                .addOpenApiCustomizer(openApi -> openApi.info(info))
+                .pathsToMatch(paths)
+                .build();
+    }
+
 
     @Bean
     public OpenAPI customOpenAPI() {

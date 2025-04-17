@@ -1,6 +1,6 @@
 package com.pi.resources;
 
-import com.pi.core_auth.utils.constants.Router;
+import com.pi.core_auth.core.utils.constants.Router;
 import com.pi.utils.models.GlobalInfo;
 
 import io.swagger.v3.oas.annotations.Operation;
