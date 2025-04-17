@@ -28,33 +28,69 @@ import java.util.stream.Collectors;
 
 /**
  * Service class for handling the generation of anonymous tokens.
+ * <p>
+ * This class implements the {@link Callable} interface to generate a JWT token
+ * for a user based on their login credentials. It validates the user, builds
+ * the token claims, and encodes the token.
+ * </p>
  */
 @Service
 public class CasePostAnonymousToken implements Callable<Token> {
+    /**
+     * Expiry time for the token in seconds (approximately 1 day).
+     */
+    @Value("${jwt.expiry-seconds:86400}") private Long EXPIRY_SECONDS;
 
-    public static final String PUPIL = "PUPIL-";
+    /**
+     * Identifier for the JWT issuer.
+     */
+    @Value("${jwt.issuer:ms_auth}") private String MS_AUTH;
 
-    @Value("${jwt.expiry-seconds:86400}") // Default to 1 day
-    private Long EXPIRY_SECONDS;
+    /**
+     * Prefix for the subject of the JWT token.
+     */
+    private static final String PUPIL = "PUPIL-";
 
-    @Value("${jwt.issuer:ms_auth}")
-    private String MS_AUTH;
+    /**
+     * SecureRandom instance for generating random numbers.
+     */
+    private static final SecureRandom SECURE_RANDOM = new SecureRandom();
 
+    /**
+     * JWT encoder used to encode the token.
+     */
     private final JwtEncoder encoder;
 
+    /**
+     * Data transfer object containing the command details.
+     */
     private CommandDto commandDto;
 
-    private static final SecureRandom secureRandom = new SecureRandom();
-
+    /**
+     * Constructs a {@code CasePostAnonymousToken} instance with a provided {@link JwtEncoder}.
+     *
+     * @param encoder the {@link JwtEncoder} used to encode JWT tokens.
+     */
     @Autowired
     public CasePostAnonymousToken(JwtEncoder encoder) {
         this.encoder = encoder;
     }
 
+    /**
+     * Sets the command data transfer object.
+     *
+     * @param commandDto the {@link CommandDto} containing the command details.
+     */
     public void setCommandDto(CommandDto commandDto) {
         this.commandDto = Objects.requireNonNull(commandDto, "CommandDto cannot be null");
     }
 
+    /**
+     * Executes the token generation process.
+     *
+     * @return the generated {@link Token}.
+     * @throws GlobalException if validation fails or an error occurs.
+     */
     @Override
     public Token call() throws GlobalException {
         commandDto.validate();
@@ -62,6 +98,11 @@ public class CasePostAnonymousToken implements Callable<Token> {
         return generateToken(claims);
     }
 
+    /**
+     * Builds the JWT claims for the token.
+     *
+     * @return the {@link JwtClaimsSet} containing the token claims.
+     */
     protected JwtClaimsSet buildClaims() {
         var now = Instant.now();
         return JwtClaimsSet.builder()
@@ -73,6 +114,13 @@ public class CasePostAnonymousToken implements Callable<Token> {
                 .build();
     }
 
+    /**
+     * Generates the JWT token based on the provided claims.
+     *
+     * @param claims the {@link JwtClaimsSet} containing the token claims.
+     * @return the generated {@link Token}.
+     * @throws GlobalException if an error occurs during token generation.
+     */
     protected Token generateToken(JwtClaimsSet claims) {
         try {
             var now = Instant.now();
@@ -91,6 +139,11 @@ public class CasePostAnonymousToken implements Callable<Token> {
         }
     }
 
+    /**
+     * Retrieves the authorities for the user's scopes.
+     *
+     * @return a {@link Set} of {@link GrantedAuthority} representing the user's scopes.
+     */
     protected Set<GrantedAuthority> getAuthoritiesScopes() {
         var scopes = EnumSet.of(ScopeType.ANONYMOUS);
         return scopes.stream()
@@ -105,7 +158,7 @@ public class CasePostAnonymousToken implements Callable<Token> {
      */
     protected static String generateToken() {
         long currentTimeMillis = System.currentTimeMillis();
-        int randomInt = secureRandom.nextInt();
+        int randomInt = SECURE_RANDOM.nextInt();
         return Long.toHexString(currentTimeMillis) + Integer.toHexString(randomInt);
     }
 }
