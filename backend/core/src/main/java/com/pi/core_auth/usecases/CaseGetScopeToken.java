@@ -6,13 +6,13 @@ import com.pi.core_auth.core.utils.constants.Claim;
 import com.pi.core_auth.core.utils.constants.Response;
 import com.pi.core_auth.core.utils.services.Utils;
 import com.pi.utils.exceptions.GlobalException;
+
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import java.util.EnumSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
