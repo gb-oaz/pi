@@ -7,6 +7,8 @@ import com.pi.core_auth.core.utils.constants.Response;
 import com.pi.core_auth.core.utils.services.Utils;
 import com.pi.utils.exceptions.GlobalException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -26,6 +28,8 @@ import java.util.stream.Collectors;
  */
 @Service
 public class CaseGetScopeToken implements Callable<Response> {
+    private static final Logger LOG = LoggerFactory.getLogger(CaseGetScopeToken.class);
+
     /**
      * JWT decoder used to decode token.
      */
@@ -62,9 +66,12 @@ public class CaseGetScopeToken implements Callable<Response> {
      */
     @Override
     public Response call() throws GlobalException {
+        LOG.info("Init CaseGetScopeToken call.");
         var token = queryDto.validate();
         var onlyToken = Utils.removePrefixBearerToToken(token.getToken());
-        return getScopeToken(onlyToken);
+        var scope = getScopeToken(onlyToken);
+        LOG.info("End CaseGetScopeToken call.");
+        return scope;
     }
 
     /**
@@ -74,10 +81,13 @@ public class CaseGetScopeToken implements Callable<Response> {
      * @return a {@link Response} object containing the scope of the token.
      */
     protected Response getScopeToken(String token) {
+        LOG.info("Init Get scope token from token: {}", token);
         var jwt = jwtDecoder.decode(token);
         var scopes = jwt.getClaimAsStringList(Claim.SCOPE);
+        var scopeSet = convertToEnumSet(scopes);
+        LOG.info("End Get scope token from token: {}", token);
         return Response.builder()
-                .scope(convertToEnumSet(scopes))
+                .scope(scopeSet)
                 .build();
     }
 
@@ -88,6 +98,7 @@ public class CaseGetScopeToken implements Callable<Response> {
      * @return an {@link EnumSet} of {@link ScopeType} representing the converted scopes.
      */
     protected EnumSet<ScopeType> convertToEnumSet(List<String> scopes) {
+        LOG.info("Convert To EnumSet with scopes: {}", scopes);
         if (CollectionUtils.isEmpty(scopes)) return EnumSet.noneOf(ScopeType.class);
 
         return scopes.stream()

@@ -10,6 +10,8 @@ import com.pi.utils.enums.SystemCodeEnum;
 import com.pi.utils.exceptions.GlobalException;
 import com.pi.utils.models.CustomAlert;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.GrantedAuthority;
@@ -36,6 +38,8 @@ import java.util.stream.Collectors;
  */
 @Service
 public class CasePostSignInToken implements Callable<Token> {
+    private static final Logger LOG = LoggerFactory.getLogger(CasePostSignInToken.class);
+
     /**
      * Expiry time for the token in seconds (approximately 1 month).
      */
@@ -97,10 +101,13 @@ public class CasePostSignInToken implements Callable<Token> {
      */
     @Override
     public Token call() throws GlobalException {
+        LOG.info("Init CasePostSignInToken call.");
         commandDto.validate();
         var scopes = findRolesUserIfExist();
         var claims = buildClaims(scopes);
-        return generateToken(claims);
+        var token = generateToken(claims);
+        LOG.info("End CasePostSignInToken call.");
+        return token;
     }
 
     /**
@@ -110,13 +117,16 @@ public class CasePostSignInToken implements Callable<Token> {
      * @throws GlobalException if the user does not exist or an error occurs.
      */
     protected EnumSet<ScopeType> findRolesUserIfExist() throws GlobalException {
+        LOG.info("Init Find roles user if exist.");
         var scopes = authCommandOut.existUser(commandDto.login(), commandDto.code(), commandDto.password());
         if (scopes.isEmpty()) {
+            LOG.warn("{} - User not found.", SystemCodeEnum.C050PI.name());
             throw GlobalException.builder()
                     .status(401)
                     .alert(new CustomAlert(SystemCodeEnum.C050PI))
                     .build();
         }
+        LOG.info("End Find roles user if exist.");
         return scopes;
     }
 
@@ -127,6 +137,7 @@ public class CasePostSignInToken implements Callable<Token> {
      * @return the {@link JwtClaimsSet} containing the token claims.
      */
     protected JwtClaimsSet buildClaims(EnumSet<ScopeType> scopes) {
+        LOG.info("Init Build claims for token.");
         var now = Instant.now();
         return JwtClaimsSet.builder()
                 .issuer(MS_AUTH)
@@ -146,6 +157,7 @@ public class CasePostSignInToken implements Callable<Token> {
      */
     protected Token generateToken(JwtClaimsSet claims) {
         try {
+            LOG.info("Init Generate token.");
             var now = Instant.now();
             var jwtToken = encoder.encode(JwtEncoderParameters.from(claims)).getTokenValue();
             return Token.builder()
@@ -155,6 +167,7 @@ public class CasePostSignInToken implements Callable<Token> {
                     .status(StatusType.ACTIVE)
                     .build();
         } catch (Exception e) {
+            LOG.error("Error generating token: {}", e.getMessage());
             throw GlobalException.builder()
                     .status(401)
                     .alert(new CustomAlert(SystemCodeEnum.C050PI))
@@ -169,6 +182,7 @@ public class CasePostSignInToken implements Callable<Token> {
      * @return a {@link Set} of {@link GrantedAuthority} representing the user's scopes.
      */
     protected Set<GrantedAuthority> getAuthoritiesScopes(EnumSet<ScopeType> scopes) {
+        LOG.info("Get authorities scopes for user session.");
         return scopes.stream()
                 .map(role -> new SimpleGrantedAuthority(role.name()))
                 .collect(Collectors.toSet());

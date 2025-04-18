@@ -9,6 +9,8 @@ import com.pi.utils.enums.SystemCodeEnum;
 import com.pi.utils.exceptions.GlobalException;
 import com.pi.utils.models.CustomAlert;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.GrantedAuthority;
@@ -36,6 +38,8 @@ import java.util.stream.Collectors;
  */
 @Service
 public class CasePostAnonymousToken implements Callable<Token> {
+    private static final Logger LOG = LoggerFactory.getLogger(CasePostAnonymousToken.class);
+
     /**
      * Expiry time for the token in seconds (approximately 1 day).
      */
@@ -93,9 +97,12 @@ public class CasePostAnonymousToken implements Callable<Token> {
      */
     @Override
     public Token call() throws GlobalException {
+        LOG.info("Init CasePostAnonymousToken call.");
         commandDto.validate();
         var claims = buildClaims();
-        return generateToken(claims);
+        var token = generateToken(claims);
+        LOG.info("End CasePostAnonymousToken call.");
+        return token;
     }
 
     /**
@@ -104,6 +111,7 @@ public class CasePostAnonymousToken implements Callable<Token> {
      * @return the {@link JwtClaimsSet} containing the token claims.
      */
     protected JwtClaimsSet buildClaims() {
+        LOG.info("Init Build claims for token.");
         var now = Instant.now();
         return JwtClaimsSet.builder()
                 .issuer(MS_AUTH)
@@ -123,6 +131,7 @@ public class CasePostAnonymousToken implements Callable<Token> {
      */
     protected Token generateToken(JwtClaimsSet claims) {
         try {
+            LOG.info("Init Generate token.");
             var now = Instant.now();
             var jwtToken = encoder.encode(JwtEncoderParameters.from(claims)).getTokenValue();
             return Token.builder()
@@ -132,6 +141,7 @@ public class CasePostAnonymousToken implements Callable<Token> {
                     .status(StatusType.ACTIVE)
                     .build();
         } catch (Exception e) {
+            LOG.error("Error generating token: {}", e.getMessage());
             throw GlobalException.builder()
                     .status(500)
                     .alert(new CustomAlert(SystemCodeEnum.C050PI))
@@ -145,6 +155,7 @@ public class CasePostAnonymousToken implements Callable<Token> {
      * @return a {@link Set} of {@link GrantedAuthority} representing the user's scopes.
      */
     protected Set<GrantedAuthority> getAuthoritiesScopes() {
+        LOG.info("Get authorities scopes for anonymous session.");
         var scopes = EnumSet.of(ScopeType.ANONYMOUS);
         return scopes.stream()
                 .map(role -> new SimpleGrantedAuthority(role.name()))
@@ -157,6 +168,7 @@ public class CasePostAnonymousToken implements Callable<Token> {
      * @return the generated token. ex - 17f9343c5c114ed6a
      */
     protected static String generateToken() {
+        LOG.info("Generate token for anonymous pupil session.");
         long currentTimeMillis = System.currentTimeMillis();
         int randomInt = SECURE_RANDOM.nextInt();
         return Long.toHexString(currentTimeMillis) + Integer.toHexString(randomInt);

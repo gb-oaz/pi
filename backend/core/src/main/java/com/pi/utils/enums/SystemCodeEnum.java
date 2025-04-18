@@ -45,7 +45,10 @@ public enum SystemCodeEnum {
 
     // RANGE Authorization and Authentication ---- //
     C050PI("Error in Authentication", "Your user not have access to this resource"),
-    C051PI("Error in Authorization", "Your user not have permission to this resource");
+    C051PI("Error in Authorization", "Your user not have permission to this resource"),
+
+    // RANGE Token ---- //
+    C060PI("Unknown result token validation", "Check your token format"),;
 
     private final String problem;
     private final String action;

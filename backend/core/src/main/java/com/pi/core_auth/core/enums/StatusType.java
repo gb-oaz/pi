@@ -28,7 +28,12 @@ public enum StatusType {
     /**
      * Indicates that the token is expired and cannot be used.
      */
-    EXPIRED("The token is expired and cannot be used."),;
+    EXPIRED("The token is expired and cannot be used."),
+
+    /**
+     * Indicates that the token is invalid and cannot be used.
+     */
+    INVALID("The token is invalid and cannot be used."),;
 
     private final String description;
 

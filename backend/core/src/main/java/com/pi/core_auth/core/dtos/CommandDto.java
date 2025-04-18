@@ -7,6 +7,8 @@ import com.pi.utils.enums.SystemCodeEnum;
 import com.pi.utils.exceptions.GlobalException;
 import com.pi.utils.interfaces.IGValidationDto;
 import com.pi.utils.models.CustomAlert;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 
@@ -17,8 +19,12 @@ public record CommandDto(
         String password,
         String anonymousToken
 ) implements IGValidationDto<Map<String, Object>> {
+    private static final Logger LOG = LoggerFactory.getLogger(CommandDto.class);
+    private static final String LOG_MESSAGE_FORMAT = "CommandDto - {} - : {}.";
+
     @Override
     public Map<String, Object> validate() throws GlobalException {
+        LOG.info(LOG_MESSAGE_FORMAT, commandType, this);
         Validate.command(commandType.toString());
 
         return switch (commandType) {
@@ -38,6 +44,7 @@ public record CommandDto(
                 yield  Map.of();
             }
             default -> {
+                LOG.error("{} - Invalid command type.", SystemCodeEnum.C030PI.name());
                 throw GlobalException.builder()
                         .status(400)
                         .alert(new CustomAlert(SystemCodeEnum.C030PI))

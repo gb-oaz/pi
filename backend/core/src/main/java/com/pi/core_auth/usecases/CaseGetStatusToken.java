@@ -5,8 +5,12 @@ import com.pi.core_auth.core.dtos.QueryDto;
 import com.pi.core_auth.core.enums.StatusType;
 import com.pi.core_auth.core.utils.constants.Response;
 import com.pi.core_auth.core.utils.services.Utils;
+import com.pi.utils.enums.SystemCodeEnum;
 import com.pi.utils.exceptions.GlobalException;
 
+import com.pi.utils.models.CustomAlert;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtException;
@@ -24,6 +28,8 @@ import java.util.concurrent.Callable;
  */
 @Service
 public class CaseGetStatusToken implements Callable<Response> {
+    private static final Logger LOG = LoggerFactory.getLogger(CaseGetStatusToken.class);
+
     /**
      * JWT decoder used to decode token.
      */
@@ -61,9 +67,12 @@ public class CaseGetStatusToken implements Callable<Response> {
      */
     @Override
     public Response call() throws GlobalException {
+        LOG.info("Init CaseGetStatusToken call.");
         var token = queryDto.validate();
         var onlyToken = Utils.removePrefixBearerToToken(token.getToken());
-        return validateTokenStatus(onlyToken);
+        var response =  validateTokenStatus(onlyToken);
+        LOG.info("End CaseGetStatusToken call.");
+        return response;
     }
 
     /**
@@ -74,14 +83,31 @@ public class CaseGetStatusToken implements Callable<Response> {
      */
     protected Response validateTokenStatus(String token) {
         try {
+            LOG.info("Init Check status token from token: {}", token);
             jwtDecoder.decode(token);
+            LOG.info("Token is valid.");
             return Response.builder()
                 .status(StatusType.ACTIVE)
                 .build();
         } catch (JwtException e) {
-            return Response.builder()
-                .status(StatusType.EXPIRED)
-                .build();
+            LOG.warn("Error decoding token: {}", e.getMessage());
+            if (e.getMessage().contains("Expired")) {
+                LOG.info("Token is expired.");
+                return Response.builder()
+                    .status(StatusType.EXPIRED)
+                    .build();
+            } else if (e.getMessage().contains("Invalid")) {
+                LOG.info("Token is invalid.");
+                return Response.builder()
+                    .status(StatusType.INVALID)
+                    .build();
+            } else {
+                LOG.error("Token is invalid.");
+                throw GlobalException.builder()
+                    .status(422)
+                    .alert(new CustomAlert(SystemCodeEnum.C060PI))
+                    .build();
+            }
         }
     }
 }

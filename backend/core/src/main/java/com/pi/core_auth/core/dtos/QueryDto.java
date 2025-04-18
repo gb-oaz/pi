@@ -7,13 +7,19 @@ import com.pi.utils.enums.SystemCodeEnum;
 import com.pi.utils.exceptions.GlobalException;
 import com.pi.utils.interfaces.IGValidationDto;
 import com.pi.utils.models.CustomAlert;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public record QueryDto(
         QueryType queryType,
         String token
 ) implements IGValidationDto<Token> {
+    private static final Logger LOG = LoggerFactory.getLogger(QueryDto.class);
+    private static final String LOG_MESSAGE_FORMAT = "QueryDto - {} - : {}.";
+
     @Override
     public Token validate() throws GlobalException {
+        LOG.info(LOG_MESSAGE_FORMAT, queryType, this);
         Validate.query(queryType.toString());
 
         return switch (queryType) {
@@ -24,6 +30,7 @@ public record QueryDto(
                     .build();
             }
             default -> {
+                LOG.error("{} - Invalid query type.", SystemCodeEnum.C010PI.name());
                 throw GlobalException.builder()
                     .status(400)
                     .alert(new CustomAlert(SystemCodeEnum.C010PI))
