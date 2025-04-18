@@ -18,8 +18,8 @@ import java.util.concurrent.Callable;
 /**
  * Service class for handling token status verification.
  * <p>
- * This class implements the {@link Callable} interface to verify
- * and return the status of a JWT token.
+ *      This class implements the {@link Callable} interface to verify
+ *      and return the status of a JWT token.
  * </p>
  */
 @Service
