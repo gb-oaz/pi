@@ -21,6 +21,12 @@ public class Router {
     public static final String GET_STATUS_TOKEN = "/auth/v1/get/status/token";
 
     /**
+     * The route for getScopeToken.
+     * This route points to the "/auth/v1/get/scope/token" endpoint.
+     */
+    public static final String GET_SCOPE_TOKEN = "/auth/v1/get/scope/token";
+
+    /**
      * The route for postSignInToken.
      * This route points to the "/auth/v1/post/sign/in/token" endpoint.
      */

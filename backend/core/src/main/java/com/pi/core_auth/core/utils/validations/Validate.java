@@ -43,7 +43,7 @@ public class Validate {
     }
 
     public static void login(String login) {
-        if (ObjectUtils.isEmpty(login) && !Regex.LOGIN.matches(login)) {
+        if (ObjectUtils.isEmpty(login) || !login.matches(Regex.LOGIN)) {
             throw GlobalException.builder()
                     .status(400)
                     .alert(new CustomAlert(SystemCodeEnum.C031PI))
@@ -52,7 +52,7 @@ public class Validate {
     }
 
     public static void code(String code) {
-        if (ObjectUtils.isEmpty(code) && !Regex.CODE.matches(code)) {
+        if (ObjectUtils.isEmpty(code) || !code.matches(Regex.CODE)) {
             throw GlobalException.builder()
                     .status(400)
                     .alert(new CustomAlert(SystemCodeEnum.C032PI))
@@ -61,7 +61,7 @@ public class Validate {
     }
 
     public static void password(String password) {
-        if (ObjectUtils.isEmpty(password) && !Regex.PASSWORD.matches(password)) {
+        if (ObjectUtils.isEmpty(password) || !password.matches(Regex.PASSWORD)) {
             throw GlobalException.builder()
                     .status(400)
                     .alert(new CustomAlert(SystemCodeEnum.C033PI))

@@ -16,12 +16,15 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.EnumSet;
 
 @RestController
-public class AuthController implements IAuthCommandIn {
+public class AuthCommandAdapterController implements IAuthCommandIn {
 
     private final CasePostSignInToken casePostSignInToken;
     private final CasePostAnonymousToken casePostAnonymousToken;
 
-    public AuthController(CasePostSignInToken casePostSignInToken, CasePostAnonymousToken casePostAnonymousToken) {
+    public AuthCommandAdapterController(
+            CasePostSignInToken casePostSignInToken,
+            CasePostAnonymousToken casePostAnonymousToken
+    ) {
         this.casePostSignInToken = casePostSignInToken;
         this.casePostAnonymousToken = casePostAnonymousToken;
         this.casePostSignInToken.setServices(new MockAuthCommandOutAdapter());
@@ -46,6 +49,7 @@ public class AuthController implements IAuthCommandIn {
         var dto = CommandDto.builder()
                 .commandType(CommandType.valueOf(commandType))
                 .build();
+
         casePostAnonymousToken.setCommandDto(dto);
         return ResponseEntity.status(201).body(casePostAnonymousToken.call());
     }

@@ -1,5 +1,6 @@
 package com.pi.core_auth.core.domains;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.pi.core_auth.core.enums.StatusType;
 
 /**
@@ -34,6 +35,7 @@ import com.pi.core_auth.core.enums.StatusType;
  * @author GustavoBoaz
  * @since 1.0
  */
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class Token {
     private String token;
     private String createAt;

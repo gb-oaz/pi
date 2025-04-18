@@ -13,20 +13,20 @@ public class Regex {
 
     /**
      * Regular expression pattern for validating login.
-     * The login must be at least 8 characters uppercase letters.
+     * The login must be between 8 and 15 characters in capital letters.
      */
-    public static final String LOGIN = "^[A-Z]{8,}$";
+    public static final String LOGIN = "^[A-Z]{8,15}$";
 
     /**
      * Regular expression pattern for validating code.
      * The code must be at least 6 numbers.
      */
-    public static final String CODE = "^[0-9]{6,}$";
+    public static final String CODE = "^[0-9]{6,6}$";
 
     /**
      * Regular expression pattern for validating password.
-     * The password must be at least 15 characters long, containing at least one lowercase letter,
+     * The password must be between 15 and 25 characters long, containing at least one lowercase letter,
      * one uppercase letter, one digit, and one special character !?@#$%&.
      */
-    public static final String PASSWORD = "^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!?@#$%&]).{15,}$";
+    public static final String PASSWORD = "^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!?@#$%&]).{15,25}$";
 }

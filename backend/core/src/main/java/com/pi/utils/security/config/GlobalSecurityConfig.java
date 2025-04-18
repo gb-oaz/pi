@@ -11,6 +11,7 @@ import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
 
 import com.pi.core_auth.core.enums.CommandType;
+import com.pi.core_auth.core.enums.QueryType;
 import com.pi.core_auth.core.utils.constants.Router;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -20,15 +21,12 @@ import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
 import org.springframework.security.oauth2.server.resource.web.BearerTokenAuthenticationEntryPoint;
 import org.springframework.security.oauth2.server.resource.web.access.BearerTokenAccessDeniedHandler;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
@@ -37,9 +35,6 @@ public class GlobalSecurityConfig {
 
     @Value("${jwt.public.key}") RSAPublicKey publicKey;
     @Value("${jwt.private.key}") RSAPrivateKey privateKey;
-    @Value("${credentials.username}") String username;
-    @Value("${credentials.password}") String password;
-    @Value("${credentials.authorities}") String authorities;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -61,6 +56,8 @@ public class GlobalSecurityConfig {
                     csrf.ignoringRequestMatchers(com.pi.core_user.utils.constants.Router.SERVER_INFO);
                     csrf.ignoringRequestMatchers(Router.POST_ANONYMOUS_TOKEN + "/" + CommandType.POST_ANONYMOUS_TOKEN.name());
                     csrf.ignoringRequestMatchers(Router.POST_SIGN_IN_TOKEN + "/" + CommandType.POST_SIGN_IN_TOKEN.name());
+                    csrf.ignoringRequestMatchers(Router.GET_STATUS_TOKEN + "/" + QueryType.GET_STATUS_TOKEN.name());
+                    csrf.ignoringRequestMatchers(Router.GET_SCOPE_TOKEN + "/" + QueryType.GET_SCOPE_TOKEN.name());
                 })
                 .httpBasic(Customizer.withDefaults())
                 .oauth2ResourceServer(oauth2 -> oauth2
@@ -74,16 +71,6 @@ public class GlobalSecurityConfig {
                         .accessDeniedHandler(new BearerTokenAccessDeniedHandler())
                 );
         return http.build();
-    }
-
-    @Bean
-    UserDetailsService users() {
-        return new InMemoryUserDetailsManager(
-                User.withUsername(username)
-                        .password("{noop}" + password)
-                        .authorities(authorities)
-                        .build()
-        );
     }
 
     @Bean

@@ -48,7 +48,95 @@ public class Auth {
         var info = new Info()
                 .title("2 - MS Auth v1")
                 .version("1.0.0")
-                .description("This microservice is fundamental for manipulation account and credentials.")
+                .description("""
+                        # 🔐 Fluxo de Utilização da API de Autenticação
+                        
+                        ## 1. Obter Token Anônimo
+                        
+                        **Endpoint:** \s
+                        `POST /auth/v1/post/anonymous/token/POST_ANONYMOUS_TOKEN`
+                        
+                        **Uso:** \s
+                        Utilizado como primeiro passo para interações. Gera um token anônimo para ser usado nas próximas requisições.
+                        
+                        **Resposta:**
+                        ```json
+                        {
+                          "token": "Bearer <anonymous-token>",
+                          "createAt": "2024-09-23T10:00:00Z",
+                          "expiryAt": "2024-09-24T10:00:00Z",
+                          "status": "ACTIVE"
+                        }
+                        ```
+                        
+                        ---
+                        
+                        ## 2. Login e Geração de Token de Acesso
+                        
+                        **Endpoint:** \s
+                        `POST /auth/v1/post/sign/in/token/POST_SIGN_IN_TOKEN`
+                        
+                        **Headers:**
+                        ```
+                        Authorization: Bearer <anonymous-token>
+                        Content-Type: multipart/form-data
+                        ```
+                        
+                        **Body:**
+                        - `login`: mínimo 8 caracteres, letras maiúsculas.
+                        
+                        - `code`: mínimo 6 dígitos numéricos.
+                        
+                        - `password`: mínimo 15 caracteres, com letras maiúsculas, minúsculas, números e especiais.
+                        
+                        **Resposta:**
+                        ```json
+                        {
+                          "token": "Bearer <access-token>",
+                          "createAt": "2024-09-23T10:00:00Z",
+                          "expiryAt": "2024-09-24T10:00:00Z",
+                          "status": "ACTIVE"
+                        }
+                        ```
+                        
+                        ---
+                        
+                        ## 3. Validar Status do Token
+                        
+                        **Endpoint:** \s
+                        `GET /auth/v1/get/status/token/GET_STATUS_TOKEN`
+                        
+                        **Headers:**
+                        ```
+                        Authorization: Bearer <access-token>
+                        ```
+                        
+                        **Resposta:**
+                        ```json
+                        {
+                          "status": "ACTIVE"
+                        }
+                        ```
+                        
+                        ---
+                        
+                        ## 4. Validar Scope do Token
+                        
+                        **Endpoint:** \s
+                        `GET /auth/v1/get/scope/token/GET_SCOPE_TOKEN`
+                        
+                        **Headers:**
+                        ```
+                        Authorization: Bearer <access-token>
+                        ```
+                        
+                        **Resposta:**
+                        ```json
+                        {
+                          "scope": ["SCOPE_ANONYMOUS", "SCOPE_TEACHER", "SCOPE_STUDENT"]
+                        }
+                        ```
+                        """)
                 .contact(new Contact().email(email));
 
         return GroupedOpenApi.builder()

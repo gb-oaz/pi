@@ -20,11 +20,6 @@ springdoc:
   api-docs:
     path: /docs/openapi
 
-credentials:
-  username: pi
-  password: pi
-  authorities: app
-
 jwt:
   private:
     key: classpath:private.key

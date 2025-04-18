@@ -26,6 +26,15 @@ public enum QueryType {
     GET_STATUS_TOKEN(
         "Retrieve the status of a token. Use this query to validate or check the status of a token.",
         EnumSet.of(ScopeType.ANONYMOUS, ScopeType.STUDENT, ScopeType.TEACHER)
+    ),
+
+    /**
+     * Query to retrieve the permissions associated with a token.
+     * Suggested for use in scenarios where permission checks are required.
+     */
+    GET_SCOPE_TOKEN(
+        "Retrieve the scope of a token. Use this query to check the permissions associated with a token.",
+        EnumSet.of(ScopeType.ANONYMOUS, ScopeType.STUDENT, ScopeType.TEACHER)
     );
 
     private final String description;

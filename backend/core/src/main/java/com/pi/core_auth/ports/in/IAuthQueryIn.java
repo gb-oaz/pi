@@ -1,7 +1,7 @@
 package com.pi.core_auth.ports.in;
 
-import com.pi.core_auth.core.domains.Token;
 import com.pi.core_auth.core.utils.constants.Request;
+import com.pi.core_auth.core.utils.constants.Response;
 import com.pi.core_auth.core.utils.constants.Router;
 import com.pi.utils.exceptions.GlobalException;
 
@@ -50,9 +50,6 @@ public interface IAuthQueryIn {
      * Example Response Body JSON:
      * <pre>
      * {
-     *     "token": "Bearer &lt;your-anonymous-access-token&gt;",
-     *     "createAt": "2024-09-23T10:00:00Z",
-     *     "expiryAt": "2024-09-24T10:00:00Z",
      *     "status": "ACTIVE"
      * }
      * </pre>
@@ -88,26 +85,119 @@ public interface IAuthQueryIn {
             **Example Response Body JSON:**
             ```json
             {
-                "token": "Bearer <your-anonymous-access-token>",
-                "createAt": "2024-09-23T10:00:00Z",
-                "expiryAt": "2024-09-24T10:00:00Z",
                 "status": "ACTIVE"
             }
 
             For more details, contact the developer team.
             """,
             responses = {
-                    @ApiResponse(responseCode = "200", description = "Token generated successfully", content = {
-                            @Content(mediaType = "application/json", schema = @Schema(implementation = Token.class))
+                    @ApiResponse(responseCode = "200", description = "Token validated successfully", content = {
+                            @Content(mediaType = "application/json", schema = @Schema(implementation = Response.class))
                     }),
-                    @ApiResponse(responseCode = "400 to 500", description = "Error", content = {
+                    @ApiResponse(responseCode = "400", description = "Error", content = {
+                            @Content(mediaType = "application/json", schema = @Schema(implementation = GlobalException.class))
+                    }),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized", content = {
+                            @Content(mediaType = "application/json", schema = @Schema(implementation = GlobalException.class))
+                    }),
+                    @ApiResponse(responseCode = "403", description = "Forbidden", content = {
+                            @Content(mediaType = "application/json", schema = @Schema(implementation = GlobalException.class))
+                    }),
+                    @ApiResponse(responseCode = "500", description = "Internal Server Error", content = {
                             @Content(mediaType = "application/json", schema = @Schema(implementation = GlobalException.class))
                     })
             }
     )
     @GetMapping(path = Router.GET_STATUS_TOKEN + "/{queryType}", produces = "application/json")
-    @PreAuthorize("hasRole('ROLE_ANONYMOUS') and hasAuthority('SCOPE_READ')")
-    ResponseEntity<Token> getStatusToken(
+    @PreAuthorize("hasAnyAuthority('SCOPE_ANONYMOUS', 'SCOPE_TEACHER', 'SCOPE_STUDENT')")
+    ResponseEntity<Response> getStatusToken(
+            @PathVariable(name = Request.QUERY_TYPE) String queryType,
+            @RequestHeader(name = Request.AUTHORIZATION) String authorization
+    ) throws GlobalException;
+
+    /**
+     * Retrieves the scope of a token.
+     * <p>
+     * This endpoint is used to retrieve the scope of a token. The query type
+     * must be {@code GET_SCOPE_TOKEN}, and the token must be valid.
+     * </p>
+     * <p>
+     * Example Path JSON:
+     * <pre>
+     * {
+     *     "path": "/auth/v1/get/scope/token/GET_SCOPE_TOKEN"
+     * }
+     * </pre>
+     * Example Headers JSON:
+     * <pre>
+     * {
+     *     "Authorization": "Bearer &lt;your-token&gt;"
+     * }
+     * </pre>
+     * Example Response Body JSON:
+     * <pre>
+     * {
+     *     "scope": ["SCOPE_ANONYMOUS", "SCOPE_TEACHER", "SCOPE_STUDENT"]
+     * }
+     * </pre>
+     * </p>
+     *
+     * @param queryType the type of query being performed, must be {@code GET_SCOPE_TOKEN}
+     * @param authorization the authorization header containing the bearer token
+     * @return a {@link ResponseEntity} containing the scope types if valid
+     * @throws GlobalException if the token is invalid or an error occurs
+     */
+    @Operation(
+            security = @SecurityRequirement(name = "bearer-key"),
+            description = """
+            ### Retrieve scope token
+            Use this endpoint to retrieve the scope of a token.
+            - The queryType must be GET_SCOPE_TOKEN.
+            - The token must be a valid token.
+            
+            **Example Path JSON:**
+            ```json
+            {
+                path: "/auth/v1/get/scope/token/GET_SCOPE_TOKEN"
+            }
+            ```
+            
+            **Example Headers JSON:**
+            ```json
+            {
+                "Authorization": "Bearer <your-token>",
+            }
+            ```
+            
+            **Example Response Body JSON:**
+            ```json
+            {
+                "scope": ["SCOPE_ANONYMOUS", "SCOPE_TEACHER", "SCOPE_STUDENT"]
+            }
+
+            For more details, contact the developer team.
+            """,
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Token scope retrieved successfully", content = {
+                            @Content(mediaType = "application/json", schema = @Schema(implementation = Response.class))
+                    }),
+                    @ApiResponse(responseCode = "400", description = "Error", content = {
+                            @Content(mediaType = "application/json", schema = @Schema(implementation = GlobalException.class))
+                    }),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized", content = {
+                            @Content(mediaType = "application/json", schema = @Schema(implementation = GlobalException.class))
+                    }),
+                    @ApiResponse(responseCode = "403", description = "Forbidden", content = {
+                            @Content(mediaType = "application/json", schema = @Schema(implementation = GlobalException.class))
+                    }),
+                    @ApiResponse(responseCode = "500", description = "Internal Server Error", content = {
+                            @Content(mediaType = "application/json", schema = @Schema(implementation = GlobalException.class))
+                    })
+            }
+    )
+    @GetMapping(path = Router.GET_SCOPE_TOKEN + "/{queryType}", produces = "application/json")
+    @PreAuthorize("hasAnyAuthority('SCOPE_ANONYMOUS', 'SCOPE_TEACHER', 'SCOPE_STUDENT')")
+    ResponseEntity<Response> getScopeToken(
             @PathVariable(name = Request.QUERY_TYPE) String queryType,
             @RequestHeader(name = Request.AUTHORIZATION) String authorization
     ) throws GlobalException;

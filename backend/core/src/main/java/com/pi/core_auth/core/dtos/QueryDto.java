@@ -17,7 +17,7 @@ public record QueryDto(
         Validate.query(queryType.toString());
 
         return switch (queryType) {
-            case GET_STATUS_TOKEN -> {
+            case GET_STATUS_TOKEN, GET_SCOPE_TOKEN -> {
                 Validate.token(token);
                 yield Token.builder()
                     .token(token)
