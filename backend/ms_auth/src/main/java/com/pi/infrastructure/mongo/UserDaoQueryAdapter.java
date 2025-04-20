@@ -5,6 +5,7 @@ import com.pi.core_auth.ports.out.IAuthQueryOut;
 import com.pi.utils.enums.SystemCodeEnum;
 import com.pi.utils.exceptions.GlobalException;
 import com.pi.utils.models.CustomAlert;
+import com.pi.utils.mongo.documents.UserDocument;
 import com.pi.utils.services.Crypt;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,8 +21,8 @@ import java.util.EnumSet;
 public class UserDaoQueryAdapter implements IAuthQueryOut {
     private static final String LOGIN = "login";
     private static final String CODE = "code";
-    private static final String PASSWORD = "password";
     private static final String RESPONSE_NOT_FOUND = "User not found";
+    private static final String RESPONSE_PASSWORD_NOT_MATCH = "User password not match";
 
     private final MongoTemplate template;
 
@@ -37,21 +38,25 @@ public class UserDaoQueryAdapter implements IAuthQueryOut {
     }
 
     protected UserDocument executeQueryAndCheckResponse(String login, String code, String password) {
-        var user = template.findOne(buildQuery(login, code, password), UserDocument.class);
-        if (ObjectUtils.isEmpty(user))
-            throw GlobalException.builder()
-                    .status(404)
-                    .alert(new CustomAlert(SystemCodeEnum.C003PI))
-                    .details(RESPONSE_NOT_FOUND)
-                    .build();
+        var user = template.findOne(buildQuery(login, code), UserDocument.class);
+        validate(ObjectUtils.isEmpty(user), 404, RESPONSE_NOT_FOUND);
+        validate(!Crypt.isMatch(password, user.getPassword()), 401, RESPONSE_PASSWORD_NOT_MATCH);
         return user;
     }
 
-    protected Query buildQuery(String login, String code, String password) {
+    protected static void validate(boolean logical, int status, String responsePasswordNotMatch) {
+        if (logical)
+            throw GlobalException.builder()
+                    .status(status)
+                    .alert(new CustomAlert(SystemCodeEnum.C003PI))
+                    .details(responsePasswordNotMatch)
+                    .build();
+    }
+
+    protected Query buildQuery(String login, String code) {
         var query = new Query();
         query.addCriteria(Criteria.where(LOGIN).is(login));
         query.addCriteria(Criteria.where(CODE).is(code));
-        query.addCriteria(Criteria.where(PASSWORD).is(Crypt.encrypt(password)));
         return query;
     }
 }

@@ -1,7 +1,10 @@
 package com.pi.core_user.ports.out;
 
+import com.pi.core_auth.core.enums.ScopeType;
 import com.pi.core_user.core.domains.User;
 import com.pi.utils.exceptions.GlobalException;
+
+import java.util.EnumSet;
 
 /**
  * Interface for handling user-related commands in the output port.
@@ -21,10 +24,11 @@ public interface IUserCommandOut {
      * @param login the user's login, must be at least 8 characters with uppercase letters
      * @param code the user's code, must be at least 6 numbers
      * @param password the user's password, must be at least 15 characters long with specific requirements
+     * @param scopes the user's scopes, must be a set of {@link ScopeType}
      * @return on {@link User} created
      * @throws GlobalException if occurs error during the process
      */
-    User createUser(final String name, final String email, final String login, final String code, final String password) throws GlobalException;
+    User createUser(final String name, final String email, final String login, final String code, final String password, final EnumSet<ScopeType> scopes) throws GlobalException;
 
     /**
      * Updates an existing user entity.

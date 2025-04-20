@@ -27,9 +27,10 @@ services:
       - pi_net
     depends_on:
       - mongo
+      - ms_user
     environment:
       - SPRING_DATA_MONGODB_URI=mongodb://mongo:27017
-      - SPRING_DATA_MONGODB_DATABASE=PI-C-Users
+      - SPRING_DATA_MONGODB_DATABASE=PI-DB-Users
   ms_user:
     container_name: ms_user
     build:
@@ -43,7 +44,7 @@ services:
       - mongo
     environment:
       - SPRING_DATA_MONGODB_URI=mongodb://mongo:27017
-      - SPRING_DATA_MONGODB_DATABASE=PI-C-Users
+      - SPRING_DATA_MONGODB_DATABASE=PI-DB-Users
 
 volumes:
   mongo_data:

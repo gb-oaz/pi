@@ -71,10 +71,33 @@ public class CaseGetUser implements Callable<User> {
     public User call() throws GlobalException {
         LOG.info("Init CaseGetUser call.");
         dto.validate();
+        ifUserGetByEmailLoginAndCodeCheck(dto.email(), dto.login(), dto.code());
         ifUserGetByLoginAndCodeCheck(dto.login(), dto.code());
         var user = findUserAndCheckIfUserExist();
         LOG.info("End CaseGetUser call.");
+        user.setPassword("***********");
         return user;
+    }
+
+    /**
+     * Checks if at least one field is provided.
+     * <p>
+     *     This method is used to check if at least one field is provided.
+     * </p>
+     * @param email the user's email
+     * @param login the user's login
+     * @param code the user's code
+     * @throws GlobalException if occurs error during the process
+     */
+    private void ifUserGetByEmailLoginAndCodeCheck(String email, String login, String code) {
+        LOG.info("Init CaseGetUser ifUserGetByEmailLoginAndCodeCheck call.");
+        if (ObjectUtils.isEmpty(email) && ObjectUtils.isEmpty(login) && ObjectUtils.isEmpty(code)) {
+            LOG.warn("Provide at least one field param email or login and code.");
+            throw GlobalException.builder()
+                    .status(404)
+                    .alert(new CustomAlert(SystemCodeEnum.C071PI))
+                    .build();
+        }
     }
 
     /**

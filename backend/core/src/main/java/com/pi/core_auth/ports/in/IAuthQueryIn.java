@@ -137,7 +137,9 @@ public interface IAuthQueryIn {
      * Example Response Body JSON:
      * <pre>
      * {
-     *     "scope": ["SCOPE_ANONYMOUS", "SCOPE_TEACHER", "SCOPE_STUDENT"]
+     *     "scope": ["SCOPE_ANONYMOUS", "SCOPE_TEACHER", "SCOPE_STUDENT"],
+     *     "login": "GUSTAVOBOAZ",
+     *     "code": "123456"
      * }
      * </pre>
      * </p>
@@ -172,7 +174,9 @@ public interface IAuthQueryIn {
             **Example Response Body JSON:**
             ```json
             {
-                "scope": ["SCOPE_ANONYMOUS", "SCOPE_TEACHER", "SCOPE_STUDENT"]
+                "scope": ["SCOPE_ANONYMOUS", "SCOPE_TEACHER", "SCOPE_STUDENT"],
+                "login": "GUSTAVOBOAZ",
+                "code": "123456"
             }
 
             For more details, contact the developer team.

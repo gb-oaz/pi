@@ -78,11 +78,12 @@ public class CaseCreateUser implements Callable<User> {
     @Override
     public User call() throws GlobalException {
         LOG.info("Init CaseCreateUser call.");
-        dto.validate();
-        existUserWithEmail();
-        existUserWithLoginAndCode();
-        var user = userCommandOut.createUser(dto.name(), dto.email(), dto.login(), dto.code(), Crypt.encrypt(dto.password()));
+        var dtoValid = dto.validate();
+        existUserWithEmail(dtoValid);
+        existUserWithLoginAndCode(dtoValid);
+        var user = userCommandOut.createUser(dtoValid.getName(), dtoValid.getEmail(), dtoValid.getLogin(), dtoValid.getCode(), Crypt.encrypt(dtoValid.getPassword()), dtoValid.getScopes());
         LOG.info("End CaseCreateUser call.");
+        user.setPassword("***********");
         return user;
     }
 
@@ -91,11 +92,11 @@ public class CaseCreateUser implements Callable<User> {
      *
      * @throws GlobalException If a user with the same email already exists.
      */
-    protected void existUserWithEmail() throws GlobalException {
+    protected void existUserWithEmail(User dtoValid) throws GlobalException {
         LOG.info("Init validation if exist user email.");
-        var user = userQueryOut.getUserByProjection(dto.email(), null, null);
+        var user = userQueryOut.getUserByProjection(dtoValid.getEmail(), null, null);
         if (!ObjectUtils.isEmpty(user)) {
-            LOG.warn("{} - User email already exist", dto.email());
+            LOG.warn("{} - User email already exist", dtoValid.getEmail());
             throw GlobalException.builder()
                     .status(409)
                     .alert(new CustomAlert(SystemCodeEnum.C052PI))
@@ -108,11 +109,11 @@ public class CaseCreateUser implements Callable<User> {
      *
      * @throws GlobalException If a user with the same login and code already exists.
      */
-    protected void existUserWithLoginAndCode() throws GlobalException {
+    protected void existUserWithLoginAndCode(User dtoValid) throws GlobalException {
         LOG.info("Init validation if exist user login and code.");
-        var user = userQueryOut.getUserByProjection(null, dto.login(), dto.code());
+        var user = userQueryOut.getUserByProjection(null, dtoValid.getLogin(), dtoValid.getCode());
         if (!ObjectUtils.isEmpty(user)) {
-            LOG.warn("{} # {} - User login and code already exist", dto.login(), dto.code());
+            LOG.warn("{} # {} - User login and code already exist", dtoValid.getLogin(), dtoValid.getCode());
             throw GlobalException.builder()
                     .status(409)
                     .alert(new CustomAlert(SystemCodeEnum.C053PI))

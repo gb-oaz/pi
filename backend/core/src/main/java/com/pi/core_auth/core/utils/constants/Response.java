@@ -14,6 +14,16 @@ public class Response {
     public EnumSet<ScopeType> scope;
 
     /**
+     * The login identifier of the user.
+     */
+    public String login;
+
+    /**
+     * The status code of the response.
+     */
+    public String code;
+
+    /**
      * Enum representing the status of the response.
      */
     public StatusType status;
@@ -25,6 +35,8 @@ public class Response {
      */
     private Response(Builder builder) {
         this.scope = builder.scope;
+        this.login = builder.login;
+        this.code = builder.code;
         this.status = builder.status;
     }
 
@@ -42,10 +54,22 @@ public class Response {
      */
     public static class Builder {
         private EnumSet<ScopeType> scope;
+        private String login;
+        private String code;
         private StatusType status;
 
         public Builder scope(EnumSet<ScopeType> scope) {
             this.scope = scope;
+            return this;
+        }
+
+        public Builder login(String login) {
+            this.login = login;
+            return this;
+        }
+
+        public Builder code(String code) {
+            this.code = code;
             return this;
         }
 

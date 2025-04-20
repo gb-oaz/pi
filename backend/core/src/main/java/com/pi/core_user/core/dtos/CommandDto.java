@@ -69,7 +69,10 @@ public record CommandDto(
             case COMMAND_PUT_UPDATE_USER -> {
                 if (!ObjectUtils.isEmpty(name)) Validate.name(name);
                 if (!ObjectUtils.isEmpty(email)) Validate.email(email);
-                if (!ObjectUtils.isEmpty(password)) Validate.password(password); Validate.password(oldPassword);
+                if (!ObjectUtils.isEmpty(password)) {
+                    Validate.password(password);
+                    Validate.password(oldPassword);
+                }
                 yield User.builder()
                         .name(name)
                         .email(email)

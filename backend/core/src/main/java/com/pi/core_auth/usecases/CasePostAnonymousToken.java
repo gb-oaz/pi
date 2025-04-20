@@ -112,13 +112,16 @@ public class CasePostAnonymousToken implements Callable<Token> {
      */
     protected JwtClaimsSet buildClaims() {
         LOG.info("Init Build claims for token.");
+        var code = generateRandomToken();
         var now = Instant.now();
         return JwtClaimsSet.builder()
                 .issuer(MS_AUTH)
                 .issuedAt(now)
                 .expiresAt(now.plusSeconds(EXPIRY_SECONDS))
-                .subject(PUPIL + generateToken())
+                .subject(PUPIL + code)
                 .claim(Claim.SCOPE, getAuthoritiesScopes().stream().map(GrantedAuthority::getAuthority).collect(Collectors.joining(" ")))
+                .claim(Claim.LOGIN, PUPIL)
+                .claim(Claim.CODE, code)
                 .build();
     }
 
@@ -167,7 +170,7 @@ public class CasePostAnonymousToken implements Callable<Token> {
      *
      * @return the generated token. ex - 17f9343c5c114ed6a
      */
-    protected static String generateToken() {
+    protected static String generateRandomToken() {
         LOG.info("Generate token for anonymous pupil session.");
         long currentTimeMillis = System.currentTimeMillis();
         int randomInt = SECURE_RANDOM.nextInt();

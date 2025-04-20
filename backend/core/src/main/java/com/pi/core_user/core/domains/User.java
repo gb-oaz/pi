@@ -40,4 +40,6 @@ public class User {
     public String getCreateAt() { return createAt; }
     public String getUpdateAt() { return updateAt; }
     public EnumSet<ScopeType> getScopes() { return scopes; }
+    // Setters
+    public void setPassword(String password) { this.password = password; }
 }

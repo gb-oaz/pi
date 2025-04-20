@@ -2,11 +2,10 @@ package com.pi.infrasctructure.mongo;
 
 import com.pi.core_user.core.domains.User;
 import com.pi.core_user.ports.out.IUserQueryOut;
-import com.pi.utils.enums.SystemCodeEnum;
 import com.pi.utils.exceptions.GlobalException;
-import com.pi.utils.models.CustomAlert;
 import com.pi.utils.models.Pageable;
 
+import com.pi.utils.mongo.documents.UserDocument;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -22,7 +21,6 @@ public class UserDaoQueryAdapter implements IUserQueryOut {
     private static final String EMAIL = "email";
     private static final String LOGIN = "login";
     private static final String CODE = "code";
-    private static final String RESPONSE_NOT_FOUND = "User not found";
 
     private final MongoTemplate template;
 
@@ -34,7 +32,7 @@ public class UserDaoQueryAdapter implements IUserQueryOut {
     @Override
     public User getUserByProjection(String email, String login, String code) throws GlobalException {
         var document = executeQueryAndCheckResponse(email, login, code);
-        return document.toUser();
+        return UserDocument.mapperUser(document);
     }
 
     @Override
@@ -60,9 +58,9 @@ public class UserDaoQueryAdapter implements IUserQueryOut {
 
     protected Query buildQuery(String email, String login, String code) {
         var query = new Query();
-        query.addCriteria(Criteria.where(EMAIL).is(email));
-        query.addCriteria(Criteria.where(LOGIN).is(login));
-        query.addCriteria(Criteria.where(CODE).is(code));
+        if (!ObjectUtils.isEmpty(email)) query.addCriteria(Criteria.where(EMAIL).is(email));
+        if (!ObjectUtils.isEmpty(login)) query.addCriteria(Criteria.where(LOGIN).is(login));
+        if (!ObjectUtils.isEmpty(code)) query.addCriteria(Criteria.where(CODE).is(code));
         return query;
     }
 
@@ -84,7 +82,7 @@ public class UserDaoQueryAdapter implements IUserQueryOut {
         query.skip(skip).limit(pageSize);
         return template.find(query, UserDocument.class)
                 .stream()
-                .map(UserDocument::toUser)
+                .map(UserDocument::mapperUser)
                 .toList();
     }
 

@@ -100,7 +100,7 @@ public class CaseUpdateUser implements Callable<User> {
         var userExist = findUserIfExist(dto.token());
         ifUserUpdateEmailCheck(dto.email());
         ifUserUpdatePasswordCheck(userExist, dto.oldPassword());
-        var user = userCommandOut.updateUser(userExist.getLogin(), userExist.getCode(), dto.name(), dto.email(), Crypt.encrypt(dto.password()));
+        var user = userCommandOut.updateUser(userExist.getLogin(), userExist.getCode(), dto.name(), dto.email(), ifUserUpdatePasswordGet());
         LOG.info("End CaseUpdateUser call.");
         return user;
     }
@@ -125,6 +125,7 @@ public class CaseUpdateUser implements Callable<User> {
                     .build();
         }
         LOG.info("End Find user if exist.");
+        user.setPassword("***********");
         return user;
     }
 
@@ -199,5 +200,17 @@ public class CaseUpdateUser implements Callable<User> {
                         .build();
             }
         }
+    }
+
+    /**
+     * Encrypts the user's new password if it is provided.
+     * <p>
+     *     This method checks if the new password is not empty and encrypts it using
+     *     the {@link Crypt} utility class. If the password is empty, it returns null.
+     * </p>
+     * @return the encrypted password or null if the password is empty.
+     */
+    private String ifUserUpdatePasswordGet() {
+        return ObjectUtils.isEmpty(dto.password()) ? null : Crypt.encrypt(dto.password());
     }
 }

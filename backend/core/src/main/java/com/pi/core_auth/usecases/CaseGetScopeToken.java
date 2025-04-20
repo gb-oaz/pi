@@ -69,25 +69,29 @@ public class CaseGetScopeToken implements Callable<Response> {
         LOG.info("Init CaseGetScopeToken call.");
         var token = queryDto.validate();
         var onlyToken = Utils.removePrefixBearerToToken(token.getToken());
-        var scope = getScopeToken(onlyToken);
+        var scope = getScopeTokenData(onlyToken);
         LOG.info("End CaseGetScopeToken call.");
         return scope;
     }
 
     /**
-     * Retrieves the scope of a JWT token.
+     * Retrieves the scope data of a JWT token.
      *
      * @param token the JWT token string to retrieve the scope from.
      * @return a {@link Response} object containing the scope of the token.
      */
-    protected Response getScopeToken(String token) {
+    protected Response getScopeTokenData(String token) {
         LOG.info("Init Get scope token from token: {}", token);
         var jwt = jwtDecoder.decode(token);
         var scopes = jwt.getClaimAsStringList(Claim.SCOPE);
+        var login = jwt.getClaimAsString(Claim.LOGIN);
+        var code = jwt.getClaimAsString(Claim.CODE);
         var scopeSet = convertToEnumSet(scopes);
         LOG.info("End Get scope token from token: {}", token);
         return Response.builder()
                 .scope(scopeSet)
+                .login(login)
+                .code(code)
                 .build();
     }
 

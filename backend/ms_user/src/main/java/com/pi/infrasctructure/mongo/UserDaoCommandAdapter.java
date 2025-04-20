@@ -1,8 +1,11 @@
 package com.pi.infrasctructure.mongo;
 
+import com.pi.core_auth.core.enums.ScopeType;
 import com.pi.core_user.core.domains.User;
 import com.pi.core_user.ports.out.IUserCommandOut;
 import com.pi.utils.exceptions.GlobalException;
+
+import com.pi.utils.mongo.documents.UserDocument;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 
@@ -14,6 +17,10 @@ import org.springframework.stereotype.Repository;
 import org.springframework.util.ObjectUtils;
 
 import java.time.OffsetDateTime;
+import java.util.EnumSet;
+import java.util.Objects;
+
+import static com.pi.utils.mongo.constants.Collections.COLLECTION_USERS;
 
 @Repository
 public class UserDaoCommandAdapter implements IUserCommandOut {
@@ -33,19 +40,20 @@ public class UserDaoCommandAdapter implements IUserCommandOut {
     }
 
     @Override
-    public User createUser(String name, String email, String login, String code, String password) throws GlobalException {
-        UserDocument document = (UserDocument) User.builder()
+    public User createUser(String name, String email, String login, String code, String password, EnumSet<ScopeType> scopes) throws GlobalException {
+        var user = User.builder()
                 .name(name)
                 .email(email)
                 .login(login)
                 .code(code)
                 .password(password)
+                .scopes(scopes)
                 .createAt(OffsetDateTime.now().toString())
                 .updateAt(OffsetDateTime.now().toString())
                 .build();
 
-        var newDoc = template.insert(document);
-        return newDoc.toUser();
+        var document = template.insert(Objects.requireNonNull(UserDocument.mapperDocument(user)), COLLECTION_USERS);
+        return UserDocument.mapperUser(document);
     }
 
     @Override
@@ -81,6 +89,6 @@ public class UserDaoCommandAdapter implements IUserCommandOut {
                     .details(RESPONSE_NOT_FOUND)
                     .build();
         }
-        return document.toUser();
+        return UserDocument.mapperUser(document);
     }
 }

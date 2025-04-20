@@ -71,6 +71,7 @@ public class CaseGetUsers implements Callable<Pageable<User>> {
         LOG.info("Init CaseGetUsers call.");
         dto.validate();
         var pageable = userQueryOut.getUsersByProjection(dto.name(), dto.email(), dto.login(), dto.code(), dto.page(), dto.size());
+        pageable.getContent().forEach(user -> user.setPassword("***********"));
         LOG.info("End CaseGetUsers call.");
         return pageable;
     }

@@ -55,6 +55,7 @@ public enum SystemCodeEnum {
 
     // RANGE Query dto user---- //
     C070PI("Field query is necessary", "Provide correct value, string example: | GET_USER_BY_PROJECTION or GET_USERS_BY_PROJECTION |"),
+    C071PI("At least one field is required", "Provide field email or login and code is required"),
 
     // RANGE Command dto user---- //
     C080PI("Field command is necessary", "Provide correct value, string example: | POST_CREATE_USER_TEACHER, POST_CREATE_USER_STUDENT or PUT_UPDATE_USER |"),

@@ -133,7 +133,9 @@ public class Auth {
                         **Resposta:**
                         ```json
                         {
-                          "scope": ["SCOPE_ANONYMOUS", "SCOPE_TEACHER", "SCOPE_STUDENT"]
+                          "scope": ["SCOPE_ANONYMOUS", "SCOPE_TEACHER", "SCOPE_STUDENT"],
+                          "login": "GUSTAVOBOAZ",
+                          "code": "123456"
                         }
                         ```
                         """)

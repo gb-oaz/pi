@@ -30,4 +30,5 @@ spring:
   data:
     mongodb:
       uri: ${SPRING_DATA_MONGODB_URI:mongodb://localhost:27017}
-      database: ${SPRING_DATA_MONGODB_DATABASE:PI-C-Users}
+      database: ${SPRING_DATA_MONGODB_DATABASE:PI-DB-Users}
+      collection: ${COLLECTION_NAME:PI-C-Users}
