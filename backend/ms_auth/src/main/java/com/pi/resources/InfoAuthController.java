@@ -31,7 +31,7 @@ public class InfoAuthController {
                     @Content(mediaType = "application/json", schema = @Schema(implementation = GlobalInfo.class))
             }),
     })
-    @GetMapping(path = Router.SERVER_INFO)
+    @GetMapping(path = Router.ROUTER_AUTH_INFO)
     public ResponseEntity<GlobalInfo> getInfo() {
         var result = GlobalInfo.builder().name(name).version(version).description(description).build();
 

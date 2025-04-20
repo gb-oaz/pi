@@ -1,7 +1,7 @@
 package com.pi.core_auth.core.dtos;
 
 import com.pi.core_auth.core.enums.CommandType;
-import com.pi.core_auth.core.utils.constants.Command;
+import com.pi.utils.constants.Command;
 import com.pi.core_auth.core.utils.validations.Validate;
 import com.pi.utils.enums.SystemCodeEnum;
 import com.pi.utils.exceptions.GlobalException;
@@ -28,7 +28,7 @@ public record CommandDto(
         Validate.command(commandType.toString());
 
         return switch (commandType) {
-            case POST_SIGN_IN_TOKEN -> {
+            case COMMAND_POST_SIGN_IN_TOKEN -> {
                 Validate.login(login);
                 Validate.code(code);
                 Validate.password(password);
@@ -40,7 +40,7 @@ public record CommandDto(
                         Command.ANONYMOUS_TOKEN, anonymousToken
                 );
             }
-            case POST_ANONYMOUS_TOKEN -> {
+            case COMMAND_POST_ANONYMOUS_TOKEN -> {
                 yield  Map.of();
             }
             default -> {

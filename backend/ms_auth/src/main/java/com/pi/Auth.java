@@ -32,7 +32,7 @@ public class Auth {
 
     @Bean
     public GroupedOpenApi infoAuth() {
-        String[] paths = { Router.SERVER_INFO };
+        String[] paths = { Router.ROUTER_AUTH_INFO};
         var info = new Info().title(title).version(version).description(description).contact(new Contact().email(email));
 
         return GroupedOpenApi.builder()
@@ -54,7 +54,7 @@ public class Auth {
                         ## 1. Obter Token Anônimo
                         
                         **Endpoint:** \s
-                        `POST /auth/v1/post/anonymous/token/POST_ANONYMOUS_TOKEN`
+                        `POST /auth/v1/post/anonymous/token/COMMAND_POST_ANONYMOUS_TOKEN`
                         
                         **Uso:** \s
                         Utilizado como primeiro passo para interações. Gera um token anônimo para ser usado nas próximas requisições.
@@ -74,7 +74,7 @@ public class Auth {
                         ## 2. Login e Geração de Token de Acesso
                         
                         **Endpoint:** \s
-                        `POST /auth/v1/post/sign/in/token/POST_SIGN_IN_TOKEN`
+                        `POST /auth/v1/post/sign/in/token/COMMAND_POST_SIGN_IN_TOKEN`
                         
                         **Headers:**
                         ```
@@ -104,7 +104,7 @@ public class Auth {
                         ## 3. Validar Status do Token
                         
                         **Endpoint:** \s
-                        `GET /auth/v1/get/status/token/GET_STATUS_TOKEN`
+                        `GET /auth/v1/get/status/token/QUERY_GET_STATUS_TOKEN`
                         
                         **Headers:**
                         ```
@@ -123,7 +123,7 @@ public class Auth {
                         ## 4. Validar Scope do Token
                         
                         **Endpoint:** \s
-                        `GET /auth/v1/get/scope/token/GET_SCOPE_TOKEN`
+                        `GET /auth/v1/get/scope/token/QUERY_GET_SCOPE_TOKEN`
                         
                         **Headers:**
                         ```

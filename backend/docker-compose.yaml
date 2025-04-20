@@ -1,6 +1,19 @@
 version: '3'
 services:
   # #################
+  # Storage services
+  # #################
+  mongo:
+    container_name: mongo
+    image: mongo:6.0
+    restart: always
+    ports:
+      - "27017:27017"
+    networks:
+      - pi_net
+    volumes:
+      - mongo_data:/data/db
+  # #################
   # Backend services
   # #################
   ms_auth:
@@ -12,6 +25,11 @@ services:
       - "8000:8000"
     networks:
       - pi_net
+    depends_on:
+      - mongo
+    environment:
+      - SPRING_DATA_MONGODB_URI=mongodb://mongo:27017
+      - SPRING_DATA_MONGODB_DATABASE=PI-C-Users
   ms_user:
     container_name: ms_user
     build:
@@ -21,6 +39,15 @@ services:
       - "8001:8001"
     networks:
       - pi_net
+    depends_on:
+      - mongo
+    environment:
+      - SPRING_DATA_MONGODB_URI=mongodb://mongo:27017
+      - SPRING_DATA_MONGODB_DATABASE=PI-C-Users
+
+volumes:
+  mongo_data:
+
 networks:
   pi_net:
     driver: bridge

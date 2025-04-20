@@ -1,6 +1,6 @@
 package com.pi.core_auth.ports.in;
 
-import com.pi.core_auth.core.utils.constants.Request;
+import com.pi.utils.constants.Request;
 import com.pi.core_auth.core.utils.constants.Response;
 import com.pi.core_auth.core.utils.constants.Router;
 import com.pi.utils.exceptions.GlobalException;
@@ -32,13 +32,13 @@ public interface IAuthQueryIn {
      * Validates the status of a token.
      * <p>
      * This endpoint is used to validate the status of a token. The query type
-     * must be {@code GET_STATUS_TOKEN}, and the token must be valid.
+     * must be {@code QUERY_GET_STATUS_TOKEN}, and the token must be valid.
      * </p>
      * <p>
      * Example Path JSON:
      * <pre>
      * {
-     *     "path": "/auth/v1/get/status/token/GET_STATUS_TOKEN"
+     *     "path": "/auth/v1/get/status/token/QUERY_GET_STATUS_TOKEN"
      * }
      * </pre>
      * Example Headers JSON:
@@ -55,7 +55,7 @@ public interface IAuthQueryIn {
      * </pre>
      * </p>
      *
-     * @param queryType the type of query being performed, must be {@code GET_STATUS_TOKEN}
+     * @param queryType the type of query being performed, must be {@code QUERY_GET_STATUS_TOKEN}
      * @param authorization the authorization header containing the bearer token
      * @return a {@link ResponseEntity} containing the token details if valid
      * @throws GlobalException if the token is invalid or an error occurs
@@ -65,13 +65,13 @@ public interface IAuthQueryIn {
             description = """
             ### Validate status token
             Use this endpoint to validate the status of a token.
-            - The queryType must be GET_STATUS_TOKEN.
+            - The queryType must be QUERY_GET_STATUS_TOKEN.
             - The token must be a valid token.
 
             **Example Path JSON:**
             ```json
             {
-                path: "/auth/v1/get/status/token/GET_STATUS_TOKEN"
+                path: "/auth/v1/get/status/token/QUERY_GET_STATUS_TOKEN"
             }
             ```
             
@@ -108,7 +108,7 @@ public interface IAuthQueryIn {
                     })
             }
     )
-    @GetMapping(path = Router.GET_STATUS_TOKEN + "/{queryType}", produces = "application/json")
+    @GetMapping(path = Router.ROUTER_GET_STATUS_TOKEN + "/{queryType}", produces = "application/json")
     @PreAuthorize("hasAnyAuthority('SCOPE_ANONYMOUS', 'SCOPE_TEACHER', 'SCOPE_STUDENT')")
     ResponseEntity<Response> getStatusToken(
             @PathVariable(name = Request.QUERY_TYPE) String queryType,
@@ -119,13 +119,13 @@ public interface IAuthQueryIn {
      * Retrieves the scope of a token.
      * <p>
      * This endpoint is used to retrieve the scope of a token. The query type
-     * must be {@code GET_SCOPE_TOKEN}, and the token must be valid.
+     * must be {@code QUERY_GET_SCOPE_TOKEN}, and the token must be valid.
      * </p>
      * <p>
      * Example Path JSON:
      * <pre>
      * {
-     *     "path": "/auth/v1/get/scope/token/GET_SCOPE_TOKEN"
+     *     "path": "/auth/v1/get/scope/token/QUERY_GET_SCOPE_TOKEN"
      * }
      * </pre>
      * Example Headers JSON:
@@ -142,7 +142,7 @@ public interface IAuthQueryIn {
      * </pre>
      * </p>
      *
-     * @param queryType the type of query being performed, must be {@code GET_SCOPE_TOKEN}
+     * @param queryType the type of query being performed, must be {@code QUERY_GET_SCOPE_TOKEN}
      * @param authorization the authorization header containing the bearer token
      * @return a {@link ResponseEntity} containing the scope types if valid
      * @throws GlobalException if the token is invalid or an error occurs
@@ -152,13 +152,13 @@ public interface IAuthQueryIn {
             description = """
             ### Retrieve scope token
             Use this endpoint to retrieve the scope of a token.
-            - The queryType must be GET_SCOPE_TOKEN.
+            - The queryType must be QUERY_GET_SCOPE_TOKEN.
             - The token must be a valid token.
             
             **Example Path JSON:**
             ```json
             {
-                path: "/auth/v1/get/scope/token/GET_SCOPE_TOKEN"
+                path: "/auth/v1/get/scope/token/QUERY_GET_SCOPE_TOKEN"
             }
             ```
             
@@ -195,7 +195,7 @@ public interface IAuthQueryIn {
                     })
             }
     )
-    @GetMapping(path = Router.GET_SCOPE_TOKEN + "/{queryType}", produces = "application/json")
+    @GetMapping(path = Router.ROUTER_GET_SCOPE_TOKEN + "/{queryType}", produces = "application/json")
     @PreAuthorize("hasAnyAuthority('SCOPE_ANONYMOUS', 'SCOPE_TEACHER', 'SCOPE_STUDENT')")
     ResponseEntity<Response> getScopeToken(
             @PathVariable(name = Request.QUERY_TYPE) String queryType,

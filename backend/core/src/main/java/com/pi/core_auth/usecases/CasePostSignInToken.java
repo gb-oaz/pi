@@ -5,7 +5,7 @@ import com.pi.core_auth.core.dtos.CommandDto;
 import com.pi.core_auth.core.enums.ScopeType;
 import com.pi.core_auth.core.enums.StatusType;
 import com.pi.core_auth.core.utils.constants.Claim;
-import com.pi.core_auth.ports.out.IAuthCommandOut;
+import com.pi.core_auth.ports.out.IAuthQueryOut;
 import com.pi.utils.enums.SystemCodeEnum;
 import com.pi.utils.exceptions.GlobalException;
 import com.pi.utils.models.CustomAlert;
@@ -58,7 +58,7 @@ public class CasePostSignInToken implements Callable<Token> {
     /**
      * Output port for authentication-related commands.
      */
-    private IAuthCommandOut authCommandOut;
+    private IAuthQueryOut authCommandOut;
 
     /**
      * Data transfer object containing the command details.
@@ -80,7 +80,7 @@ public class CasePostSignInToken implements Callable<Token> {
      *
      * @param authCommandOut the output port for authentication-related commands.
      */
-    public void setServices(IAuthCommandOut authCommandOut) {
+    public void setServices(IAuthQueryOut authCommandOut) {
         this.authCommandOut = authCommandOut;
     }
 
@@ -145,6 +145,8 @@ public class CasePostSignInToken implements Callable<Token> {
                 .expiresAt(now.plusSeconds(EXPIRY_SECONDS))
                 .subject(commandDto.login())
                 .claim(Claim.SCOPE, getAuthoritiesScopes(scopes).stream().map(GrantedAuthority::getAuthority).collect(Collectors.joining(" ")))
+                .claim(Claim.LOGIN, commandDto.login())
+                .claim(Claim.CODE, commandDto.code())
                 .build();
     }
 

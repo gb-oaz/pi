@@ -12,7 +12,7 @@ import java.util.EnumSet;
  * based on their login credentials and retrieving their associated roles.
  * </p>
  */
-public interface IAuthCommandOut {
+public interface IAuthQueryOut {
 
     /**
      * Checks if a user exists based on the provided login credentials and retrieves their roles.

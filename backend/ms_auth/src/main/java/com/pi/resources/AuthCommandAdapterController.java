@@ -3,17 +3,14 @@ package com.pi.resources;
 import com.pi.core_auth.core.domains.Token;
 import com.pi.core_auth.core.dtos.CommandDto;
 import com.pi.core_auth.core.enums.CommandType;
-import com.pi.core_auth.core.enums.ScopeType;
 import com.pi.core_auth.ports.in.IAuthCommandIn;
-import com.pi.core_auth.ports.out.IAuthCommandOut;
 import com.pi.core_auth.usecases.CasePostAnonymousToken;
 import com.pi.core_auth.usecases.CasePostSignInToken;
+import com.pi.infrastructure.mongo.UserDaoQueryAdapter;
 import com.pi.utils.exceptions.GlobalException;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.EnumSet;
 
 @RestController
 public class AuthCommandAdapterController implements IAuthCommandIn {
@@ -23,11 +20,12 @@ public class AuthCommandAdapterController implements IAuthCommandIn {
 
     public AuthCommandAdapterController(
             CasePostSignInToken casePostSignInToken,
-            CasePostAnonymousToken casePostAnonymousToken
+            CasePostAnonymousToken casePostAnonymousToken,
+            UserDaoQueryAdapter userDaoAdapter
     ) {
         this.casePostSignInToken = casePostSignInToken;
         this.casePostAnonymousToken = casePostAnonymousToken;
-        this.casePostSignInToken.setServices(new MockAuthCommandOutAdapter());
+        this.casePostSignInToken.setServices(userDaoAdapter);
     }
 
     @Override
@@ -52,13 +50,5 @@ public class AuthCommandAdapterController implements IAuthCommandIn {
 
         casePostAnonymousToken.setCommandDto(dto);
         return ResponseEntity.status(201).body(casePostAnonymousToken.call());
-    }
-
-    protected static class MockAuthCommandOutAdapter implements IAuthCommandOut {
-
-        @Override
-        public EnumSet<ScopeType> existUser(String login, String code, String password) throws GlobalException {
-            return EnumSet.of(ScopeType.TEACHER);
-        }
     }
 }

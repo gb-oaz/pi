@@ -1,8 +1,8 @@
 package com.pi.core_auth.ports.in;
 
 import com.pi.core_auth.core.domains.Token;
-import com.pi.core_auth.core.utils.constants.Command;
-import com.pi.core_auth.core.utils.constants.Request;
+import com.pi.utils.constants.Command;
+import com.pi.utils.constants.Request;
 import com.pi.core_auth.core.utils.constants.Router;
 import com.pi.utils.exceptions.GlobalException;
 
@@ -34,13 +34,13 @@ public interface IAuthCommandIn {
      * Generates a token for a user based on login credentials.
      * <p>
      * This endpoint is used to generate a token for a user after validating
-     * their login, code, and password. The command type must be {@code POST_SIGN_IN_TOKEN}.
+     * their login, code, and password. The command type must be {@code COMMAND_POST_SIGN_IN_TOKEN}.
      * </p>
      * <p>
      * Example Path JSON:
      * <pre>
      * {
-     *     "path": "/auth/v1/post/sign/in/token/POST_SIGN_IN_TOKEN"
+     *     "path": "/auth/v1/post/sign/in/token/COMMAND_POST_SIGN_IN_TOKEN"
      * }
      * </pre>
      * Example Headers JSON:
@@ -68,7 +68,7 @@ public interface IAuthCommandIn {
      * </pre>
      * </p>
      *
-     * @param commandType the type of command being executed, must be {@code POST_SIGN_IN_TOKEN}
+     * @param commandType the type of command being executed, must be {@code COMMAND_POST_SIGN_IN_TOKEN}
      * @param authorization the authorization header containing the bearer token
      * @param login the user's login, must be at least 8 characters with uppercase letters
      * @param code the user's code, must be at least 6 numbers
@@ -81,7 +81,7 @@ public interface IAuthCommandIn {
             description = """
             ### Generate Token by Sign In
             Use this endpoint to generate a token for an user based on login credentials.
-            - The commandType must be POST_SIGN_IN_TOKEN.
+            - The commandType must be COMMAND_POST_SIGN_IN_TOKEN.
             - The login must be at least 8 characters uppercase letters.
             - The code must be at least 6 numbers.
             - The password must be at least 15 characters long, containing at least one lowercase letter,
@@ -91,7 +91,7 @@ public interface IAuthCommandIn {
             **Example Path JSON:**
             ```json
             {
-                path: "/auth/v1/post/sign/in/token/POST_SIGN_IN_TOKEN"
+                path: "/auth/v1/post/sign/in/token/COMMAND_POST_SIGN_IN_TOKEN"
             }
             ```
             
@@ -140,7 +140,7 @@ public interface IAuthCommandIn {
                     })
             }
     )
-    @PostMapping(path = Router.POST_SIGN_IN_TOKEN + "/{commandType}", produces = "application/json", consumes = "multipart/form-data")
+    @PostMapping(path = Router.ROUTER_POST_SIGN_IN_TOKEN + "/{commandType}", produces = "application/json", consumes = "multipart/form-data")
     @PreAuthorize("hasAnyAuthority('SCOPE_ANONYMOUS')")
     ResponseEntity<Token> postSignInToken(
             @PathVariable(name = Request.COMMAND_TYPE) String commandType,
@@ -154,13 +154,13 @@ public interface IAuthCommandIn {
      * Generates a token for an anonymous user.
      * <p>
      * This endpoint is used to generate a token for an anonymous user. The command type
-     * must be {@code POST_ANONYMOUS_TOKEN}.
+     * must be {@code COMMAND_POST_ANONYMOUS_TOKEN}.
      * </p>
      * <p>
      * Example Path JSON:
      * <pre>
      * {
-     *     "path": "/auth/v1/post/anonymous/token/POST_ANONYMOUS_TOKEN"
+     *     "path": "/auth/v1/post/anonymous/token/COMMAND_POST_ANONYMOUS_TOKEN"
      * }
      * </pre>
      * Example Response Body JSON:
@@ -174,7 +174,7 @@ public interface IAuthCommandIn {
      * </pre>
      * </p>
      *
-     * @param commandType the type of command being executed, must be {@code POST_ANONYMOUS_TOKEN}
+     * @param commandType the type of command being executed, must be {@code COMMAND_POST_ANONYMOUS_TOKEN}
      * @return a {@link ResponseEntity} containing the generated token details
      * @throws GlobalException if an error occurs
      */
@@ -182,12 +182,12 @@ public interface IAuthCommandIn {
             description = """
             ### Generate Token by Anonymous user
             Use this endpoint to generate a token for an user based in not access.
-            - The commandType must be POST_ANONYMOUS_TOKEN.
+            - The commandType must be COMMAND_POST_ANONYMOUS_TOKEN.
 
             **Example Path JSON:**
             ```json
             {
-                path: "/auth/v1/post/anonymous/token/POST_ANONYMOUS_TOKEN"
+                path: "/auth/v1/post/anonymous/token/COMMAND_POST_ANONYMOUS_TOKEN"
             }
             ```
             
@@ -220,7 +220,7 @@ public interface IAuthCommandIn {
                     })
             }
     )
-    @PostMapping(path = Router.POST_ANONYMOUS_TOKEN + "/{commandType}", produces = "application/json")
+    @PostMapping(path = Router.ROUTER_POST_ANONYMOUS_TOKEN + "/{commandType}", produces = "application/json")
     ResponseEntity<Token> postAnonymousToken(
             @PathVariable(name = Request.COMMAND_TYPE) String commandType
     ) throws GlobalException;

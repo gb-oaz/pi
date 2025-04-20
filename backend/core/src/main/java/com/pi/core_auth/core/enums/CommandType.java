@@ -22,7 +22,7 @@ public enum CommandType {
      * Command to post a sign-in token.
      * Suggested for use in scenarios where user authentication is required.
      */
-    POST_SIGN_IN_TOKEN(
+    COMMAND_POST_SIGN_IN_TOKEN(
         "Post a sign-in token. Use this command to authenticate users.",
         EnumSet.of(ScopeType.ANONYMOUS)
     ),
@@ -31,7 +31,7 @@ public enum CommandType {
      * Command to post an anonymous token.
      * Suggested for use in scenarios where guest access is required.
      */
-    POST_ANONYMOUS_TOKEN(
+    COMMAND_POST_ANONYMOUS_TOKEN(
         "Post an anonymous token. Use this command to provide guest access.",
         EnumSet.of(ScopeType.ANONYMOUS)
     );

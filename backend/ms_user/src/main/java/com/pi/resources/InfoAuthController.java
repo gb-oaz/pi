@@ -1,6 +1,6 @@
 package com.pi.resources;
 
-import com.pi.core_user.utils.constants.Router;
+import com.pi.core_user.core.utils.constants.Router;
 import com.pi.utils.models.GlobalInfo;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -31,7 +31,7 @@ public class InfoAuthController {
                     @Content(mediaType = "application/json", schema = @Schema(implementation = GlobalInfo.class))
             }),
     })
-    @GetMapping(path = Router.SERVER_INFO)
+    @GetMapping(path = Router.ROUTER_USER_INFO)
     public ResponseEntity<GlobalInfo> getInfo() {
         var result = GlobalInfo.builder().name(name).version(version).description(description).build();
 

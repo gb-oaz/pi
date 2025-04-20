@@ -1,4 +1,4 @@
-package com.pi.core_auth.core.utils.constants;
+package com.pi.utils.constants;
 
 /**
  * A utility class that defines constant values for HTTP request headers and parameters.
@@ -26,4 +26,16 @@ public class Request {
      * of query being performed.
      */
     public static final String QUERY_TYPE = "queryType";
+
+    /**
+     * Represents the "page" request parameter, used to specify the page number
+     * for pagination.
+     */
+    public static final String PAGE = "page";
+
+    /**
+     * Represents the "size" request parameter, used to specify the page size
+     * for pagination.
+     */
+    public static final String SIZE = "size";
 }

@@ -1,4 +1,4 @@
-package com.pi.core_auth.core.utils.constants;
+package com.pi.utils.constants;
 
 /**
  * The {@code Regex} class contains regular expression patterns for validating login and password.
@@ -29,4 +29,16 @@ public class Regex {
      * one uppercase letter, one digit, and one special character !?@#$%&.
      */
     public static final String PASSWORD = "^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!?@#$%&]).{15,25}$";
+
+    /**
+     * Regular expression pattern for validating name.
+     * The name must be between 3 and 40 characters with space.
+     */
+    public static final String NAME = "^[a-zA-ZÀ-ÿ\\s]{3,40}$";
+
+    /**
+     * Regular expression pattern for validating email.
+     * The email must be in a valid format.
+     */
+    public static final String EMAIL = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$";
 }

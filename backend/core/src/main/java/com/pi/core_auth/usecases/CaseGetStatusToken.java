@@ -5,10 +5,8 @@ import com.pi.core_auth.core.dtos.QueryDto;
 import com.pi.core_auth.core.enums.StatusType;
 import com.pi.core_auth.core.utils.constants.Response;
 import com.pi.core_auth.core.utils.services.Utils;
-import com.pi.utils.enums.SystemCodeEnum;
 import com.pi.utils.exceptions.GlobalException;
 
-import com.pi.utils.models.CustomAlert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -90,24 +88,7 @@ public class CaseGetStatusToken implements Callable<Response> {
                 .status(StatusType.ACTIVE)
                 .build();
         } catch (JwtException e) {
-            LOG.warn("Error decoding token: {}", e.getMessage());
-            if (e.getMessage().contains("Expired")) {
-                LOG.info("Token is expired.");
-                return Response.builder()
-                    .status(StatusType.EXPIRED)
-                    .build();
-            } else if (e.getMessage().contains("Invalid")) {
-                LOG.info("Token is invalid.");
-                return Response.builder()
-                    .status(StatusType.INVALID)
-                    .build();
-            } else {
-                LOG.error("Token is invalid.");
-                throw GlobalException.builder()
-                    .status(422)
-                    .alert(new CustomAlert(SystemCodeEnum.C060PI))
-                    .build();
-            }
+            return Utils.validateResponseJwtException(e);
         }
     }
 }
