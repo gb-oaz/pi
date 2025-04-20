@@ -102,6 +102,7 @@ public class CaseUpdateUser implements Callable<User> {
         ifUserUpdatePasswordCheck(userExist, dto.oldPassword());
         var user = userCommandOut.updateUser(userExist.getLogin(), userExist.getCode(), dto.name(), dto.email(), ifUserUpdatePasswordGet());
         LOG.info("End CaseUpdateUser call.");
+        user.setPassword("***********");
         return user;
     }
 
