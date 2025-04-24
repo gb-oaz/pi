@@ -1,7 +1,7 @@
 package com.pi.core_auth.ports.in;
 
 import com.pi.utils.constants.Request;
-import com.pi.core_auth.core.utils.constants.Response;
+import com.pi.core_auth.core.utils.models.Response;
 import com.pi.core_auth.core.utils.constants.Router;
 import com.pi.utils.exceptions.GlobalException;
 

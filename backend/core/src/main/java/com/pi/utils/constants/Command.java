@@ -41,4 +41,24 @@ public class Command {
      * Represents the "anonymousToken" command, typically used for anonymous token operations.
      */
     public static final String ANONYMOUS_TOKEN = "anonymousToken";
+
+    /**
+     * Represents the "categories" value, typically used for categories operations.
+     */
+    public static final String CATEGORIES = "categories";
+
+    /**
+     * Represents the "quiz" value key, typically used for quiz item operations.
+     */
+    public static final String KEY = "key";
+
+    /**
+     * Represents the "quiz item position" value, typically used for quiz item operations.
+     */
+    public static final String POSITION = "position";
+
+    /**
+     * Represents the "quiz item type" value, typically used for quiz item operations.
+     */
+    public static final String TYPE_ITEM = "typeItem";
 }

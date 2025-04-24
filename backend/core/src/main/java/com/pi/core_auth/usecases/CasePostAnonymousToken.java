@@ -9,6 +9,7 @@ import com.pi.utils.enums.SystemCodeEnum;
 import com.pi.utils.exceptions.GlobalException;
 import com.pi.utils.models.CustomAlert;
 
+import com.pi.utils.services.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +21,6 @@ import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
 import org.springframework.stereotype.Service;
 
-import java.security.SecureRandom;
 import java.time.Instant;
 import java.util.EnumSet;
 import java.util.Objects;
@@ -54,11 +54,6 @@ public class CasePostAnonymousToken implements Callable<Token> {
      * Prefix for the subject of the JWT token.
      */
     private static final String PUPIL = "PUPIL-";
-
-    /**
-     * SecureRandom instance for generating random numbers.
-     */
-    private static final SecureRandom SECURE_RANDOM = new SecureRandom();
 
     /**
      * JWT encoder used to encode the token.
@@ -112,7 +107,7 @@ public class CasePostAnonymousToken implements Callable<Token> {
      */
     protected JwtClaimsSet buildClaims() {
         LOG.info("Init Build claims for token.");
-        var code = generateRandomToken();
+        var code = Utils.generateRandomToken();
         var now = Instant.now();
         return JwtClaimsSet.builder()
                 .issuer(MS_AUTH)
@@ -163,17 +158,5 @@ public class CasePostAnonymousToken implements Callable<Token> {
         return scopes.stream()
                 .map(role -> new SimpleGrantedAuthority(role.name()))
                 .collect(Collectors.toSet());
-    }
-
-    /**
-     * Generates a token using the current timestamp and a random number.
-     *
-     * @return the generated token. ex - 17f9343c5c114ed6a
-     */
-    protected static String generateRandomToken() {
-        LOG.info("Generate token for anonymous pupil session.");
-        long currentTimeMillis = System.currentTimeMillis();
-        int randomInt = SECURE_RANDOM.nextInt();
-        return Long.toHexString(currentTimeMillis) + Integer.toHexString(randomInt);
     }
 }

@@ -26,4 +26,19 @@ public class Query {
      * Represents the "code" command, typically used for code verification.
      */
     public static final String CODE = "code";
+
+    /**
+     * Represents the "categories" value, typically used for categories operations.
+     */
+    public static final String CATEGORIES = "categories";
+
+    /**
+     * Represents the "quiz" value key, typically used for quiz item operations.
+     */
+    public static final String KEY = "key";
+
+    /**
+     * Represents the "position item" value, typically used for query type operations.
+     */
+    public static final String POSITION = "position";
 }

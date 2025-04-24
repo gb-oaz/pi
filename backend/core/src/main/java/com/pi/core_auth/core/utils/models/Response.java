@@ -1,4 +1,4 @@
-package com.pi.core_auth.core.utils.constants;
+package com.pi.core_auth.core.utils.models;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.pi.core_auth.core.enums.ScopeType;

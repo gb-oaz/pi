@@ -53,17 +53,19 @@ public class User {
                         
                         ## 1. Criar Usuário - Perfil Professor
                         
-                        **Endpoint:** \s
+                        **Endpoint:**
                         
                         `POST /user/v1/post/create/user/teacher/COMMAND_POST_CREATE_USER_TEACHER`
                         
                         **Headers:**
+                        
                         ```
                         Authorization: Bearer <anonymous-token>
                         Content-Type: multipart/form-data
                         ```
                         
                         **Body:**
+                        
                         - `name`: entre 3 e 40 caracteres, pode conter espaços.
                         
                         - `email`: email válido.
@@ -80,6 +82,7 @@ public class User {
                           - um caractere especial (!?@#$%&).
                         
                         **Resposta:**
+                        
                         ```json
                         {
                           "name": "Gustavo Boaz",
@@ -95,7 +98,7 @@ public class User {
                         
                         ## 2. Criar Usuário - Perfil Estudante
                         
-                        **Endpoint:** \s
+                        **Endpoint:**
                         
                         `POST /user/v1/post/create/user/student/COMMAND_POST_CREATE_USER_STUDENT`
                         
@@ -105,10 +108,12 @@ public class User {
                         Content-Type: multipart/form-data
                         ```
                         
-                        **Body:** \s
+                        **Body:**
+                        
                         Mesmo formato da criação de professor.
                         
                         **Resposta:**
+                        
                         ```json
                         {
                           "name": "Gustavo Boaz",
@@ -124,17 +129,19 @@ public class User {
                         
                         ## 3. Atualizar Dados do Usuário
                         
-                        **Endpoint:** \s
+                        **Endpoint:**
                         
                         `PUT /user/v1/put/update/user/COMMAND_PUT_UPDATE_USER`
                         
                         **Headers:**
+                        
                         ```
                         Authorization: Bearer <token>
                         Content-Type: multipart/form-data
                         ```
                         
                         **Body:**
+                        
                         - `name`: entre 3 e 40 caracteres.
                         
                         - `email`: email válido.
@@ -144,6 +151,7 @@ public class User {
                         - `oldPassword`: senha anterior.
                         
                         **Resposta:**
+                        
                         ```json
                         {
                           "name": "Gustavo Boaz",
@@ -157,7 +165,7 @@ public class User {
                         
                         ## 4. Obter Informações do Usuário (Por Email/Login/Código)
                         
-                        **Endpoint:** \s
+                        **Endpoint:**
                         
                         `GET /user/v1/get/user/by/projection/QUERY_GET_USER_BY_PROJECTION`
                         
@@ -167,6 +175,7 @@ public class User {
                         ```
                         
                         **Params:**
+                        
                         ```
                         email=gustavo.boaz@domainpi.com \s
                         login=GUSTAVOBOAZ \s
@@ -174,6 +183,7 @@ public class User {
                         ```
                         
                         **Resposta:**
+                        
                         ```json
                         {
                           "name": "Gustavo Boaz",
@@ -189,7 +199,7 @@ public class User {
                         
                         ## 5. Buscar Lista de Usuários (Com Filtro)
                         
-                        **Endpoint:** \s
+                        **Endpoint:**
                         
                         `GET /user/v1/get/users/by/projection/QUERY_GET_USERS_BY_PROJECTION`
                         
@@ -199,6 +209,7 @@ public class User {
                         ```
                         
                         **Params:**
+                        
                         ```
                         name=Gustavo Boaz \s
                         email=gustavo.boaz@domainpi.com \s
@@ -209,6 +220,7 @@ public class User {
                         ```
                         
                         **Resposta:**
+                        
                         ```json
                         {
                           "content": [

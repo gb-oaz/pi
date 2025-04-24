@@ -20,6 +20,7 @@
 
         <module>ms_auth</module>
         <module>ms_user</module>
+        <module>ms_quiz</module>
     </modules>
 
 </project>

@@ -35,6 +35,26 @@ import static com.pi.core_auth.core.enums.CommandType.COMMAND_POST_SIGN_IN_TOKEN
 import static com.pi.core_auth.core.enums.QueryType.QUERY_GET_STATUS_TOKEN;
 import static com.pi.core_auth.core.enums.QueryType.QUERY_GET_SCOPE_TOKEN;
 
+import static com.pi.core_quiz.core.utils.constants.Router.ROUTER_QUIZ_INFO;
+import static com.pi.core_quiz.core.utils.constants.Router.ROUTER_GET_QUIZ;
+import static com.pi.core_quiz.core.utils.constants.Router.ROUTER_GET_QUIZES_PROJECTION;
+import static com.pi.core_quiz.core.utils.constants.Router.ROUTER_GET_QUIZ_ITEM;
+import static com.pi.core_quiz.core.utils.constants.Router.ROUTER_PATCH_QUIZ_ITEM;
+import static com.pi.core_quiz.core.utils.constants.Router.ROUTER_POST_NEW_QUIZ;
+import static com.pi.core_quiz.core.utils.constants.Router.ROUTER_POST_QUIZ_ITEM;
+import static com.pi.core_quiz.core.utils.constants.Router.ROUTER_PUT_QUIZ;
+import static com.pi.core_quiz.core.utils.constants.Router.ROUTER_DELETE_QUIZ;
+import static com.pi.core_quiz.core.utils.constants.Router.ROUTER_DELETE_QUIZ_ITEM;
+import static com.pi.core_quiz.core.enums.CommandType.COMMAND_PATCH_QUIZ_ITEM;
+import static com.pi.core_quiz.core.enums.CommandType.COMMAND_POST_NEW_QUIZ;
+import static com.pi.core_quiz.core.enums.CommandType.COMMAND_POST_QUIZ_ITEM;
+import static com.pi.core_quiz.core.enums.CommandType.COMMAND_PUT_QUIZ;
+import static com.pi.core_quiz.core.enums.CommandType.COMMAND_DELETE_QUIZ;
+import static com.pi.core_quiz.core.enums.CommandType.COMMAND_DELETE_QUIZ_ITEM;
+import static com.pi.core_quiz.core.enums.QueryType.QUERY_GET_QUIZ;
+import static com.pi.core_quiz.core.enums.QueryType.QUERY_GET_QUIZES_PROJECTION;
+import static com.pi.core_quiz.core.enums.QueryType.QUERY_GET_QUIZ_ITEM;
+
 import static com.pi.core_user.core.utils.constants.Router.ROUTER_USER_INFO;
 import static com.pi.core_user.core.utils.constants.Router.ROUTER_GET_USER_BY_PROJECTION;
 import static com.pi.core_user.core.utils.constants.Router.ROUTER_GET_USERS_BY_PROJECTION;
@@ -46,7 +66,6 @@ import static com.pi.core_user.core.enums.CommandType.COMMAND_POST_CREATE_USER_S
 import static com.pi.core_user.core.enums.CommandType.COMMAND_PUT_UPDATE_USER;
 import static com.pi.core_user.core.enums.QueryType.QUERY_GET_USERS_BY_PROJECTION;
 import static com.pi.core_user.core.enums.QueryType.QUERY_GET_USER_BY_PROJECTION;
-
 
 @Configuration
 @EnableMethodSecurity
@@ -68,6 +87,9 @@ public class GlobalSecurityConfig {
                     // MS_USER
                     authorize.requestMatchers(HttpMethod.GET, ROUTER_USER_INFO).permitAll();
 
+                    // MS_QUIZ
+                    authorize.requestMatchers(HttpMethod.GET, ROUTER_QUIZ_INFO).permitAll();
+
                     // OTHER REQUESTS
                     authorize.anyRequest().authenticated();
                 })
@@ -86,6 +108,18 @@ public class GlobalSecurityConfig {
                     csrf.ignoringRequestMatchers(ROUTER_POST_CREATE_USER_TEACHER + "/" + COMMAND_POST_CREATE_USER_TEACHER.name());
                     csrf.ignoringRequestMatchers(ROUTER_POST_CREATE_USER_STUDENT + "/" + COMMAND_POST_CREATE_USER_STUDENT.name());
                     csrf.ignoringRequestMatchers(ROUTER_PUT_UPDATE_USER + "/" + COMMAND_PUT_UPDATE_USER.name());
+
+                    // MS_QUIZ
+                    csrf.ignoringRequestMatchers(ROUTER_QUIZ_INFO);
+                    csrf.ignoringRequestMatchers(ROUTER_GET_QUIZ + "/" + QUERY_GET_QUIZ.name());
+                    csrf.ignoringRequestMatchers(ROUTER_GET_QUIZES_PROJECTION + "/" + QUERY_GET_QUIZES_PROJECTION.name());
+                    csrf.ignoringRequestMatchers(ROUTER_GET_QUIZ_ITEM + "/" + QUERY_GET_QUIZ_ITEM.name());
+                    csrf.ignoringRequestMatchers(ROUTER_POST_NEW_QUIZ + "/" + COMMAND_POST_NEW_QUIZ.name());
+                    csrf.ignoringRequestMatchers(ROUTER_POST_QUIZ_ITEM + "/" + COMMAND_POST_QUIZ_ITEM.name());
+                    csrf.ignoringRequestMatchers(ROUTER_PATCH_QUIZ_ITEM + "/" + COMMAND_PATCH_QUIZ_ITEM.name());
+                    csrf.ignoringRequestMatchers(ROUTER_PUT_QUIZ + "/" + COMMAND_PUT_QUIZ.name());
+                    csrf.ignoringRequestMatchers(ROUTER_DELETE_QUIZ_ITEM + "/" + COMMAND_DELETE_QUIZ_ITEM.name());
+                    csrf.ignoringRequestMatchers(ROUTER_DELETE_QUIZ + "/" + COMMAND_DELETE_QUIZ.name());
                 })
                 .oauth2ResourceServer(oauth2 -> oauth2
                         .jwt(jwt -> jwt.decoder(jwtDecoder()))

@@ -7,6 +7,7 @@ import com.pi.utils.exceptions.GlobalException;
 
 import com.pi.utils.mongo.documents.UserDocument;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.mongodb.core.MongoTemplate;
 
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -20,10 +21,11 @@ import java.time.OffsetDateTime;
 import java.util.EnumSet;
 import java.util.Objects;
 
-import static com.pi.utils.mongo.constants.Collections.COLLECTION_USERS;
-
 @Repository
 public class UserDaoCommandAdapter implements IUserCommandOut {
+
+    @Value("${spring.data.mongodb.collection}") String COLLECTION_NAME;
+
     private static final String NAME = "name";
     private static final String EMAIL = "email";
     private static final String LOGIN = "login";
@@ -52,7 +54,7 @@ public class UserDaoCommandAdapter implements IUserCommandOut {
                 .updateAt(OffsetDateTime.now().toString())
                 .build();
 
-        var document = template.insert(Objects.requireNonNull(UserDocument.mapperDocument(user)), COLLECTION_USERS);
+        var document = template.insert(Objects.requireNonNull(UserDocument.mapperDocument(user)), COLLECTION_NAME);
         return UserDocument.mapperUser(document);
     }
 

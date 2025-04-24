@@ -1,0 +1,34 @@
+server:
+  port: 8002
+
+microservice:
+  quiz:
+    name: Quiz
+    version: v1
+    description: Responsible for quiz templates
+    routes:
+      info:
+        title: Info API
+        version: 1.0.0
+        description: This api provide custom server information
+        contact:
+          email: gustavo.boaz@hotmail.com
+
+springdoc:
+  swagger-ui:
+    path: /docs/swagger
+  api-docs:
+    path: /docs/openapi
+
+jwt:
+  private:
+    key: classpath:private.key
+  public:
+    key: classpath:public.pub
+
+spring:
+  data:
+    mongodb:
+      uri: ${SPRING_DATA_MONGODB_URI:mongodb://localhost:27017}
+      database: ${SPRING_DATA_MONGODB_DATABASE:PI-DB-Quizes}
+      collection: ${COLLECTION_NAME:PI-C-Quizes}

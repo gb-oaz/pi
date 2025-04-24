@@ -2,6 +2,7 @@ package com.pi.utils.exceptions;
 
 import java.io.Serial;
 import java.util.Map;
+import java.util.Objects;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.pi.utils.models.CustomAlert;
@@ -75,10 +76,10 @@ public class GlobalException extends RuntimeException {
     // Mapper to Json
     public Map<String, Object> toJson() {
         return Map.of(
-                "message", this.message,
-                "status", this.status,
-                "alert", this.alert,
-                "details", this.details == null ? "" : this.details
+                "message", Objects.requireNonNullElse(this.message, ""),
+                "status", Objects.requireNonNullElse(this.status, 500),
+                "alert", Objects.requireNonNullElse(this.alert, "error"),
+                "details", Objects.requireNonNullElse(this.details, "")
         );
     }
 }

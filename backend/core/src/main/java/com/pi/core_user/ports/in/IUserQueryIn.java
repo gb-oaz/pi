@@ -264,7 +264,7 @@ public interface IUserQueryIn {
                     }
                 ],
                 "pageable": {
-                    "page": 0,
+                    "page": 1,
                     "size": 10,
                     "total": 1
                 }
@@ -299,7 +299,7 @@ public interface IUserQueryIn {
             @RequestParam(name = Query.EMAIL, required = false) String email,
             @RequestParam(name = Query.LOGIN, required = false) String login,
             @RequestParam(name = Query.CODE, required = false) String code,
-            @RequestParam(name = Request.PAGE, required = false, defaultValue = "0") Integer page,
+            @RequestParam(name = Request.PAGE, required = false, defaultValue = "1") Integer page,
             @RequestParam(name = Request.SIZE, required = false, defaultValue = "10") Integer size
     ) throws GlobalException;
 }

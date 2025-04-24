@@ -3,8 +3,8 @@ package com.pi.core_auth.usecases;
 import com.pi.core_auth.core.dtos.QueryDto;
 import com.pi.core_auth.core.enums.ScopeType;
 import com.pi.core_auth.core.utils.constants.Claim;
-import com.pi.core_auth.core.utils.constants.Response;
-import com.pi.core_auth.core.utils.services.Utils;
+import com.pi.core_auth.core.utils.models.Response;
+import com.pi.utils.services.Utils;
 import com.pi.utils.exceptions.GlobalException;
 
 import org.slf4j.Logger;

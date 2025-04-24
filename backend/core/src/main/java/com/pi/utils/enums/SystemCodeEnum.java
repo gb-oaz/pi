@@ -62,6 +62,20 @@ public enum SystemCodeEnum {
     C081PI("Field name is necessary", "Provide correct value, the name must be between 3 and 40 characters"),
     C082PI("Field email is necessary", "Provide correct value, the email example: | <your_email>@<domain>.<tld> |"),
 
+    // RAGE quiz ---- //
+    C090PI("Field type quiz is necessary", "Provide correct value, string example: | QUIZ_MULTIPLE_CHOICE, QUIZ_FILL_SPACE, QUIZ_TRUE_FALSE, QUIZ_OPEN, QUIZ_POLL, QUIZ_WORD_CLOUD |"),
+    C091PI("Field in quizItem is necessary", "Provide field quizItem is required"),
+    C092PI("Field type slide is necessary", "Provide correct value, string example: | SLIDE_TITLE_1, SLIDE_TITLE_2, SLIDE_TEXT_1, SLIDE_TEXT_2, SLIDE_TEXT_MEDIA_1, SLIDE_TEXT_MEDIA_2 |"),
+
+    // RANGE Command dto quiz ---- //
+    C100PI("Field command is necessary", "Provide correct value, string example: | COMMAND_POST_NEW_QUIZ, COMMAND_POST_QUIZ_ITEM, COMMAND_PATCH_QUIZ_ITEM, COMMAND_PUT_QUIZ, COMMAND_DELETE_QUIZ_ITEM, COMMAND_DELETE_QUIZ |"),
+    C101PI("Field key is necessary", "Provide key value, string example: | <key_quiz> |"),
+    C102PI("Field position is necessary", "Provide position value, integer example: | 1 or 2 |"),
+    C103PI("Field name is necessary", "Provide position value, string example: | <name_quiz> |"),
+    C104PI("Field categories is necessary", "Provide categories value, string example: | <category_1>, <category_2> |"),
+
+    // RAGE Query dto quiz ---- //
+    C110PI("Field queryType is necessary", "Provide correct value, string example: | QUERY_GET_QUIZ, QUERY_GET_QUIZ_PROJECTION, QUERY_GET_QUIZ_ITEM |"),
     ;
 
     private final String problem;

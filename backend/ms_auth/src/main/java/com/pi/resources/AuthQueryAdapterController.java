@@ -2,7 +2,7 @@ package com.pi.resources;
 
 import com.pi.core_auth.core.dtos.QueryDto;
 import com.pi.core_auth.core.enums.QueryType;
-import com.pi.core_auth.core.utils.constants.Response;
+import com.pi.core_auth.core.utils.models.Response;
 import com.pi.core_auth.ports.in.IAuthQueryIn;
 import com.pi.core_auth.usecases.CaseGetScopeToken;
 import com.pi.core_auth.usecases.CaseGetStatusToken;

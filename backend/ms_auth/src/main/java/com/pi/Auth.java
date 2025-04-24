@@ -53,13 +53,16 @@ public class Auth {
                         
                         ## 1. Obter Token Anônimo
                         
-                        **Endpoint:** \s
+                        **Endpoint:**
+                        
                         `POST /auth/v1/post/anonymous/token/COMMAND_POST_ANONYMOUS_TOKEN`
                         
-                        **Uso:** \s
+                        **Uso:**
+                        
                         Utilizado como primeiro passo para interações. Gera um token anônimo para ser usado nas próximas requisições.
                         
                         **Resposta:**
+                        
                         ```json
                         {
                           "token": "Bearer <anonymous-token>",
@@ -73,16 +76,19 @@ public class Auth {
                         
                         ## 2. Login e Geração de Token de Acesso
                         
-                        **Endpoint:** \s
+                        **Endpoint:**
+                        
                         `POST /auth/v1/post/sign/in/token/COMMAND_POST_SIGN_IN_TOKEN`
                         
                         **Headers:**
+                        
                         ```
                         Authorization: Bearer <anonymous-token>
                         Content-Type: multipart/form-data
                         ```
                         
                         **Body:**
+                        
                         - `login`: mínimo 8 caracteres, letras maiúsculas.
                         
                         - `code`: mínimo 6 dígitos numéricos.
@@ -90,6 +96,7 @@ public class Auth {
                         - `password`: mínimo 15 caracteres, com letras maiúsculas, minúsculas, números e especiais.
                         
                         **Resposta:**
+                        
                         ```json
                         {
                           "token": "Bearer <access-token>",
@@ -103,7 +110,8 @@ public class Auth {
                         
                         ## 3. Validar Status do Token
                         
-                        **Endpoint:** \s
+                        **Endpoint:**
+                        
                         `GET /auth/v1/get/status/token/QUERY_GET_STATUS_TOKEN`
                         
                         **Headers:**
@@ -112,6 +120,7 @@ public class Auth {
                         ```
                         
                         **Resposta:**
+                        
                         ```json
                         {
                           "status": "ACTIVE"
@@ -122,7 +131,8 @@ public class Auth {
                         
                         ## 4. Validar Scope do Token
                         
-                        **Endpoint:** \s
+                        **Endpoint:**
+                        
                         `GET /auth/v1/get/scope/token/QUERY_GET_SCOPE_TOKEN`
                         
                         **Headers:**
@@ -131,6 +141,7 @@ public class Auth {
                         ```
                         
                         **Resposta:**
+                        
                         ```json
                         {
                           "scope": ["SCOPE_ANONYMOUS", "SCOPE_TEACHER", "SCOPE_STUDENT"],

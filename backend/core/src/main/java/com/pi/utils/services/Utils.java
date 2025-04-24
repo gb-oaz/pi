@@ -1,16 +1,24 @@
-package com.pi.core_auth.core.utils.services;
+package com.pi.utils.services;
 
 import com.pi.core_auth.core.enums.StatusType;
-import com.pi.core_auth.core.utils.constants.Response;
+import com.pi.core_auth.core.utils.models.Response;
 import com.pi.utils.enums.SystemCodeEnum;
 import com.pi.utils.exceptions.GlobalException;
 import com.pi.utils.models.CustomAlert;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.oauth2.jwt.JwtException;
 
+import java.security.SecureRandom;
+
 public class Utils {
     private static final Logger LOG = LoggerFactory.getLogger(Utils.class);
+
+    /**
+     * SecureRandom instance for generating random numbers.
+     */
+    private static final SecureRandom SECURE_RANDOM = new SecureRandom();
 
     /**
      * Removes the "Bearer " prefix from the token if present.
@@ -50,6 +58,34 @@ public class Utils {
                     .status(422)
                     .alert(new CustomAlert(SystemCodeEnum.C060PI))
                     .build();
+        }
+    }
+
+    /**
+     * Generates a token using the current timestamp and a random number.
+     *
+     * @return the generated token. ex - 17f9343c5c114ed6a
+     */
+    public static String generateRandomToken() {
+        LOG.info("Generate token for anonymous pupil session.");
+        long currentTimeMillis = System.currentTimeMillis();
+        int randomInt = SECURE_RANDOM.nextInt();
+        return Long.toHexString(currentTimeMillis) + Integer.toHexString(randomInt);
+    }
+
+    /**
+     * Verifies if a value is part of an Enum.
+     *
+     * @param value    the value to be checked
+     * @param enumClass the Enum class
+     * @return true if the value is part of the Enum, false otherwise
+     */
+    public static <T extends Enum<T>> boolean isInEnum(String value, Class<T> enumClass) {
+        try {
+            Enum.valueOf(enumClass, value);
+            return true;
+        } catch (IllegalArgumentException e) {
+            return false;
         }
     }
 }

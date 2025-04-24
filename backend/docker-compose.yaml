@@ -27,7 +27,6 @@ services:
       - pi_net
     depends_on:
       - mongo
-      - ms_user
     environment:
       - SPRING_DATA_MONGODB_URI=mongodb://mongo:27017
       - SPRING_DATA_MONGODB_DATABASE=PI-DB-Users
@@ -42,9 +41,26 @@ services:
       - pi_net
     depends_on:
       - mongo
+      - ms_auth
     environment:
       - SPRING_DATA_MONGODB_URI=mongodb://mongo:27017
       - SPRING_DATA_MONGODB_DATABASE=PI-DB-Users
+  ms_quiz:
+    container_name: ms_quiz
+    build:
+      context: ./ms_quiz
+    restart: on-failure
+    ports:
+      - "8002:8002"
+    networks:
+      - pi_net
+    depends_on:
+      - mongo
+      - ms_auth
+      - ms_user
+    environment:
+      - SPRING_DATA_MONGODB_URI=mongodb://mongo:27017
+      - SPRING_DATA_MONGODB_DATABASE=PI-DB-Quizes
 
 volumes:
   mongo_data:
