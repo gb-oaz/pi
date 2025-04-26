@@ -88,4 +88,25 @@ public class Utils {
             return false;
         }
     }
+
+    /**
+     * Verifies if a value is part of an Enum return enum.
+     *
+     * @param value     the value to be checked
+     * @param enumClass the Enum class
+     * @param <T>       the value enum
+     * @return T        entity
+     * @throws GlobalException in case error
+     */
+    public static <T extends Enum<T>> T ifEnumGet(String value, Class<T> enumClass) throws GlobalException {
+        try {
+            return Enum.valueOf(enumClass, value);
+        } catch (IllegalArgumentException e) {
+            throw GlobalException.builder()
+                    .status(400)
+                    .alert(new CustomAlert(SystemCodeEnum.C003PI))
+                    .details("Check value enum: " + value)
+                    .build();
+        }
+    }
 }

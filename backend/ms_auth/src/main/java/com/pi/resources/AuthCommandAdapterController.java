@@ -2,7 +2,6 @@ package com.pi.resources;
 
 import com.pi.core_auth.core.domains.Token;
 import com.pi.core_auth.core.dtos.CommandDto;
-import com.pi.core_auth.core.enums.CommandType;
 import com.pi.core_auth.ports.in.IAuthCommandIn;
 import com.pi.core_auth.usecases.CasePostAnonymousToken;
 import com.pi.core_auth.usecases.CasePostSignInToken;
@@ -31,7 +30,7 @@ public class AuthCommandAdapterController implements IAuthCommandIn {
     @Override
     public ResponseEntity<Token> postSignInToken(String commandType, String authorization, String login, String code, String password) throws GlobalException {
         var dto = CommandDto.builder()
-                .commandType(CommandType.valueOf(commandType))
+                .commandType(commandType)
                 .anonymousToken(authorization)
                 .login(login)
                 .code(code)
@@ -45,7 +44,7 @@ public class AuthCommandAdapterController implements IAuthCommandIn {
     @Override
     public ResponseEntity<Token> postAnonymousToken(String commandType) throws GlobalException {
         var dto = CommandDto.builder()
-                .commandType(CommandType.valueOf(commandType))
+                .commandType(commandType)
                 .build();
 
         casePostAnonymousToken.setCommandDto(dto);

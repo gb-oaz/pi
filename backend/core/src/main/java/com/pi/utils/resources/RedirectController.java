@@ -43,7 +43,7 @@ public class RedirectController {
      *
      * @return a {@link RedirectView} that redirects the user to "/docs/swagger"
      */
-    @GetMapping({ "/", "/swagger", "/docs"})
+    @GetMapping({ "/", "/swagger", "/swagger/", "/docs", "/docs/"})
     public RedirectView redirectToSwagger() {
         return new RedirectView("/docs/swagger", true);
     }

@@ -4,7 +4,9 @@ import com.pi.core_quiz.core.domain.Quiz;
 import com.pi.core_quiz.core.domain.itens.IQuizItem;
 import com.pi.core_quiz.core.utils.models.Response;
 import com.pi.core_quiz.ports.out.IQuizCommandOut;
+import com.pi.utils.enums.SystemCodeEnum;
 import com.pi.utils.exceptions.GlobalException;
+import com.pi.utils.models.CustomAlert;
 import com.pi.utils.mongo.documents.QuizDocument;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -44,8 +46,8 @@ public class QuizDaoCommandAdapter implements IQuizCommandOut {
     @Override
     public Response addQuizItem(String key, Integer position, IQuizItem item) throws GlobalException {
         var quiz = template.findOne(new Query(Criteria.where(KEY).is(key)), QuizDocument.class, COLLECTION_NAME);
-        if (ObjectUtils.isEmpty(quiz)) throw GlobalException.builder().status(404).details(RESPONSE_NOT_FOUND).build();
-        if (quiz.exist(position)) throw GlobalException.builder().status(400).details(POSITION_ALREADY_EXISTS).build();
+        if (ObjectUtils.isEmpty(quiz)) throw GlobalException.builder().status(404).details(RESPONSE_NOT_FOUND).alert(new CustomAlert(SystemCodeEnum.C003PI)).build();
+        if (quiz.exist(position)) throw GlobalException.builder().status(400).details(POSITION_ALREADY_EXISTS).alert(new CustomAlert(SystemCodeEnum.C003PI)).build();
         quiz.addQuizItem(position, item);
         template.updateFirst(new Query(Criteria.where(KEY).is(key)), new Update().set(QUIZES, quiz.getQuizes()), QuizDocument.class, COLLECTION_NAME);
         return Response.builder().key(quiz.getKey()).build();
@@ -54,8 +56,8 @@ public class QuizDaoCommandAdapter implements IQuizCommandOut {
     @Override
     public Response updateQuizItem(String key, Integer position, IQuizItem item) throws GlobalException {
         var quiz = template.findOne(new Query(Criteria.where(KEY).is(key)), QuizDocument.class, COLLECTION_NAME);
-        if (ObjectUtils.isEmpty(quiz)) throw GlobalException.builder().status(404).details(RESPONSE_NOT_FOUND).build();
-        if (!quiz.exist(position)) throw GlobalException.builder().status(400).details(POSITION_NOT_EXISTS).build();
+        if (ObjectUtils.isEmpty(quiz)) throw GlobalException.builder().status(404).details(RESPONSE_NOT_FOUND).alert(new CustomAlert(SystemCodeEnum.C003PI)).build();
+        if (!quiz.exist(position)) throw GlobalException.builder().status(400).details(POSITION_NOT_EXISTS).alert(new CustomAlert(SystemCodeEnum.C003PI)).build();
         quiz.updateQuizItem(position, item);
         template.updateFirst(new Query(Criteria.where(KEY).is(key)), new Update().set(QUIZES, quiz.getQuizes()), QuizDocument.class, COLLECTION_NAME);
         return Response.builder().key(quiz.getKey()).build();
@@ -64,7 +66,7 @@ public class QuizDaoCommandAdapter implements IQuizCommandOut {
     @Override
     public Response updateQuiz(String key, String name, Set<String> categories) throws GlobalException {
         var quiz = template.findOne(new Query(Criteria.where(KEY).is(key)), QuizDocument.class, COLLECTION_NAME);
-        if (ObjectUtils.isEmpty(quiz)) throw GlobalException.builder().status(404).details(RESPONSE_NOT_FOUND).build();
+        if (ObjectUtils.isEmpty(quiz)) throw GlobalException.builder().status(404).details(RESPONSE_NOT_FOUND).alert(new CustomAlert(SystemCodeEnum.C003PI)).build();
 
         var update = new Update();
         if (!ObjectUtils.isEmpty(name)) update.set(NAME, name);
@@ -77,7 +79,7 @@ public class QuizDaoCommandAdapter implements IQuizCommandOut {
     @Override
     public Response deleteQuizItem(String key, Integer position) throws GlobalException {
         var quiz = template.findOne(new Query(Criteria.where(KEY).is(key)), QuizDocument.class, COLLECTION_NAME);
-        if (ObjectUtils.isEmpty(quiz)) throw GlobalException.builder().status(404).details(RESPONSE_NOT_FOUND).build();
+        if (ObjectUtils.isEmpty(quiz)) throw GlobalException.builder().status(404).details(RESPONSE_NOT_FOUND).alert(new CustomAlert(SystemCodeEnum.C003PI)).build();
         quiz.deleteQuizItem(position);
         template.updateFirst(new Query(Criteria.where(KEY).is(key)), new Update().set(QUIZES, quiz.getQuizes()), QuizDocument.class, COLLECTION_NAME);
         return Response.builder().key(quiz.getKey()).build();
@@ -86,7 +88,7 @@ public class QuizDaoCommandAdapter implements IQuizCommandOut {
     @Override
     public Response deleteQuiz(String key) throws GlobalException {
         var quiz = template.findOne(new Query(Criteria.where(KEY).is(key)), QuizDocument.class, COLLECTION_NAME);
-        if (ObjectUtils.isEmpty(quiz)) throw GlobalException.builder().status(404).details(RESPONSE_NOT_FOUND).build();
+        if (ObjectUtils.isEmpty(quiz)) throw GlobalException.builder().status(404).details(RESPONSE_NOT_FOUND).alert(new CustomAlert(SystemCodeEnum.C003PI)).build();
         template.remove(new Query(Criteria.where(KEY).is(key)), QuizDocument.class, COLLECTION_NAME);
         return Response.builder().key(quiz.getKey()).build();
     }

@@ -1,7 +1,6 @@
 package com.pi.resources;
 
 import com.pi.core_auth.core.dtos.QueryDto;
-import com.pi.core_auth.core.enums.QueryType;
 import com.pi.core_auth.core.utils.models.Response;
 import com.pi.core_auth.ports.in.IAuthQueryIn;
 import com.pi.core_auth.usecases.CaseGetScopeToken;
@@ -27,7 +26,7 @@ public class AuthQueryAdapterController implements IAuthQueryIn {
     @Override
     public ResponseEntity<Response> getStatusToken(String queryType, String authorization) throws GlobalException {
         var dto = QueryDto.builder()
-                .queryType(QueryType.valueOf(queryType))
+                .queryType(queryType)
                 .token(authorization)
                 .build();
 
@@ -38,7 +37,7 @@ public class AuthQueryAdapterController implements IAuthQueryIn {
     @Override
     public ResponseEntity<Response> getScopeToken(String queryType, String authorization) throws GlobalException {
         var dto = QueryDto.builder()
-                .queryType(QueryType.valueOf(queryType))
+                .queryType(queryType)
                 .token(authorization)
                 .build();
 

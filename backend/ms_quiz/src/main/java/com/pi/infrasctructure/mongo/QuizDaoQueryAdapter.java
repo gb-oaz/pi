@@ -3,7 +3,9 @@ package com.pi.infrasctructure.mongo;
 import com.pi.core_quiz.core.domain.Quiz;
 import com.pi.core_quiz.core.domain.itens.IQuizItem;
 import com.pi.core_quiz.ports.out.IQuizQueryOut;
+import com.pi.utils.enums.SystemCodeEnum;
 import com.pi.utils.exceptions.GlobalException;
+import com.pi.utils.models.CustomAlert;
 import com.pi.utils.models.Pageable;
 import com.pi.utils.mongo.documents.QuizDocument;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +21,8 @@ import java.util.Set;
 
 @Repository
 public class QuizDaoQueryAdapter implements IQuizQueryOut {
-    private static final String RESPONSE_NOT_FOUND = "Quiz not found";
+    private static final String KEY_NOT_FOUND = "Provide exist key";
+    private static final String POSITION_NOT_FOUND = "Provide exist position";
     private static final String KEY = "key";
     private static final String LOGIN = "login";
     private static final String CODE = "code";
@@ -36,7 +39,7 @@ public class QuizDaoQueryAdapter implements IQuizQueryOut {
     @Override
     public Quiz findQuizByKey(String key) throws GlobalException {
         var quiz = template.findOne(new Query(Criteria.where(KEY).is(key)), Quiz.class, COLLECTION_NAME);
-        if (ObjectUtils.isEmpty(quiz)) throw GlobalException.builder().status(404).details(RESPONSE_NOT_FOUND).build();
+        if (ObjectUtils.isEmpty(quiz)) throw GlobalException.builder().status(404).details(KEY_NOT_FOUND).alert(new CustomAlert(SystemCodeEnum.C003PI)).build();
         return quiz;
     }
 
@@ -59,12 +62,13 @@ public class QuizDaoQueryAdapter implements IQuizQueryOut {
     @Override
     public IQuizItem findQuizItemByKeyAndPosition(String key, Integer position) throws GlobalException {
         var quiz = template.findOne(new Query(Criteria.where(KEY).is(key)), QuizDocument.class, COLLECTION_NAME);
-        if (ObjectUtils.isEmpty(quiz)) throw GlobalException.builder().status(404).details(RESPONSE_NOT_FOUND).build();
+        if (ObjectUtils.isEmpty(quiz))
+            throw GlobalException.builder().status(404).details(KEY_NOT_FOUND).alert(new CustomAlert(SystemCodeEnum.C003PI)).build();
 
         return quiz.getQuizes().stream()
                 .filter(item -> item.getPosition().equals(position))
                 .findFirst()
-                .orElseThrow(() -> GlobalException.builder().status(404).details(RESPONSE_NOT_FOUND).build());
+                .orElseThrow(() -> GlobalException.builder().status(404).details(POSITION_NOT_FOUND).alert(new CustomAlert(SystemCodeEnum.C003PI)).build());
     }
 
     protected Query buildQuery(String login, String code, String name, Set<String> categories) {

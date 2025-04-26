@@ -6,6 +6,7 @@ import com.pi.utils.enums.SystemCodeEnum;
 import com.pi.utils.exceptions.GlobalException;
 import com.pi.utils.interfaces.IGValidationDto;
 import com.pi.utils.models.CustomAlert;
+import com.pi.utils.services.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.ObjectUtils;
@@ -13,7 +14,7 @@ import org.springframework.util.ObjectUtils;
 import java.util.Set;
 
 public record QueryDto(
-        QueryType queryType,
+        String queryType,
         String token,
         String login,
         String code,
@@ -30,7 +31,7 @@ public record QueryDto(
     public Object validate() {
         Validate.token(token);
 
-        return switch (queryType) {
+        return switch (Utils.ifEnumGet(queryType, QueryType.class)) {
             case QUERY_GET_QUIZ -> {
                 Validate.key(key);
                 yield key;
@@ -60,7 +61,7 @@ public record QueryDto(
     public static Builder builder() { return new Builder(); }
 
     public static class Builder {
-        private QueryType queryType;
+        private String queryType;
         private String token;
         private String login;
         private String code;
@@ -71,7 +72,7 @@ public record QueryDto(
         private Integer page;
         private Integer size;
 
-        public Builder queryType(QueryType queryType) {
+        public Builder queryType(String queryType) {
             this.queryType = queryType;
             return this;
         }

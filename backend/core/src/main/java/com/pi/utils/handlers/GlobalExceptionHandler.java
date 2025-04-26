@@ -1,10 +1,13 @@
 package com.pi.utils.handlers;
+
 import java.util.Map;
 
 import com.pi.utils.enums.SystemCodeEnum;
 import com.pi.utils.exceptions.GlobalException;
 import com.pi.utils.models.CustomAlert;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.servlet.NoHandlerFoundException;
@@ -54,7 +57,9 @@ public class GlobalExceptionHandler {
      * @return a {@link ResponseEntity} containing a generic error response in JSON format
      */
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<Map<String, Object>> handleGenericException(Throwable ex) {
+    public ResponseEntity<Map<String, Object>> handleGenericException(Throwable ex) throws Throwable {
+        if (ex instanceof AccessDeniedException || ex instanceof AuthenticationException) throw ex;
+
         var exception = GlobalException.builder()
                 .status(500)
                 .alert(new CustomAlert(SystemCodeEnum.C001PI))

@@ -8,12 +8,13 @@ import com.pi.utils.exceptions.GlobalException;
 import com.pi.utils.interfaces.IGValidationDto;
 import com.pi.utils.models.CustomAlert;
 
+import com.pi.utils.services.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.ObjectUtils;
 
 public record QueryDto(
-        QueryType queryType,
+        String queryType,
         String token,
         String name,
         String email,
@@ -34,7 +35,7 @@ public record QueryDto(
         if (!ObjectUtils.isEmpty(login)) Validate.login(login);
         if (!ObjectUtils.isEmpty(code)) Validate.code(code);
 
-        return switch (queryType) {
+        return switch (Utils.ifEnumGet(queryType, QueryType.class)) {
             case QUERY_GET_USER_BY_PROJECTION -> {
                 yield User.builder()
                         .name(name)
@@ -65,7 +66,7 @@ public record QueryDto(
     public static Builder builder() { return new Builder(); }
 
     public static class Builder {
-        private QueryType queryType;
+        private String queryType;
         private String token;
         private String name;
         private String email;
@@ -74,7 +75,7 @@ public record QueryDto(
         private Integer page;
         private Integer size;
 
-        public Builder queryType(QueryType queryType) { this.queryType = queryType; return this; }
+        public Builder queryType(String queryType) { this.queryType = queryType; return this; }
         public Builder token(String token) { this.token = token; return this; }
         public Builder name(String name) { this.name = name; return this; }
         public Builder email(String email) { this.email = email; return this; }

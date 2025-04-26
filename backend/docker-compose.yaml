@@ -17,10 +17,13 @@ services:
     container_name: redis
     image: redis:7.2
     restart: always
+    command: ["redis-server", "--appendonly", "yes"]
     ports:
       - "6379:6379"
     networks:
       - pi_net
+    volumes:
+      - redis_data:/data/db
   # #################
   # Backend services
   # #################
@@ -93,6 +96,7 @@ services:
 
 volumes:
   mongo_data:
+  redis_data:
 
 networks:
   pi_net:

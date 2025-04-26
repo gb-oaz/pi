@@ -7,13 +7,14 @@ import com.pi.utils.enums.SystemCodeEnum;
 import com.pi.utils.exceptions.GlobalException;
 import com.pi.utils.interfaces.IGValidationDto;
 import com.pi.utils.models.CustomAlert;
+import com.pi.utils.services.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 
 public record CommandDto(
-        CommandType commandType,
+        String commandType,
         String login,
         String code,
         String password,
@@ -25,9 +26,9 @@ public record CommandDto(
     @Override
     public Map<String, Object> validate() throws GlobalException {
         LOG.info(LOG_MESSAGE_FORMAT, commandType, this);
-        Validate.command(commandType.toString());
+        Validate.command(commandType);
 
-        return switch (commandType) {
+        return switch (Utils.ifEnumGet(commandType, CommandType.class)) {
             case COMMAND_POST_SIGN_IN_TOKEN -> {
                 Validate.login(login);
                 Validate.code(code);
@@ -58,13 +59,13 @@ public record CommandDto(
     }
 
     public static class Builder {
-        private CommandType commandType;
+        private String commandType;
         private String login;
         private String code;
         private String password;
         private String anonymousToken;
 
-        public Builder commandType(CommandType commandType) {
+        public Builder commandType(String commandType) {
             this.commandType = commandType;
             return this;
         }

@@ -2,7 +2,6 @@ package com.pi.resources;
 
 import com.pi.core_user.core.domains.User;
 import com.pi.core_user.core.dtos.CommandDto;
-import com.pi.core_user.core.enums.CommandType;
 import com.pi.core_user.ports.in.IUserCommandIn;
 import com.pi.core_user.usecases.CaseCreateUser;
 import com.pi.core_user.usecases.CaseUpdateUser;
@@ -34,7 +33,7 @@ public class UserCommandAdapterController implements IUserCommandIn {
     @Override
     public ResponseEntity<User> postCreateUserTeacher(String commandType, String anonymousToken, String name, String email, String login, String code, String password) throws GlobalException {
         var dto = CommandDto.builder()
-                .commandType(CommandType.valueOf(commandType))
+                .commandType(commandType)
                 .token(anonymousToken)
                 .name(name)
                 .email(email)
@@ -50,7 +49,7 @@ public class UserCommandAdapterController implements IUserCommandIn {
     @Override
     public ResponseEntity<User> postCreateUserStudent(String commandType, String anonymousToken, String name, String email, String login, String code, String password) throws GlobalException {
         var dto = CommandDto.builder()
-                .commandType(CommandType.valueOf(commandType))
+                .commandType(commandType)
                 .token(anonymousToken)
                 .name(name)
                 .email(email)
@@ -66,7 +65,7 @@ public class UserCommandAdapterController implements IUserCommandIn {
     @Override
     public ResponseEntity<User> putUpdateUser(String commandType, String token, String name, String email, String password, String oldPassword) throws GlobalException {
         var dto = CommandDto.builder()
-                .commandType(CommandType.valueOf(commandType))
+                .commandType(commandType)
                 .token(token)
                 .name(name)
                 .email(email)

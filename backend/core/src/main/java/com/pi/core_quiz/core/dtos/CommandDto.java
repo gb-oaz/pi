@@ -18,7 +18,7 @@ import org.springframework.util.ObjectUtils;
 import java.util.Set;
 
 public record CommandDto(
-        CommandType commandType,
+        String commandType,
         String token,
         String login,
         String code,
@@ -35,7 +35,7 @@ public record CommandDto(
     public Object validate() throws GlobalException {
         Validate.token(token);
 
-        return switch (commandType) {
+        return switch (Utils.ifEnumGet(commandType, CommandType.class)) {
             case COMMAND_POST_NEW_QUIZ -> {
                 Validate.login(login);
                 Validate.code(code);
@@ -78,7 +78,7 @@ public record CommandDto(
     public static Builder builder() { return new Builder(); }
 
     public static class Builder {
-        private CommandType commandType;
+        private String commandType;
         private String token;
         private String login;
         private String code;
@@ -89,7 +89,7 @@ public record CommandDto(
         private IQuizItem quizItem;
         private Set<String> categories;
 
-        public Builder commandType(CommandType commandType) {
+        public Builder commandType(String commandType) {
             this.commandType = commandType;
             return this;
         }

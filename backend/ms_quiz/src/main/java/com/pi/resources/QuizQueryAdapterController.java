@@ -3,7 +3,6 @@ package com.pi.resources;
 import com.pi.core_quiz.core.domain.Quiz;
 import com.pi.core_quiz.core.domain.itens.IQuizItem;
 import com.pi.core_quiz.core.dtos.QueryDto;
-import com.pi.core_quiz.core.enums.QueryType;
 import com.pi.core_quiz.ports.in.IQuizQueryIn;
 import com.pi.core_quiz.usecases.CaseGetQuiz;
 import com.pi.core_quiz.usecases.CaseGetQuizItem;
@@ -42,7 +41,7 @@ public class QuizQueryAdapterController implements IQuizQueryIn {
     public ResponseEntity<Quiz> getQuiz(String key, String queryType, String token) throws GlobalException {
         var dto = QueryDto.builder()
                 .key(key)
-                .queryType(QueryType.valueOf(queryType))
+                .queryType(queryType)
                 .token(token)
                 .build();
 
@@ -53,7 +52,7 @@ public class QuizQueryAdapterController implements IQuizQueryIn {
     @Override
     public ResponseEntity<Pageable<Quiz>> getQuizesProjection(String queryType, String token, String login, String code, String name, Set<String> categories, Integer page, Integer size) throws GlobalException {
         var dto = QueryDto.builder()
-                .queryType(QueryType.valueOf(queryType))
+                .queryType(queryType)
                 .token(token)
                 .name(name)
                 .categories(categories)
@@ -70,7 +69,7 @@ public class QuizQueryAdapterController implements IQuizQueryIn {
         var dto = QueryDto.builder()
                 .key(key)
                 .position(position)
-                .queryType(QueryType.valueOf(queryType))
+                .queryType(queryType)
                 .token(teacherToken)
                 .build();
 

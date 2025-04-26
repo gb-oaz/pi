@@ -2,7 +2,6 @@ package com.pi.resources;
 
 import com.pi.core_quiz.core.domain.itens.IQuizItem;
 import com.pi.core_quiz.core.dtos.CommandDto;
-import com.pi.core_quiz.core.enums.CommandType;
 import com.pi.core_quiz.core.utils.models.Response;
 import com.pi.core_quiz.ports.in.IQuizCommandIn;
 import com.pi.core_quiz.usecases.CaseAddQuizItem;
@@ -55,7 +54,7 @@ public class QuizCommandAdapterController implements IQuizCommandIn {
     @Override
     public ResponseEntity<Response> postNewQuiz(String commandType, String teacherToken, String login, String code, String name, Set<String> categories) throws GlobalException {
         var dto = CommandDto.builder()
-                .commandType(CommandType.valueOf(commandType))
+                .commandType(commandType)
                 .token(teacherToken)
                 .login(login)
                 .code(code)
@@ -72,7 +71,7 @@ public class QuizCommandAdapterController implements IQuizCommandIn {
         var dto = CommandDto.builder()
                 .key(key)
                 .position(position)
-                .commandType(CommandType.valueOf(commandType))
+                .commandType(commandType)
                 .typeItem(typeItem)
                 .token(teacherToken)
                 .quizItem(quizItem)
@@ -87,7 +86,7 @@ public class QuizCommandAdapterController implements IQuizCommandIn {
         var dto = CommandDto.builder()
                 .key(key)
                 .position(position)
-                .commandType(CommandType.valueOf(commandType))
+                .commandType(commandType)
                 .typeItem(typeItem)
                 .token(teacherToken)
                 .quizItem(quizItem)
@@ -101,7 +100,7 @@ public class QuizCommandAdapterController implements IQuizCommandIn {
     public ResponseEntity<Response> putQuiz(String key, String commandType, String teacherToken, String name, Set<String> categories) throws GlobalException {
         var dto = CommandDto.builder()
                 .key(key)
-                .commandType(CommandType.valueOf(commandType))
+                .commandType(commandType)
                 .token(teacherToken)
                 .name(name)
                 .categories(categories)
@@ -116,7 +115,7 @@ public class QuizCommandAdapterController implements IQuizCommandIn {
         var dto = CommandDto.builder()
                 .key(key)
                 .position(position)
-                .commandType(CommandType.valueOf(commandType))
+                .commandType(commandType)
                 .token(teacherToken)
                 .build();
 
@@ -128,7 +127,7 @@ public class QuizCommandAdapterController implements IQuizCommandIn {
     public ResponseEntity<Response> deleteQuiz(String key, String commandType, String teacherToken) throws GlobalException {
         var dto = CommandDto.builder()
                 .key(key)
-                .commandType(CommandType.valueOf(commandType))
+                .commandType(commandType)
                 .token(teacherToken)
                 .build();
 

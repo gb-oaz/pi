@@ -126,7 +126,6 @@ public class CaseUpdateUser implements Callable<User> {
                     .build();
         }
         LOG.info("End Find user if exist.");
-        user.setPassword("***********");
         return user;
     }
 

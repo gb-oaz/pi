@@ -117,7 +117,29 @@
             <version>${spring.boot-version}</version>
         </dependency>
 
+        <!-- Hibernate validation -->
+        <dependency>
+            <groupId>org.hibernate.validator</groupId>
+            <artifactId>hibernate-validator</artifactId>
+            <version>8.0.1.Final</version>
+        </dependency>
+
     </dependencies>
+
+    <dependencyManagement>
+
+        <!-- Solution for vulnerability: Spring boot starter data redis -->
+        <dependencies>
+            <dependency>
+                <groupId>io.netty</groupId>
+                <artifactId>netty-bom</artifactId>
+                <version>4.1.119.Final</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+
+    </dependencyManagement>
 
     <build>
         <plugins>

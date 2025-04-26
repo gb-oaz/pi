@@ -7,11 +7,12 @@ import com.pi.utils.enums.SystemCodeEnum;
 import com.pi.utils.exceptions.GlobalException;
 import com.pi.utils.interfaces.IGValidationDto;
 import com.pi.utils.models.CustomAlert;
+import com.pi.utils.services.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public record QueryDto(
-        QueryType queryType,
+        String queryType,
         String token
 ) implements IGValidationDto<Token> {
     private static final Logger LOG = LoggerFactory.getLogger(QueryDto.class);
@@ -20,9 +21,9 @@ public record QueryDto(
     @Override
     public Token validate() throws GlobalException {
         LOG.info(LOG_MESSAGE_FORMAT, queryType, this);
-        Validate.query(queryType.toString());
+        Validate.query(queryType);
 
-        return switch (queryType) {
+        return switch (Utils.ifEnumGet(queryType, QueryType.class)) {
             case QUERY_GET_STATUS_TOKEN, QUERY_GET_SCOPE_TOKEN -> {
                 Validate.token(token);
                 yield Token.builder()
@@ -44,10 +45,10 @@ public record QueryDto(
     }
 
     public static class Builder {
-        private QueryType queryType;
+        private String queryType;
         private String token;
 
-        public Builder queryType(QueryType queryType) {
+        public Builder queryType(String queryType) {
             this.queryType = queryType;
             return this;
         }

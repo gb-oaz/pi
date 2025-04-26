@@ -9,6 +9,7 @@ import com.pi.utils.exceptions.GlobalException;
 import com.pi.utils.interfaces.IGValidationDto;
 import com.pi.utils.models.CustomAlert;
 
+import com.pi.utils.services.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.ObjectUtils;
@@ -16,7 +17,7 @@ import org.springframework.util.ObjectUtils;
 import java.util.EnumSet;
 
 public record CommandDto(
-        CommandType commandType,
+        String commandType,
         String token,
         String name,
         String email,
@@ -32,10 +33,10 @@ public record CommandDto(
     public User validate() throws GlobalException {
         LOG.info(LOG_MESSAGE_FORMAT, commandType, this);
         // Common validations
-        Validate.command(commandType.toString());
+        Validate.command(commandType);
         Validate.token(token);
 
-        return switch (commandType) {
+        return switch (Utils.ifEnumGet(commandType, CommandType.class)) {
             case COMMAND_POST_CREATE_USER_TEACHER -> {
                 Validate.name(name);
                 Validate.email(email);
@@ -92,7 +93,7 @@ public record CommandDto(
     public static Builder builder() { return new Builder(); }
 
     public static class Builder {
-        private CommandType commandType;
+        private String commandType;
         private String token;
         private String name;
         private String email;
@@ -101,7 +102,7 @@ public record CommandDto(
         private String password;
         private String oldPassword;
 
-        public Builder commandType(CommandType commandType) { this.commandType = commandType; return this; }
+        public Builder commandType(String commandType) { this.commandType = commandType; return this; }
         public Builder token(String anonymousToken) { this.token = anonymousToken; return this; }
         public Builder name(String name) { this.name = name; return this; }
         public Builder email(String email) { this.email = email; return this; }

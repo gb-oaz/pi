@@ -33,3 +33,6 @@ spring:
       database: ${DATABASE_MONGO:PI-Database}
       collections:
         lives: ${COLLECTION_LIVES:PI-C-Lives}
+    redis:
+      host: redis
+      port: 6379

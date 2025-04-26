@@ -33,6 +33,3 @@ spring:
       database: ${DATABASE_MONGO:PI-Database}
       collections:
         quizes: ${COLLECTION_QUIZES:PI-C-Quizes}
-    redis:
-      host: redis
-      port: 6379

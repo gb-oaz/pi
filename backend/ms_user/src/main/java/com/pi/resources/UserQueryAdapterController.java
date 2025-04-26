@@ -2,7 +2,6 @@ package com.pi.resources;
 
 import com.pi.core_user.core.domains.User;
 import com.pi.core_user.core.dtos.QueryDto;
-import com.pi.core_user.core.enums.QueryType;
 import com.pi.core_user.ports.in.IUserQueryIn;
 import com.pi.core_user.usecases.CaseGetUser;
 import com.pi.core_user.usecases.CaseGetUsers;
@@ -33,7 +32,7 @@ public class UserQueryAdapterController implements IUserQueryIn {
     @Override
     public ResponseEntity<User> getUserByProjection(String queryType, String authorization, String email, String login, String code) throws GlobalException {
         var dto = QueryDto.builder()
-                .queryType(QueryType.valueOf(queryType))
+                .queryType(queryType)
                 .token(authorization)
                 .email(email)
                 .login(login)
@@ -47,7 +46,7 @@ public class UserQueryAdapterController implements IUserQueryIn {
     @Override
     public ResponseEntity<Pageable<User>> getUsersByProjection(String queryType, String authorization, String name, String email, String login, String code, Integer page, Integer size) throws GlobalException {
         var dto = QueryDto.builder()
-                .queryType(QueryType.valueOf(queryType))
+                .queryType(queryType)
                 .token(authorization)
                 .name(name)
                 .email(email)
