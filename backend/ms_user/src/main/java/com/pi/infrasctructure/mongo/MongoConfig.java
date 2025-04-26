@@ -13,7 +13,7 @@ public class MongoConfig {
 
     @Value("${spring.data.mongodb.uri}") String URI;
     @Value("${spring.data.mongodb.database}") String DB_NAME;
-    @Value("${spring.data.mongodb.collection}") String COLLECTION_NAME;
+    @Value("${spring.data.mongodb.collections.users}") String COLLECTION_NAME;
 
     @Bean
     public MongoClient mongoClient() {

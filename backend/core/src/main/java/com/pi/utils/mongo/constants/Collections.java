@@ -12,7 +12,12 @@ public class Collections {
     public static final String COLLECTION_USERS = "PI-C-Users";
 
     /**
-     * Collection name for the quiz.
+     * Collection name for the quizes.
      */
     public static final String COLLECTION_QUIZ = "PI-C-Quizes";
+
+    /**
+     * Collection name fot the lives
+     */
+    public static final String COLLECTION_LIVES = "PI-C-Lives";
 }

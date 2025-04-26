@@ -26,8 +26,7 @@ public class QuizDaoQueryAdapter implements IQuizQueryOut {
     private static final String NAME = "name";
     private static final String CATEGORIES = "categories";
 
-
-    @Value("${spring.data.mongodb.collection}") String COLLECTION_NAME;
+    @Value("${spring.data.mongodb.collections.quizes}") String COLLECTION_NAME;
 
     private final MongoTemplate template;
 
@@ -36,7 +35,7 @@ public class QuizDaoQueryAdapter implements IQuizQueryOut {
 
     @Override
     public Quiz findQuizByKey(String key) throws GlobalException {
-        var quiz = template.findOne(new Query(Criteria.where("key").is(key)), Quiz.class, COLLECTION_NAME);
+        var quiz = template.findOne(new Query(Criteria.where(KEY).is(key)), Quiz.class, COLLECTION_NAME);
         if (ObjectUtils.isEmpty(quiz)) throw GlobalException.builder().status(404).details(RESPONSE_NOT_FOUND).build();
         return quiz;
     }

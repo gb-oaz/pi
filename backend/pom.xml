@@ -21,6 +21,7 @@
         <module>ms_auth</module>
         <module>ms_user</module>
         <module>ms_quiz</module>
+        <module>ms_live</module>
     </modules>
 
 </project>

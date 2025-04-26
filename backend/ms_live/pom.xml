@@ -1,4 +1,4 @@
-<!-- pom.xml do módulo common_core -->
+<!-- pom.xml do módulo ms_auth -->
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
@@ -9,113 +9,22 @@
         <version>1.0.0</version>
     </parent>
 
-    <artifactId>core</artifactId>
-    <version>1.0.0</version>
-    <packaging>jar</packaging>
+    <artifactId>ms_live</artifactId>
 
     <properties>
-        <spring.boot-version>3.4.4</spring.boot-version>
-        <spring.boot.test-version>6.3.5</spring.boot.test-version>
-        <cucumber-version>7.20.1</cucumber-version>
-        <junit-vintage-engine.version>5.11.4</junit-vintage-engine.version>
-        <springdoc.openapi-version>2.8.6</springdoc.openapi-version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
     <dependencies>
 
         <!-- Internal dependencies -->
-
+        <dependency>
+            <groupId>com.pi</groupId>
+            <artifactId>core</artifactId>
+            <version>1.0.0</version>
+        </dependency>
 
         <!-- External dependencies -->
-
-        <!-- Spring boot starter web -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
-            <version>${spring.boot-version}</version>
-        </dependency>
-
-        <!-- Spring boot starter test -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-test</artifactId>
-            <version>${spring.boot-version}</version>
-        </dependency>
-
-        <!-- Spring boot starter actuator -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-actuator</artifactId>
-            <version>${spring.boot-version}</version>
-        </dependency>
-
-        <!-- Spring boot starter security -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-security</artifactId>
-            <version>${spring.boot-version}</version>
-        </dependency>
-
-        <!-- Spring boot starter oauth2 -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-oauth2-resource-server</artifactId>
-            <version>${spring.boot-version}</version>
-        </dependency>
-
-        <!-- Cucumber for BDD test | cucumber: Java - Junit - Spring - Junit vintage -->
-        <dependency>
-            <groupId>io.cucumber</groupId>
-            <artifactId>cucumber-java</artifactId>
-            <version>${cucumber-version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>io.cucumber</groupId>
-            <artifactId>cucumber-junit</artifactId>
-            <version>${cucumber-version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>io.cucumber</groupId>
-            <artifactId>cucumber-spring</artifactId>
-            <version>${cucumber-version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.junit.vintage</groupId>
-            <artifactId>junit-vintage-engine</artifactId>
-            <version>${junit-vintage-engine.version}</version>
-        </dependency>
-
-        <!-- Mock teste inline -->
-        <dependency>
-            <groupId>net.bytebuddy</groupId>
-            <artifactId>byte-buddy-agent</artifactId>
-            <version>1.15.4</version>
-            <scope>test</scope>
-        </dependency>
-
-        <!-- Springdoc OpenApi -->
-        <dependency>
-            <groupId>org.springdoc</groupId>
-            <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
-            <version>${springdoc.openapi-version}</version>
-        </dependency>
-
-        <!-- Spring boot starter data mongodb -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-mongodb</artifactId>
-            <version>${spring.boot-version}</version>
-        </dependency>
-
-        <!-- Spring boot starter data redis -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-redis</artifactId>
-            <version>${spring.boot-version}</version>
-        </dependency>
 
     </dependencies>
 
@@ -131,9 +40,6 @@
                     <source>21</source>
                     <target>21</target>
                     <encoding>UTF-8</encoding>
-                    <compilerArgs>
-                        <arg>-parameters</arg>
-                    </compilerArgs>
                 </configuration>
             </plugin>
 
@@ -147,7 +53,7 @@
                         <manifest>
                             <addClasspath>true</addClasspath>
                             <packageName>com.pi</packageName>
-                            <mainClass>com.pi.Core</mainClass>
+                            <mainClass>com.pi.Live</mainClass>
                             <classpathPrefix>dependency-pi-jars/</classpathPrefix>
                         </manifest>
                         <manifestEntries>
@@ -237,25 +143,6 @@
                             <goal>integration-test</goal>
                             <goal>verify</goal>
                         </goals>
-                    </execution>
-                </executions>
-            </plugin>
-
-            <!-- Plugin exec: Execute Class in stage prepare-package -->
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>exec-maven-plugin</artifactId>
-                <version>3.0.0</version>
-                <executions>
-                    <execution>
-                        <id>generate-rsa-keys</id>
-                        <phase>prepare-package</phase>
-                        <goals>
-                            <goal>java</goal>
-                        </goals>
-                        <configuration>
-                            <mainClass>com.pi.utils.security.KeyGenerator</mainClass>
-                        </configuration>
                     </execution>
                 </executions>
             </plugin>

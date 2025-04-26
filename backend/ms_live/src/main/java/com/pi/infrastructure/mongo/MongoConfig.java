@@ -1,4 +1,4 @@
-package com.pi.infrasctructure.mongo;
+package com.pi.infrastructure.mongo;
 
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
@@ -13,7 +13,7 @@ public class MongoConfig {
 
     @Value("${spring.data.mongodb.uri}") String URI;
     @Value("${spring.data.mongodb.database}") String DB_NAME;
-    @Value("${spring.data.mongodb.collections.quizes}") String COLLECTION_NAME;
+    @Value("${spring.data.mongodb.collections.lives}") String COLLECTION_NAME;
 
     @Bean
     public MongoClient mongoClient() {

@@ -29,6 +29,7 @@ jwt:
 spring:
   data:
     mongodb:
-      uri: ${SPRING_DATA_MONGODB_URI:mongodb://localhost:27017}
-      database: ${SPRING_DATA_MONGODB_DATABASE:PI-DB-Users}
-      collection: ${COLLECTION_NAME:PI-C-Users}
+      uri: ${URI_MONGO_DB:mongodb://localhost:27017}
+      database: ${DATABASE_MONGO:PI-Database}
+      collections:
+        users: ${COLLECTION_USERS:PI-C-Users}

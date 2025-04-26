@@ -24,7 +24,7 @@ import java.util.Objects;
 @Repository
 public class UserDaoCommandAdapter implements IUserCommandOut {
 
-    @Value("${spring.data.mongodb.collection}") String COLLECTION_NAME;
+    @Value("${spring.data.mongodb.collections.users}") String COLLECTION_NAME;
 
     private static final String NAME = "name";
     private static final String EMAIL = "email";

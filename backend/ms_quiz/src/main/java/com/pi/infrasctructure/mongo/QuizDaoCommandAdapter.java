@@ -28,7 +28,7 @@ public class QuizDaoCommandAdapter implements IQuizCommandOut {
     private static final String NAME = "name";
     private static final String CATEGORIES = "categories";
 
-    @Value("${spring.data.mongodb.collection}") String COLLECTION_NAME;
+    @Value("${spring.data.mongodb.collections.quizes}") String COLLECTION_NAME;
 
     private final MongoTemplate template;
 

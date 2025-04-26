@@ -1,11 +1,11 @@
 server:
-  port: 8000
+  port: 8003
 
 microservice:
-  auth:
-    name: Auth
+  live:
+    name: Live
     version: v1
-    description: Responsible for user management, authentication and authorization
+    description: Responsible for live class online
     routes:
       info:
         title: Info API
@@ -31,3 +31,5 @@ spring:
     mongodb:
       uri: ${URI_MONGO_DB:mongodb://localhost:27017}
       database: ${DATABASE_MONGO:PI-Database}
+      collections:
+        lives: ${COLLECTION_LIVES:PI-C-Lives}

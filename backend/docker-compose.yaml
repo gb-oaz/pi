@@ -13,6 +13,14 @@ services:
       - pi_net
     volumes:
       - mongo_data:/data/db
+  redis:
+    container_name: redis
+    image: redis:7.2
+    restart: always
+    ports:
+      - "6379:6379"
+    networks:
+      - pi_net
   # #################
   # Backend services
   # #################
@@ -28,8 +36,8 @@ services:
     depends_on:
       - mongo
     environment:
-      - SPRING_DATA_MONGODB_URI=mongodb://mongo:27017
-      - SPRING_DATA_MONGODB_DATABASE=PI-DB-Users
+      - URI_MONGO_DB=mongodb://mongo:27017
+      - DATABASE_MONGO=PI-Database
   ms_user:
     container_name: ms_user
     build:
@@ -43,8 +51,9 @@ services:
       - mongo
       - ms_auth
     environment:
-      - SPRING_DATA_MONGODB_URI=mongodb://mongo:27017
-      - SPRING_DATA_MONGODB_DATABASE=PI-DB-Users
+      - URI_MONGO_DB=mongodb://mongo:27017
+      - DATABASE_MONGO=PI-Database
+      - COLLECTION_USERS=PI-C-Users
   ms_quiz:
     container_name: ms_quiz
     build:
@@ -59,8 +68,28 @@ services:
       - ms_auth
       - ms_user
     environment:
-      - SPRING_DATA_MONGODB_URI=mongodb://mongo:27017
-      - SPRING_DATA_MONGODB_DATABASE=PI-DB-Quizes
+      - URI_MONGO_DB=mongodb://mongo:27017
+      - DATABASE_MONGO=PI-Database
+      - COLLECTION_QUIZES=PI-C-Quizes
+  ms_live:
+    container_name: ms_live
+    build:
+      context: ./ms_live
+    restart: on-failure
+    ports:
+      - "8003:8003"
+    networks:
+      - pi_net
+    depends_on:
+      - mongo
+      - redis
+      - ms_auth
+      - ms_user
+      - ms_quiz
+    environment:
+      - URI_MONGO_DB=mongodb://mongo:27017
+      - DATABASE_MONGO=PI-Database
+      - COLLECTION_LIVES=PI-C-Lives
 
 volumes:
   mongo_data:

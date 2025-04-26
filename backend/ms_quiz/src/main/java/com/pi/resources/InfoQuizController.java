@@ -1,6 +1,6 @@
 package com.pi.resources;
 
-import com.pi.core_user.core.utils.constants.Router;
+import com.pi.core_quiz.core.utils.constants.Router;
 import com.pi.utils.models.GlobalInfo;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -18,12 +18,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 @Tag(name = "Info")
 @RestController
-public class InfoAuthController {
-    private static final Logger LOG = LoggerFactory.getLogger(InfoAuthController.class);
+public class InfoQuizController {
+    private static final Logger LOG = LoggerFactory.getLogger(InfoQuizController.class);
 
-    @Value("${microservice.user.name}") String name;
-    @Value("${microservice.user.version}") String version;
-    @Value("${microservice.user.description}") String description;
+    @Value("${microservice.quiz.name}") String name;
+    @Value("${microservice.quiz.version}") String version;
+    @Value("${microservice.quiz.description}") String description;
 
     @Operation(
             description = "Provide custom server info", responses = {
@@ -31,7 +31,7 @@ public class InfoAuthController {
                     @Content(mediaType = "application/json", schema = @Schema(implementation = GlobalInfo.class))
             }),
     })
-    @GetMapping(path = Router.ROUTER_USER_INFO)
+    @GetMapping(path = Router.ROUTER_QUIZ_INFO)
     public ResponseEntity<GlobalInfo> getInfo() {
         var result = GlobalInfo.builder().name(name).version(version).description(description).build();
 

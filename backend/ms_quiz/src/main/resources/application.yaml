@@ -29,6 +29,10 @@ jwt:
 spring:
   data:
     mongodb:
-      uri: ${SPRING_DATA_MONGODB_URI:mongodb://localhost:27017}
-      database: ${SPRING_DATA_MONGODB_DATABASE:PI-DB-Quizes}
-      collection: ${COLLECTION_NAME:PI-C-Quizes}
+      uri: ${URI_MONGO_DB:mongodb://localhost:27017}
+      database: ${DATABASE_MONGO:PI-Database}
+      collections:
+        quizes: ${COLLECTION_QUIZES:PI-C-Quizes}
+    redis:
+      host: redis
+      port: 6379
