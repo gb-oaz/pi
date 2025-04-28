@@ -6,6 +6,7 @@ import com.pi.core_user.ports.out.IUserCommandOut;
 import com.pi.utils.exceptions.GlobalException;
 
 import com.pi.utils.mongo.documents.UserDocument;
+import com.pi.utils.services.Utils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -17,7 +18,6 @@ import org.springframework.data.mongodb.core.query.UpdateDefinition;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.ObjectUtils;
 
-import java.time.OffsetDateTime;
 import java.util.EnumSet;
 import java.util.Objects;
 
@@ -50,8 +50,8 @@ public class UserDaoCommandAdapter implements IUserCommandOut {
                 .code(code)
                 .password(password)
                 .scopes(scopes)
-                .createAt(OffsetDateTime.now().toString())
-                .updateAt(OffsetDateTime.now().toString())
+                .createAt(Utils.now())
+                .updateAt(Utils.now())
                 .build();
 
         var document = template.insert(Objects.requireNonNull(UserDocument.mapperDocument(user)), COLLECTION_NAME);
@@ -78,7 +78,7 @@ public class UserDaoCommandAdapter implements IUserCommandOut {
         if (!ObjectUtils.isEmpty(email)) update.set(EMAIL, email);
         if (!ObjectUtils.isEmpty(password)) update.set(PASSWORD, password);
 
-        update.set(UPDATE_AT, OffsetDateTime.now().toString());
+        update.set(UPDATE_AT, Utils.now());
 
         return update;
     }

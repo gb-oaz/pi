@@ -2,9 +2,10 @@ package com.pi.core_quiz.core.domain.quiz;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.pi.core_quiz.core.domain.itens.IOperationsQuiz;
 import com.pi.core_quiz.core.domain.itens.IQuizItem;
 import com.pi.core_quiz.core.enums.QuizType;
-import com.pi.core_quiz.core.enums.StatusQuiz;
+import com.pi.core_quiz.core.enums.StatusItem;
 
 import java.beans.ConstructorProperties;
 import java.util.HashMap;
@@ -12,15 +13,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-public final class QuizFillSpace implements IQuizItem {
+public final class QuizFillSpace implements IQuizItem, IOperationsQuiz<String> {
     private static final String TYPE = QuizType.QUIZ_FILL_SPACE.name();
     private Integer position;
     private String contentQuestion;
     private List<String> answers;
     private Integer timerSeconds;
     private Integer reward;
-    private Map<String, List<Object>> answersLive;
-    private StatusQuiz status;
+    private Map<String, List<String>> answersLive;
+    private StatusItem status;
 
     @ConstructorProperties({
             "position",
@@ -45,7 +46,7 @@ public final class QuizFillSpace implements IQuizItem {
         this.timerSeconds = timerSeconds;
         this.reward = reward;
         this.answersLive = new HashMap<>();
-        this.status = StatusQuiz.PENDING;
+        this.status = StatusItem.PENDING;
     }
 
     @Override public String getType() {
@@ -57,34 +58,25 @@ public final class QuizFillSpace implements IQuizItem {
     @Override public void setPosition(Integer position) {
         this.position = position;
     }
+    @Override public Map<String, List<String>> getAnswersLive() { return answersLive; }
+    @Override public List<String> getAnswers() { return answers; }
 
     // Getters
-    public String getContentQuestion() {
-        return contentQuestion;
-    }
-    public List<String> getAnswers() {
-        return answers;
-    }
-    public Integer getTimerSeconds() {
-        return timerSeconds;
-    }
-    public Integer getReward() {
-        return reward;
-    }
-    public Map<String, List<Object>> getAnswersLive() {
-        return answersLive;
-    }
-    public StatusQuiz getStatus() {
-        return status;
-    }
+    public String getContentQuestion() { return contentQuestion; }
+    public Integer getTimerSeconds() { return timerSeconds; }
+    public Integer getReward() { return reward; }
+    public StatusItem getStatus() { return status; }
 
     // Setters
     public void setContentQuestion(String contentQuestion) { this.contentQuestion = contentQuestion; }
     public void setAnswers(List<String> answers) { this.answers = answers; }
     public void setTimerSeconds(Integer timerSeconds) { this.timerSeconds = timerSeconds; }
     public void setReward(Integer reward) { this.reward = reward; }
-    public void setAnswersLive(Map<String, List<Object>> answersLive) { this.answersLive = answersLive; }
-    public void setStatus(StatusQuiz status) { this.status = status; }
+    public void setAnswersLive(Map<String, List<String>> answersLive) { this.answersLive = answersLive; }
+    public void setStatus(StatusItem status) { this.status = status; }
+
+    @Override
+    public void addAnswerOperationLive(String login, String code, List<String> value) { addAnswerLive(login,code,value); }
 
     @Override
     public boolean equals(Object obj) {

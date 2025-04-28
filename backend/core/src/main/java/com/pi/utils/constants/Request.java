@@ -38,4 +38,39 @@ public class Request {
      * for pagination.
      */
     public static final String SIZE = "size";
+
+    /**
+     * Represents the "keyLive" request parameter, used to specify the key of the live class.
+     */
+    public static final String KEY_LIVE = "keyLive";
+
+    /**
+     * Represents the "quizKey" request parameter, used to specify the key of the quiz.
+     */
+    public static final String KEY_QUIZ = "keyQuiz";
+
+    /**
+     * Represents the "pupilLogin" request parameter, used to specify the login of the pupil.
+     */
+    public static final String PUPIL_LOGIN = "pupilLogin";
+
+    /**
+     * Represents the "pupilCode" request parameter, used to specify the code of the pupil.
+     */
+    public static final String PUPIL_CODE = "pupilCode";
+
+    /**
+     * Represents the "answerItem" request parameter, used to specify the item of the answer.
+     */
+    public static final String ANSWER_ITEM = "answerItem";
+
+    /**
+     * Represents the "login" request parameter, used to specify the login of the user.
+     */
+    public static final String LOGIN = "login";
+
+    /**
+     * Represents the "code" request parameter, used to specify the code of the user.
+     */
+    public static final String CODE = "code";
 }

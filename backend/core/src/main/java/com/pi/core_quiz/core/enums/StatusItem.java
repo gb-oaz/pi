@@ -1,6 +1,6 @@
 package com.pi.core_quiz.core.enums;
 
-public enum StatusQuiz {
+public enum StatusItem {
     DONE,
     PENDING
 }

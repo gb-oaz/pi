@@ -35,6 +35,13 @@
             <version>${spring.boot-version}</version>
         </dependency>
 
+        <!-- Spring boot starter webflux for asynchronous and reactive programming -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-webflux</artifactId>
+            <version>${spring.boot-version}</version>
+        </dependency>
+
         <!-- Spring boot starter test -->
         <dependency>
             <groupId>org.springframework.boot</groupId>

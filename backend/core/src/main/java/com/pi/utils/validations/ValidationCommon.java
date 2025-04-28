@@ -47,10 +47,10 @@ public class ValidationCommon {
     public static void token(String token) {
         LOG.info("Init validate token format: {}", token);
         if (ObjectUtils.isEmpty(token)) {
-            LOG.warn("{} - Invalid token type.", SystemCodeEnum.C011PI.name());
+            LOG.warn("{} - Invalid token type.", SystemCodeEnum.C121PI.name());
             throw GlobalException.builder()
                     .status(400)
-                    .alert(new CustomAlert(SystemCodeEnum.C011PI))
+                    .alert(new CustomAlert(SystemCodeEnum.C121PI))
                     .build();
         }
     }

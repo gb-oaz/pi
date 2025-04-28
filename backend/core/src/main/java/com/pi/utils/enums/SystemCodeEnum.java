@@ -76,6 +76,13 @@ public enum SystemCodeEnum {
 
     // RAGE Query dto quiz ---- //
     C110PI("Field queryType is necessary", "Provide correct value, string example: | QUERY_GET_QUIZ, QUERY_GET_QUIZ_PROJECTION, QUERY_GET_QUIZ_ITEM |"),
+
+    // RAGE Query dto live ---- //
+    C120PI("Field queryType is necessary", "Provide correct value, string example: | QUERY_GET_LIVE |"),
+    C121PI("Field key is necessary", "Provide key live value, string example: | <key_quiz> |"),
+
+    // RAGE Command dto live ---- //
+    C130PI("Field commandType is necessary", "Provide correct value, string example: | COMMAND_POST_NEW_LIVE, COMMAND_PATCH_NEXT_POSITION, COMMAND_PATCH_PREVIOUS_POSITION, COMMAND_PATCH_REMOVE_PUPIL_FROM_LOBBY, COMMAND_PATCH_ADD_PUPIL_TO_LOBBY, COMMAND_PATCH_ADD_PUPIL_ANSWER_TO_QUIZ, COMMAND_PATCH_END_LIVE |"),
     ;
 
     private final String problem;

@@ -46,7 +46,7 @@ public class User {
     public GroupedOpenApi infoUserResources() {
         String[] paths = { "/user/v1/**" };
         var info = new Info()
-                .title("2 - MS Auth v1")
+                .title("2 - MS User v1")
                 .version("1.0.0")
                 .description("""
                         # 🧑‍🏫 Fluxo de Utilização da API de Usuários

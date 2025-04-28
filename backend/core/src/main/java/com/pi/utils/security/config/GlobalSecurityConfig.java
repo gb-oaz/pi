@@ -33,6 +33,24 @@ import static com.pi.core_auth.core.enums.CommandType.COMMAND_POST_SIGN_IN_TOKEN
 import static com.pi.core_auth.core.enums.QueryType.QUERY_GET_STATUS_TOKEN;
 import static com.pi.core_auth.core.enums.QueryType.QUERY_GET_SCOPE_TOKEN;
 
+import static com.pi.core_live.core.utils.constants.Router.ROUTER_LIVE_INFO;
+import static com.pi.core_live.core.utils.constants.Router.ROUTER_GET_LIVE;
+import static com.pi.core_live.core.utils.constants.Router.ROUTER_POST_NEW_LIVE;
+import static com.pi.core_live.core.utils.constants.Router.ROUTER_PATCH_NEXT_POSITION;
+import static com.pi.core_live.core.utils.constants.Router.ROUTER_PATCH_PREVIOUS_POSITION;
+import static com.pi.core_live.core.utils.constants.Router.ROUTER_PATCH_ADD_PUPIL_TO_LOBBY;
+import static com.pi.core_live.core.utils.constants.Router.ROUTER_PATCH_REMOVE_PUPIL_FROM_LOBBY;
+import static com.pi.core_live.core.utils.constants.Router.ROUTER_PATCH_ADD_PUPIL_ANSWER_TO_QUIZ;
+import static com.pi.core_live.core.utils.constants.Router.ROUTER_PATCH_END_LIVE;
+import static com.pi.core_live.core.enums.CommandType.COMMAND_POST_NEW_LIVE;
+import static com.pi.core_live.core.enums.CommandType.COMMAND_PATCH_NEXT_POSITION;
+import static com.pi.core_live.core.enums.CommandType.COMMAND_PATCH_PREVIOUS_POSITION;
+import static com.pi.core_live.core.enums.CommandType.COMMAND_PATCH_REMOVE_PUPIL_FROM_LOBBY;
+import static com.pi.core_live.core.enums.CommandType.COMMAND_PATCH_ADD_PUPIL_TO_LOBBY;
+import static com.pi.core_live.core.enums.CommandType.COMMAND_PATCH_ADD_PUPIL_ANSWER_TO_QUIZ;
+import static com.pi.core_live.core.enums.CommandType.COMMAND_PATCH_END_LIVE;
+import static com.pi.core_live.core.enums.QueryType.QUERY_GET_LIVE;
+
 import static com.pi.core_quiz.core.utils.constants.Router.ROUTER_QUIZ_INFO;
 import static com.pi.core_quiz.core.utils.constants.Router.ROUTER_GET_QUIZ;
 import static com.pi.core_quiz.core.utils.constants.Router.ROUTER_GET_QUIZES_PROJECTION;
@@ -92,6 +110,9 @@ public class GlobalSecurityConfig {
                     // MS_QUIZ
                     authorize.requestMatchers(HttpMethod.GET, ROUTER_QUIZ_INFO).permitAll();
 
+                    // MS_LIVE
+                    authorize.requestMatchers(HttpMethod.GET, ROUTER_LIVE_INFO).permitAll();
+
                     // OTHER REQUESTS
                     authorize.anyRequest().authenticated();
                 })
@@ -122,6 +143,16 @@ public class GlobalSecurityConfig {
                     csrf.ignoringRequestMatchers(ROUTER_PUT_QUIZ + "/" + COMMAND_PUT_QUIZ.name());
                     csrf.ignoringRequestMatchers(ROUTER_DELETE_QUIZ_ITEM + "/" + COMMAND_DELETE_QUIZ_ITEM.name());
                     csrf.ignoringRequestMatchers(ROUTER_DELETE_QUIZ + "/" + COMMAND_DELETE_QUIZ.name());
+
+                    // MS_LIVE
+                    csrf.ignoringRequestMatchers(ROUTER_GET_LIVE + "/" + QUERY_GET_LIVE.name());
+                    csrf.ignoringRequestMatchers(ROUTER_POST_NEW_LIVE + "/" + COMMAND_POST_NEW_LIVE.name());
+                    csrf.ignoringRequestMatchers(ROUTER_PATCH_NEXT_POSITION + "/" + COMMAND_PATCH_NEXT_POSITION.name());
+                    csrf.ignoringRequestMatchers(ROUTER_PATCH_PREVIOUS_POSITION + "/" + COMMAND_PATCH_PREVIOUS_POSITION.name());
+                    csrf.ignoringRequestMatchers(ROUTER_PATCH_REMOVE_PUPIL_FROM_LOBBY + "/" + COMMAND_PATCH_REMOVE_PUPIL_FROM_LOBBY.name());
+                    csrf.ignoringRequestMatchers(ROUTER_PATCH_ADD_PUPIL_TO_LOBBY + "/" + COMMAND_PATCH_ADD_PUPIL_TO_LOBBY.name());
+                    csrf.ignoringRequestMatchers(ROUTER_PATCH_ADD_PUPIL_ANSWER_TO_QUIZ + "/" + COMMAND_PATCH_ADD_PUPIL_ANSWER_TO_QUIZ.name());
+                    csrf.ignoringRequestMatchers(ROUTER_PATCH_END_LIVE + "/" + COMMAND_PATCH_END_LIVE.name());
                 })
                 .oauth2ResourceServer(oauth2 -> oauth2
                         .jwt(jwt -> jwt.decoder(jwtDecoder()))

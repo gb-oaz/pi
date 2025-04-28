@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.security.oauth2.jwt.JwtException;
 
 import java.security.SecureRandom;
+import java.time.Instant;
 
 public class Utils {
     private static final Logger LOG = LoggerFactory.getLogger(Utils.class);
@@ -67,7 +68,7 @@ public class Utils {
      * @return the generated token. ex - 17f9343c5c114ed6a
      */
     public static String generateRandomToken() {
-        LOG.info("Generate token for anonymous pupil session.");
+        LOG.info("Generate token session.");
         long currentTimeMillis = System.currentTimeMillis();
         int randomInt = SECURE_RANDOM.nextInt();
         return Long.toHexString(currentTimeMillis) + Integer.toHexString(randomInt);
@@ -108,5 +109,14 @@ public class Utils {
                     .details("Check value enum: " + value)
                     .build();
         }
+    }
+
+    /**
+     * Returns the current time in the ISO-8601 format.
+     *
+     * @return the current time as a string
+     */
+    public static String now() {
+        return Instant.now().toString();
     }
 }
