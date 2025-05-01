@@ -2,7 +2,7 @@ package com.pi.core_live.usecases;
 
 import com.pi.core_live.core.domain.Live;
 import com.pi.core_live.core.dtos.QueryDto;
-import com.pi.core_live.ports.out.ILiveQueryOut;
+import com.pi.core_live.ports.out.ILiveQueryCacheOut;
 import com.pi.utils.exceptions.GlobalException;
 
 import org.slf4j.Logger;
@@ -18,13 +18,13 @@ import java.util.concurrent.Callable;
 public class CaseGetLiveMono implements Callable<Mono<Live>> {
     private static final Logger LOG = LoggerFactory.getLogger(CaseGetLiveMono.class);
 
-    private ILiveQueryOut liveQueryOut;
+    private ILiveQueryCacheOut liveQueryOut;
 
     private QueryDto dto;
 
     public CaseGetLiveMono() { }
 
-    public void setServices(ILiveQueryOut liveQueryOut) {
+    public void setServices(ILiveQueryCacheOut liveQueryOut) {
         this.liveQueryOut = liveQueryOut;
     }
 

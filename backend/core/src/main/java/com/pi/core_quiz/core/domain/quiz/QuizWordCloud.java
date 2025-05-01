@@ -1,6 +1,7 @@
 package com.pi.core_quiz.core.domain.quiz;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.pi.core_quiz.core.domain.itens.IOperationsQuiz;
 import com.pi.core_quiz.core.enums.QuizType;
@@ -13,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public final class QuizWordCloud implements IQuizItem, IOperationsQuiz<String> {
     private static final String TYPE = QuizType.QUIZ_WORD_CLOUD.name();
     private Integer position;
@@ -49,7 +51,7 @@ public final class QuizWordCloud implements IQuizItem, IOperationsQuiz<String> {
         this.status = StatusItem.PENDING;
     }
 
-    @Override public String getType() {
+    @Override @JsonProperty("type") public String getType() {
         return TYPE;
     }
     @Override public Integer getPosition() {

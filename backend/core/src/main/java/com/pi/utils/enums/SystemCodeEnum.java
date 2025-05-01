@@ -73,6 +73,7 @@ public enum SystemCodeEnum {
     C102PI("Field position is necessary", "Provide position value, integer example: | 1 or 2 |"),
     C103PI("Field name is necessary", "Provide position value, string example: | <name_quiz> |"),
     C104PI("Field categories is necessary", "Provide categories value, string example: | <category_1>, <category_2> |"),
+    C105PI("Field live is necessary", "Provide live object"),
 
     // RAGE Query dto quiz ---- //
     C110PI("Field queryType is necessary", "Provide correct value, string example: | QUERY_GET_QUIZ, QUERY_GET_QUIZ_PROJECTION, QUERY_GET_QUIZ_ITEM |"),

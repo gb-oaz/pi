@@ -24,6 +24,11 @@ services:
       - pi_net
     volumes:
       - redis_data:/data/db
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 1s
+      timeout: 3s
+      retries: 30
   # #################
   # Backend services
   # #################
@@ -84,15 +89,14 @@ services:
     networks:
       - pi_net
     depends_on:
-      - mongo
-      - redis
-      - ms_auth
-      - ms_user
-      - ms_quiz
+      redis:
+        condition: service_healthy
     environment:
       - URI_MONGO_DB=mongodb://mongo:27017
       - DATABASE_MONGO=PI-Database
       - COLLECTION_LIVES=PI-C-Lives
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
 
 volumes:
   mongo_data:

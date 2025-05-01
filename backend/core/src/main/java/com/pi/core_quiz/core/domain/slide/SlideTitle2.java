@@ -1,6 +1,7 @@
 package com.pi.core_quiz.core.domain.slide;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.pi.core_quiz.core.domain.itens.IQuizItem;
 import com.pi.core_quiz.core.enums.SlideType;
@@ -8,6 +9,7 @@ import com.pi.core_quiz.core.enums.SlideType;
 import java.beans.ConstructorProperties;
 import java.util.Objects;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public final class SlideTitle2 implements IQuizItem {
     private static final String TYPE = SlideType.SLIDE_TITLE_2.name();
     private Integer position;
@@ -30,7 +32,7 @@ public final class SlideTitle2 implements IQuizItem {
         this.contentDescription = contentDescription;
     }
 
-    @Override public String getType() {
+    @Override @JsonProperty("type") public String getType() {
         return TYPE;
     }
     @Override public Integer getPosition() {

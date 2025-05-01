@@ -33,15 +33,6 @@ import static com.pi.core_auth.core.enums.CommandType.COMMAND_POST_SIGN_IN_TOKEN
 import static com.pi.core_auth.core.enums.QueryType.QUERY_GET_STATUS_TOKEN;
 import static com.pi.core_auth.core.enums.QueryType.QUERY_GET_SCOPE_TOKEN;
 
-import static com.pi.core_live.core.utils.constants.Router.ROUTER_LIVE_INFO;
-import static com.pi.core_live.core.utils.constants.Router.ROUTER_GET_LIVE;
-import static com.pi.core_live.core.utils.constants.Router.ROUTER_POST_NEW_LIVE;
-import static com.pi.core_live.core.utils.constants.Router.ROUTER_PATCH_NEXT_POSITION;
-import static com.pi.core_live.core.utils.constants.Router.ROUTER_PATCH_PREVIOUS_POSITION;
-import static com.pi.core_live.core.utils.constants.Router.ROUTER_PATCH_ADD_PUPIL_TO_LOBBY;
-import static com.pi.core_live.core.utils.constants.Router.ROUTER_PATCH_REMOVE_PUPIL_FROM_LOBBY;
-import static com.pi.core_live.core.utils.constants.Router.ROUTER_PATCH_ADD_PUPIL_ANSWER_TO_QUIZ;
-import static com.pi.core_live.core.utils.constants.Router.ROUTER_PATCH_END_LIVE;
 import static com.pi.core_live.core.enums.CommandType.COMMAND_POST_NEW_LIVE;
 import static com.pi.core_live.core.enums.CommandType.COMMAND_PATCH_NEXT_POSITION;
 import static com.pi.core_live.core.enums.CommandType.COMMAND_PATCH_PREVIOUS_POSITION;
@@ -51,6 +42,15 @@ import static com.pi.core_live.core.enums.CommandType.COMMAND_PATCH_ADD_PUPIL_AN
 import static com.pi.core_live.core.enums.CommandType.COMMAND_PATCH_END_LIVE;
 import static com.pi.core_live.core.enums.QueryType.QUERY_GET_LIVE;
 
+import static com.pi.core_live.core.utils.constants.Router.ROUTER_GET_LIVE;
+import static com.pi.core_live.core.utils.constants.Router.ROUTER_LIVE_INFO;
+import static com.pi.core_live.core.utils.constants.Router.ROUTER_PATCH_ADD_PUPIL_ANSWER_TO_QUIZ;
+import static com.pi.core_live.core.utils.constants.Router.ROUTER_PATCH_ADD_PUPIL_TO_LOBBY;
+import static com.pi.core_live.core.utils.constants.Router.ROUTER_PATCH_END_LIVE;
+import static com.pi.core_live.core.utils.constants.Router.ROUTER_PATCH_NEXT_POSITION;
+import static com.pi.core_live.core.utils.constants.Router.ROUTER_PATCH_PREVIOUS_POSITION;
+import static com.pi.core_live.core.utils.constants.Router.ROUTER_PATCH_REMOVE_PUPIL_FROM_LOBBY;
+import static com.pi.core_live.core.utils.constants.Router.ROUTER_POST_NEW_LIVE;
 import static com.pi.core_quiz.core.utils.constants.Router.ROUTER_QUIZ_INFO;
 import static com.pi.core_quiz.core.utils.constants.Router.ROUTER_GET_QUIZ;
 import static com.pi.core_quiz.core.utils.constants.Router.ROUTER_GET_QUIZES_PROJECTION;

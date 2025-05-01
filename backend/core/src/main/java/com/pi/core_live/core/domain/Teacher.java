@@ -4,9 +4,11 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class Teacher {
-    private final String login;
-    private final String code;
-    private final Control control;
+    private String login;
+    private String code;
+    private Control control;
+
+    public Teacher() {}
 
     public Teacher(String login, String code) {
         this.login = login;

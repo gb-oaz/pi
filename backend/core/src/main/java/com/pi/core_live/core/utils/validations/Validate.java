@@ -1,5 +1,6 @@
 package com.pi.core_live.core.utils.validations;
 
+import com.pi.core_live.core.domain.Live;
 import com.pi.core_live.core.enums.CommandType;
 import com.pi.core_live.core.enums.QueryType;
 import com.pi.utils.enums.SystemCodeEnum;

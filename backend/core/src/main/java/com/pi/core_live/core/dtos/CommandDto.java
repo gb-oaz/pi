@@ -1,5 +1,6 @@
 package com.pi.core_live.core.dtos;
 
+import com.pi.core_live.core.domain.Live;
 import com.pi.core_live.core.enums.CommandType;
 import com.pi.core_live.core.utils.validations.Validate;
 import com.pi.utils.enums.SystemCodeEnum;
@@ -22,6 +23,7 @@ public record CommandDto(
         String keyLive,
         String pupilLogin,
         String pupilCode,
+        Live live,
         List<String> answerItem
 ) implements IGValidationDto<Void> {
     private static final Logger LOG = LoggerFactory.getLogger(CommandDto.class);
@@ -40,7 +42,7 @@ public record CommandDto(
                 Validate.key(keyQuiz);
                 yield null;
             }
-            case COMMAND_PATCH_NEXT_POSITION, COMMAND_PATCH_PREVIOUS_POSITION, COMMAND_PATCH_END_LIVE -> {
+            case COMMAND_PATCH_NEXT_POSITION, COMMAND_PATCH_PREVIOUS_POSITION -> {
                 Validate.login(login);
                 Validate.code(code);
                 Validate.key(keyLive);
@@ -67,6 +69,11 @@ public record CommandDto(
                 Validate.answerItem(answerItem);
                 yield null;
             }
+            case COMMAND_PATCH_END_LIVE -> {
+                Validate.login(login);
+                Validate.code(code);
+                yield null;
+            }
             default -> {
                 LOG.error("{} - Invalid command type.", SystemCodeEnum.C130PI.name());
                 throw GlobalException.builder()
@@ -90,6 +97,7 @@ public record CommandDto(
         private String keyLive;
         private String pupilLogin;
         private String pupilCode;
+        private Live live;
         private List<String> answerItem;
 
         public Builder commandType(String commandType) { this.commandType = commandType; return this; }
@@ -100,7 +108,8 @@ public record CommandDto(
         public Builder keyLive(String keyLive) { this.keyLive = keyLive; return this; }
         public Builder pupilLogin(String pupilLogin) { this.pupilLogin = pupilLogin; return this; }
         public Builder pupilCode(String pupilCode) { this.pupilCode = pupilCode; return this; }
+        public Builder live(Live live) { this.live = live; return this; }
         public Builder answerItem(List<String> answerItem) { this.answerItem = answerItem; return this; }
-        public CommandDto build() { return new CommandDto(commandType, token, login, code, keyQuiz, keyLive, pupilLogin, pupilCode, answerItem); }
+        public CommandDto build() { return new CommandDto(commandType, token, login, code, keyQuiz, keyLive, pupilLogin, pupilCode, live, answerItem); }
     }
 }
