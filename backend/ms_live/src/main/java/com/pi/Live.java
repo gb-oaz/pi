@@ -284,6 +284,48 @@ public class Live {
                         
                         - Mesmo response Live do item 1.
                         
+                        ## 8. Pegar Live por chave.
+                        
+                        **Endpoint:**
+                        
+                        `GET /live/v1/get/live/QUERY_GET_LIVE/<key-live>`
+                        
+                        **Part Parâmetros:**
+                        
+                        - `key-live`: chave do Live.
+                        
+                        **Headers:**
+                        
+                        ```
+                        Authorization: Bearer <token>
+                        Content-Type: multipart/form-data
+                        ```
+                        
+                        **Response Body:**
+                        
+                        - Mesmo response Live do item 1.
+                        
+                        ## 9. Pegar Live stream por chave.
+                        
+                        **Endpoint:**
+                        
+                        `GET /live/v1/get/live/stream/QUERY_GET_LIVE_STREAM/<key-live>`
+                        
+                        **Part Parâmetros:**
+                        
+                        - `key-live`: chave do Live.
+                        
+                        **Headers:**
+                        
+                        ```
+                        Authorization: Bearer <token>
+                        Content-Type: text/event-stream
+                        ```
+                        
+                        **Response Body:**
+                        
+                        - Mesmo response Live do item 1.
+                        
                         """)
                 .contact(new Contact().email(email));
 

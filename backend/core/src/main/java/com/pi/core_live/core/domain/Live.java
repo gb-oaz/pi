@@ -41,8 +41,11 @@ public class Live {
     // Teacher operations
     public void nextPosition() {
         teacher.nextPosition();
+        status = StatusLive.PROGRESS;
         updateOn = Utils.now();
+        checkCurrentPositionIsMayorQuizSize();
     }
+
     public void previousPosition() {
         teacher.previousPosition();
         updateOn = Utils.now();
@@ -70,6 +73,11 @@ public class Live {
         lobby.add(pupilLogin + "#" + pupilCode);
         updateOn = Utils.now();
     }
+    protected void checkCurrentPositionIsMayorQuizSize() {
+        if (teacher.getControl().getCurrentPosition() > quiz.getQuizes().size()) {
+            completeLive();
+        }
+    }
     public void completeLive() {
         status = StatusLive.COMPLETED;
         updateOn = Utils.now();
@@ -78,7 +86,7 @@ public class Live {
 
     protected void validateAnswer(String login, String code, List<String> answerItem, IQuizItem item) {
         var answers = ((IOperationsQuiz<?>) item).getAnswers();
-        var hit = new HashSet<String>(answers).containsAll(answerItem);
+        var hit = new HashSet<String>(answerItem).containsAll(answers);
         evaluation.addEvaluation(login + "#" + code, item.getPosition(), answerItem, hit);
         updateOn = Utils.now();
     }

@@ -15,6 +15,7 @@ import java.time.Instant;
 
 public class Utils {
     private static final Logger LOG = LoggerFactory.getLogger(Utils.class);
+    private static final String PUPIL = "PUPIL";
 
     /**
      * SecureRandom instance for generating random numbers.
@@ -74,6 +75,32 @@ public class Utils {
         return Long.toHexString(currentTimeMillis) + Integer.toHexString(randomInt);
     }
 
+    /**
+     * Generates a string in the format PUPILXXX where X are random letters.
+     * @return the generated string. ex - PUPILABC
+     */
+    public static String generatePupilRandom() {
+        LOG.info("Generate PUPIL with random letters.");
+        StringBuilder sb = new StringBuilder(PUPIL);
+
+        for (int i = 0; i < 3; i++) {
+            char randomChar = (char) (SECURE_RANDOM.nextInt(26) + 65);
+            sb.append(randomChar);
+        }
+
+        return sb.toString();
+    }
+
+    /**
+     * Generates a random 6-digit number from 000000 to 999999.
+     * @return the generated number as String with leading zeros. ex - "004567", "123456", "000001"
+     */
+    public static String generateRandom6Digits() {
+        LOG.info("Generate 6-digit random number with leading zeros.");
+        int randomNum = SECURE_RANDOM.nextInt(1000000);
+
+        return String.format("%06d", randomNum);
+    }
     /**
      * Verifies if a value is part of an Enum.
      *

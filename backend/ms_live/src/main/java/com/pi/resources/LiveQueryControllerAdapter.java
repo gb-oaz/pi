@@ -10,7 +10,10 @@ import com.pi.utils.exceptions.GlobalException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+
+import java.time.Duration;
 
 @RestController
 public class LiveQueryControllerAdapter implements ILiveQueryIn {
@@ -31,5 +34,24 @@ public class LiveQueryControllerAdapter implements ILiveQueryIn {
         caseGetLiveMono.setServices(liveQueryCacheAdapter);
         caseGetLiveMono.setDto(dto);
         return caseGetLiveMono.call().map(ResponseEntity::ok);
+    }
+
+    @Override
+    public Flux<Live> getLiveStream(String queryType, String keyLive, String authorization) throws GlobalException {
+        return Flux.interval(Duration.ofSeconds(3))
+                .flatMap(tick -> {
+                    var caseGetLiveMono = new CaseGetLiveMono();
+                    var dto = QueryDto.builder()
+                            .queryType(queryType)
+                            .keyLive(keyLive)
+                            .token(authorization)
+                            .build();
+
+                    caseGetLiveMono.setServices(liveQueryCacheAdapter);
+                    caseGetLiveMono.setDto(dto);
+                    return caseGetLiveMono.call();
+                })
+                .distinctUntilChanged(Live::getUpdateOn)
+                .doOnCancel(() -> {});
     }
 }

@@ -23,7 +23,7 @@ public record QueryDto(
     public Void validate() throws GlobalException {
         LOG.info(LOG_MESSAGE_FORMAT, queryType, this);
         return switch (Utils.ifEnumGet(queryType, QueryType.class)) {
-            case QUERY_GET_LIVE -> {
+            case QUERY_GET_LIVE, QUERY_GET_LIVE_STREAM -> {
                 Validate.key(keyLive);
                 Validate.token(token);
                 yield null;

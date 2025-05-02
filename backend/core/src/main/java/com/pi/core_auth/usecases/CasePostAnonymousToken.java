@@ -51,11 +51,6 @@ public class CasePostAnonymousToken implements Callable<Token> {
     @Value("${jwt.issuer:ms_auth}") private String MS_AUTH;
 
     /**
-     * Prefix for the subject of the JWT token.
-     */
-    private static final String PUPIL = "PUPIL-";
-
-    /**
      * JWT encoder used to encode the token.
      */
     private final JwtEncoder encoder;
@@ -107,15 +102,16 @@ public class CasePostAnonymousToken implements Callable<Token> {
      */
     protected JwtClaimsSet buildClaims() {
         LOG.info("Init Build claims for token.");
-        var code = Utils.generateRandomToken();
+        var pupil = Utils.generatePupilRandom();
+        var code = Utils.generateRandom6Digits();
         var now = Instant.now();
         return JwtClaimsSet.builder()
                 .issuer(MS_AUTH)
                 .issuedAt(now)
                 .expiresAt(now.plusSeconds(EXPIRY_SECONDS))
-                .subject(PUPIL + code)
+                .subject(pupil + "#" + code)
                 .claim(Claim.SCOPE, getAuthoritiesScopes().stream().map(GrantedAuthority::getAuthority).collect(Collectors.joining(" ")))
-                .claim(Claim.LOGIN, PUPIL)
+                .claim(Claim.LOGIN, pupil)
                 .claim(Claim.CODE, code)
                 .build();
     }

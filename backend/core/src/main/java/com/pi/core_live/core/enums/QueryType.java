@@ -27,7 +27,14 @@ public enum QueryType {
      *
      * @since 1.0
      */
-    QUERY_GET_LIVE("Retrieve a live.", EnumSet.of(ScopeType.ANONYMOUS, ScopeType.STUDENT, ScopeType.TEACHER));
+    QUERY_GET_LIVE("Retrieve a live.", EnumSet.of(ScopeType.ANONYMOUS, ScopeType.STUDENT, ScopeType.TEACHER)),
+
+    /**
+     * Query to retrieve a live stream.
+     *
+     * @since 1.0
+     */
+    QUERY_GET_LIVE_STREAM("Retrieve a live stream.", EnumSet.of(ScopeType.ANONYMOUS, ScopeType.STUDENT, ScopeType.TEACHER));
 
     private final String description;
     private final Set<ScopeType> permissions;

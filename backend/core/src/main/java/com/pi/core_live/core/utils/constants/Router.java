@@ -20,6 +20,11 @@ public class Router {
     public static final String ROUTER_GET_LIVE = "/live/v1/get/live";
 
     /**
+     * The route for fetching a specific live stream.
+     */
+    public static final String ROUTER_GET_LIVE_STREAM = "/live/v1/get/live/stream";
+
+    /**
      * The route for creating a new live.
      */
     public static final String ROUTER_POST_NEW_LIVE = "/live/v1/post/new/live";

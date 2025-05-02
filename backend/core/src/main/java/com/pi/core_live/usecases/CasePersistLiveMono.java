@@ -66,6 +66,7 @@ public class CasePersistLiveMono implements Callable<Mono<Live>>, ITokenCheck {
         LOG.info("Init CasePersistLiveMono call.");
         dto.validate();
         checkCredentials(jwtDecoder, dto.token(), dto.login(), dto.code());
+        dto.live().completeLive();
         var response = liveCommandPersistOut.persistLive(dto.live());
         LOG.info("End CasePersistLiveMono call.");
         return response;
