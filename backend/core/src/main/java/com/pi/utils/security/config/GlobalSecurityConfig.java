@@ -2,6 +2,7 @@ package com.pi.utils.security.config;
 
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
+import java.util.List;
 
 import com.nimbusds.jose.jwk.JWK;
 import com.nimbusds.jose.jwk.JWKSet;
@@ -22,6 +23,9 @@ import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import static com.pi.core_auth.core.utils.constants.Router.ROUTER_AUTH_INFO;
 import static com.pi.core_auth.core.utils.constants.Router.ROUTER_POST_ANONYMOUS_TOKEN;
@@ -157,6 +161,7 @@ public class GlobalSecurityConfig {
                     csrf.ignoringRequestMatchers(ROUTER_PATCH_ADD_PUPIL_ANSWER_TO_QUIZ + "/" + COMMAND_PATCH_ADD_PUPIL_ANSWER_TO_QUIZ.name());
                     csrf.ignoringRequestMatchers(ROUTER_PATCH_END_LIVE + "/" + COMMAND_PATCH_END_LIVE.name());
                 })
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .oauth2ResourceServer(oauth2 -> oauth2
                         .jwt(jwt -> jwt.decoder(jwtDecoder()))
                         .authenticationEntryPoint(authEntryPoint)
@@ -180,5 +185,16 @@ public class GlobalSecurityConfig {
         JWK jwk = new RSAKey.Builder(publicKey).privateKey(privateKey).build();
         JWKSource<SecurityContext> jwks = new ImmutableJWKSet<>(new JWKSet(jwk));
         return new NimbusJwtEncoder(jwks);
+    }
+
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowedOrigins(List.of("*")); // ou domínios específicos
+        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH"));
+        configuration.setAllowedHeaders(List.of("*"));
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
     }
 }

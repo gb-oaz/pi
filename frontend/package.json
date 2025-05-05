@@ -4,13 +4,13 @@
   "license": "MIT",
   "private": true,
   "scripts": {
-    "build": "concurrently \"wsrun --parallel build\"",
-    "start": "concurrently \"wsrun --parallel preview\""
+    "dev:start": "concurrently \"wsrun --parallel dev:build\" \"wsrun --parallel dev:start\"",
+    "prod:start": "concurrently \"wsrun --parallel prod:build\" \"wsrun --parallel prod:start\""
   },
   "workspaces": [
     "*"
   ],
-  "devDependencies": {
+  "dependencies": {
     "concurrently": "^8.2.2",
     "wsrun": "^5.2.3"
   }

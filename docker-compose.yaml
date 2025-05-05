@@ -1,6 +1,35 @@
 version: '3'
 services:
   # #################
+  # Storage services
+  # #################
+  mongo:
+    container_name: mongo
+    image: mongo:6.0
+    restart: always
+    ports:
+      - "27017:27017"
+    networks:
+      - pi_net
+    volumes:
+      - mongo_data:/data/db
+  redis:
+    container_name: redis
+    image: redis:7.2
+    restart: always
+    command: [ "redis-server", "--appendonly", "yes" ]
+    ports:
+      - "6379:6379"
+    networks:
+      - pi_net
+    volumes:
+      - redis_data:/data/db
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 1s
+      timeout: 3s
+      retries: 30
+  # #################
   # Backend services
   # #################
   ms_auth:
@@ -12,6 +41,11 @@ services:
       - "8000:8000"
     networks:
       - pi_net
+    depends_on:
+      - mongo
+    environment:
+      - URI_MONGO_DB=mongodb://mongo:27017
+      - DATABASE_MONGO=PI-Database
   ms_user:
     container_name: ms_user
     build:
@@ -21,10 +55,71 @@ services:
       - "8001:8001"
     networks:
       - pi_net
+    depends_on:
+      - mongo
+      - ms_auth
+    environment:
+      - URI_MONGO_DB=mongodb://mongo:27017
+      - DATABASE_MONGO=PI-Database
+      - COLLECTION_USERS=PI-C-Users
+  ms_quiz:
+    container_name: ms_quiz
+    build:
+      context: ./backend/ms_quiz
+    restart: on-failure
+    ports:
+      - "8002:8002"
+    networks:
+      - pi_net
+    depends_on:
+      - mongo
+      - ms_auth
+      - ms_user
+    environment:
+      - URI_MONGO_DB=mongodb://mongo:27017
+      - DATABASE_MONGO=PI-Database
+      - COLLECTION_QUIZES=PI-C-Quizes
+  ms_live:
+    container_name: ms_live
+    build:
+      context: ./backend/ms_live
+    restart: on-failure
+    ports:
+      - "8003:8003"
+    networks:
+      - pi_net
+    depends_on:
+      redis:
+        condition: service_healthy
+    environment:
+      - URI_MONGO_DB=mongodb://mongo:27017
+      - DATABASE_MONGO=PI-Database
+      - COLLECTION_LIVES=PI-C-Lives
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
 
   # #################
   # Frontend services
   # #################
+  frontend:
+    container_name: frontend
+    build:
+      context: ./frontend
+    restart: on-failure
+    ports:
+      - "3000:3000"
+      - "3001:3001"
+    networks:
+      - pi_net
+    depends_on:
+      - ms_auth
+      - ms_user
+      - ms_quiz
+      - ms_live
+
+volumes:
+  mongo_data:
+  redis_data:
 
 networks:
   pi_net:

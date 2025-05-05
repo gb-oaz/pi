@@ -10,24 +10,29 @@ import 'quasar/src/css/index.sass'
 // Assumes your root component is App.vue
 // and placed in same folder as main.js
 import App from './App.vue'
+import { AuthApi } from "./services/auth/AuthApi.ts";
 
-const myApp = createApp(App)
+(async () => {
+    const authApi = new AuthApi()
+    await authApi.initAnonymousToken();
 
-myApp.use(Quasar, {
-    plugins: {}, // import Quasar plugins and add here
-})
+    const myApp = createApp(App)
 
-myApp.config.errorHandler = (err, instance, info) => {
-    console.error(`Erro capturado: ${err}`);
-    console.log(`Componente:`, instance);
-    console.log(`Informação:`, info);
-};
+    myApp.use(Quasar, {
+        plugins: {},
+    })
 
-myApp.config.warnHandler = (msg, instance, trace) => {
-    console.warn(`Alerta capturado: ${msg}`);
-    console.log(`Componente:`, instance);
-    console.log(`Trace:`, trace);
-};
+    myApp.config.errorHandler = (err, instance, info) => {
+        console.error(`Erro capturado: ${err}`)
+        console.log(`Componente:`, instance)
+        console.log(`Informação:`, info)
+    }
 
-// Assumes you have a <div id="app"></div> in your index.html
-myApp.mount('#app')
+    myApp.config.warnHandler = (msg, instance, trace) => {
+        console.warn(`Alerta capturado: ${msg}`)
+        console.log(`Componente:`, instance)
+        console.log(`Trace:`, trace)
+    }
+
+    myApp.mount('#app')
+})()
