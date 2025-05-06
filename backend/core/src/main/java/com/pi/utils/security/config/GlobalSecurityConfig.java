@@ -46,9 +46,7 @@ import static com.pi.core_live.core.enums.CommandType.COMMAND_PATCH_ADD_PUPIL_AN
 import static com.pi.core_live.core.enums.CommandType.COMMAND_PATCH_END_LIVE;
 import static com.pi.core_live.core.enums.QueryType.QUERY_GET_LIVE;
 
-import static com.pi.core_live.core.enums.QueryType.QUERY_GET_LIVE_STREAM;
 import static com.pi.core_live.core.utils.constants.Router.ROUTER_GET_LIVE;
-import static com.pi.core_live.core.utils.constants.Router.ROUTER_GET_LIVE_STREAM;
 import static com.pi.core_live.core.utils.constants.Router.ROUTER_LIVE_INFO;
 import static com.pi.core_live.core.utils.constants.Router.ROUTER_PATCH_ADD_PUPIL_ANSWER_TO_QUIZ;
 import static com.pi.core_live.core.utils.constants.Router.ROUTER_PATCH_ADD_PUPIL_TO_LOBBY;
@@ -118,6 +116,7 @@ public class GlobalSecurityConfig {
 
                     // MS_LIVE
                     authorize.requestMatchers(HttpMethod.GET, ROUTER_LIVE_INFO).permitAll();
+                    authorize.requestMatchers(HttpMethod.GET, "/live/v1/get/live/stream/QUERY_GET_LIVE_STREAM/**").permitAll();
 
                     // OTHER REQUESTS
                     authorize.anyRequest().authenticated();
@@ -152,7 +151,6 @@ public class GlobalSecurityConfig {
 
                     // MS_LIVE
                     csrf.ignoringRequestMatchers(ROUTER_GET_LIVE + "/" + QUERY_GET_LIVE.name());
-                    csrf.ignoringRequestMatchers(ROUTER_GET_LIVE_STREAM + "/" + QUERY_GET_LIVE_STREAM.name());
                     csrf.ignoringRequestMatchers(ROUTER_POST_NEW_LIVE + "/" + COMMAND_POST_NEW_LIVE.name());
                     csrf.ignoringRequestMatchers(ROUTER_PATCH_NEXT_POSITION + "/" + COMMAND_PATCH_NEXT_POSITION.name());
                     csrf.ignoringRequestMatchers(ROUTER_PATCH_PREVIOUS_POSITION + "/" + COMMAND_PATCH_PREVIOUS_POSITION.name());

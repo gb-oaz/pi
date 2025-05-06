@@ -23,7 +23,7 @@ export class QuizApi {
 
     constructor() { this.baseUrl = import.meta.env.VITE_MS_QUIZ_URL; }
 
-    async createQuiz(login: string, code: string, quizName: string, queryCategories: string[]): Promise<IKey> {
+    async createQuiz(quizName: string, queryCategories: string[]): Promise<IKey> {
         const TOKEN = this.authApi.getTokenLocalStorage() as IToken;
         const SCOPE = this.authApi.getScopeLocalStorage() as IScope;
         const COMMAND_POST_NEW_QUIZ = 'COMMAND_POST_NEW_QUIZ';
@@ -41,7 +41,7 @@ export class QuizApi {
                     headers: {
                         'Authorization': 'Bearer ' + TOKEN?.token
                     },
-                    body: this.createQuizFormData(login, code, quizName)
+                    body: this.createQuizFormData(SCOPE.login, SCOPE.code, quizName)
                 }).catch(error => {
                     throw new GlobalError(ErrorType.CONNECTION_FAILED, ERROR_DETAIL, ERROR_ACTION, error);
                 });

@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestHeader;
 
+import org.springframework.web.bind.annotation.RequestParam;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -126,7 +127,6 @@ public interface ILiveQueryIn {
     ) throws GlobalException;
 
     @Operation(
-            security = @SecurityRequirement(name = "bearer-key"),
             description = """
             ### Retrieve live class stream
             Use this endpoint to retrieve the live class
@@ -143,13 +143,6 @@ public interface ILiveQueryIn {
             ```json
             {
                 "keyLive": "<key-live>",
-            }
-            ```
-            
-            **Example Headers JSON:**
-            ```json
-            {
-                "Authorization": "Bearer <your-token>",
             }
             ```
             
@@ -214,10 +207,8 @@ public interface ILiveQueryIn {
             }
     )
     @GetMapping(path = Router.ROUTER_GET_LIVE_STREAM + "/{queryType}" + "/{keyLive}", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    @PreAuthorize("hasAnyAuthority('SCOPE_ANONYMOUS', 'SCOPE_TEACHER', 'SCOPE_STUDENT')")
     Flux<Live> getLiveStream(
             @PathVariable(Request.QUERY_TYPE) String queryType,
-            @PathVariable(Request.KEY_LIVE) String keyLive,
-            @RequestHeader(Request.AUTHORIZATION) String authorization
+            @PathVariable(Request.KEY_LIVE) String keyLive
     ) throws GlobalException;
 }

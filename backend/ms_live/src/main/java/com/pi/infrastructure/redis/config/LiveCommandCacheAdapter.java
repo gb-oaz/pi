@@ -44,7 +44,7 @@ public class LiveCommandCacheAdapter implements ILiveCommandCacheOut {
 
     @Override
     public Mono<Live> createLive(String teacherToken,String loginTeacher, String codeTeacher, String keyQuiz) throws GlobalException {
-        var redisKey = "LIVE:" + loginTeacher + ":" + codeTeacher;
+        var redisKey = "LIVE" + loginTeacher + "CODE" + codeTeacher;
         var caseGetQuizMono = new CaseGetQuizMono();
         var dto = QueryDto.builder().queryType(QueryType.QUERY_GET_QUIZ.name()).token(teacherToken).key(keyQuiz).build();
         caseGetQuizMono.setServices(liveQueryPersistOut);

@@ -37,14 +37,13 @@ public class LiveQueryControllerAdapter implements ILiveQueryIn {
     }
 
     @Override
-    public Flux<Live> getLiveStream(String queryType, String keyLive, String authorization) throws GlobalException {
+    public Flux<Live> getLiveStream(String queryType, String keyLive) throws GlobalException {
         return Flux.interval(Duration.ofSeconds(3))
                 .flatMap(tick -> {
                     var caseGetLiveMono = new CaseGetLiveMono();
                     var dto = QueryDto.builder()
                             .queryType(queryType)
                             .keyLive(keyLive)
-                            .token(authorization)
                             .build();
 
                     caseGetLiveMono.setServices(liveQueryCacheAdapter);
