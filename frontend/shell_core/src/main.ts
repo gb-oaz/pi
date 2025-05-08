@@ -11,6 +11,7 @@ import 'quasar/src/css/index.sass'
 // and placed in same folder as main.js
 import App from './App.vue'
 import { AuthApi } from "./services/auth/AuthApi.ts";
+import router from "./routes.ts";
 
 (async () => {
     const authApi = new AuthApi()
@@ -34,5 +35,7 @@ import { AuthApi } from "./services/auth/AuthApi.ts";
         console.log(`Trace:`, trace)
     }
 
-    myApp.mount('#app')
+    myApp
+        .use(router)
+        .mount('#app')
 })()

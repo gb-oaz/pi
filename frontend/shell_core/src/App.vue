@@ -2,14 +2,12 @@
 // import { defineAsyncComponent} from "vue";
 // const SidebarB = defineAsyncComponent(() => import((`remote-common/SidebarB`)));
 
-import Live from "./components/Live.vue";
-
 </script>
 
 <template>
 <!--    <SidebarB msg="Shell Core" />-->
+  <router-view></router-view>
 
-  <Live />
 </template>
 
 <style lang="sass" scoped>
