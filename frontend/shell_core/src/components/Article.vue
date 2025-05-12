@@ -1,110 +1,168 @@
 <script setup lang="ts">
-import lupa from "../assets/sidebar/lupa.svg";
-import {ref} from "vue";
+import { computed, onMounted, ref, watch, onBeforeUnmount, nextTick } from 'vue'
+import { debounce } from 'quasar'
+import type { IPageable } from '../utils/types/IPageable'
+import type { IQuiz } from '../services/quiz/types/IQuiz'
+import { QuizApi } from '../services/quiz/QuizApi'
+import { random } from '../utils/images/Randon'
+import SearchLogin from './SearchLogin.vue'
+import QuizListings from './QuizListings.vue'
 
-const searchArticle = ref('')
-const hoverBtn = ref<string | null>(null)
+// Constants
+const DEFAULT_CARDS_PER_PAGE = 4
+const CARD_WIDTH_WITH_GAP = 362 + 15
+const DEBOUNCE_DELAY = 500
+const RESIZE_DEBOUNCE_DELAY = 200
+
+// Reactive state
+const searchTerm = ref('')
+const currentPage = ref(1)
+const quizListingsContainer = ref<HTMLElement | null>(null)
+const cardsPerPage = ref(DEFAULT_CARDS_PER_PAGE)
+
+const quizApi = new QuizApi()
+const quizPageable = ref<IPageable<IQuiz>>(createEmptyPageable())
+const quizMedia = ref(createEmptyQuizMedia())
+
+// Computed properties
+const totalPages = computed(() =>
+    Math.ceil(quizPageable.value.pagination.total / cardsPerPage.value)
+)
+const paginatedQuizzes = computed(() => quizPageable.value.content)
+
+// Helper functions
+function createEmptyPageable(): IPageable<IQuiz> {
+  return {
+    content: [],
+    pagination: {
+      page: 0,
+      size: cardsPerPage.value,
+      total: 0
+    }
+  }
+}
+
+function createEmptyQuizMedia() {
+  return {
+    images: {} as Record<string, string>,
+    colors: {} as Record<string, string>
+  }
+}
+
+function calculateCardsPerPage() {
+  if (!quizListingsContainer.value) return
+
+  const containerWidth = quizListingsContainer.value.clientWidth
+  const cardsThatFit = Math.floor(containerWidth / CARD_WIDTH_WITH_GAP)
+  cardsPerPage.value = Math.max(1, cardsThatFit)
+}
+
+async function fetchQuizzes(page: number = currentPage.value, search: string = searchTerm.value) {
+  try {
+    const response = await quizApi.getQuizes(
+        undefined,
+        undefined,
+        search || undefined,
+        undefined,
+        page,
+        cardsPerPage.value
+    )
+
+    quizPageable.value = response
+    updateQuizMedia(response.content)
+  } catch (error) {
+    console.error('Failed to load quizzes:', error)
+    quizPageable.value = createEmptyPageable()
+  }
+}
+
+function updateQuizMedia(quizzes: IQuiz[]) {
+  quizzes.forEach(quiz => {
+    if (!quizMedia.value.images[quiz.key]) {
+      quizMedia.value.images[quiz.key] = random.getRandomImage()
+      quizMedia.value.colors[quiz.key] = random.getRandomColor()
+    }
+  })
+}
+
+function handleSearch() {
+  currentPage.value = 1
+  fetchQuizzes()
+}
+
+function handlePageChange(page: number) {
+  currentPage.value = page
+  fetchQuizzes()
+}
+
+function handlePlay(quiz: IQuiz) {
+  console.log('Playing quiz:', quiz.name)
+}
+
+// Watchers
+watch(searchTerm, debounce(() => {
+  currentPage.value = 1
+  fetchQuizzes()
+}, DEBOUNCE_DELAY))
+
+// Resize observer
+let resizeObserver: ResizeObserver | null = null
+
+function initResizeObserver() {
+  if (!quizListingsContainer.value) return
+
+  cleanupResizeObserver()
+
+  resizeObserver = new ResizeObserver(debounce(() => {
+    const oldValue = cardsPerPage.value
+    calculateCardsPerPage()
+
+    if (oldValue !== cardsPerPage.value) {
+      fetchQuizzes()
+    }
+  }, RESIZE_DEBOUNCE_DELAY))
+
+  resizeObserver.observe(quizListingsContainer.value)
+}
+
+function cleanupResizeObserver() {
+  if (resizeObserver) {
+    resizeObserver.disconnect()
+    resizeObserver = null
+  }
+}
+
+// Lifecycle hooks
+onMounted(() => {
+  nextTick(() => {
+    calculateCardsPerPage()
+    fetchQuizzes()
+    initResizeObserver()
+  })
+})
+
+onBeforeUnmount(() => {
+  cleanupResizeObserver()
+})
 </script>
 
 <template>
   <main class="article-container">
-    <header id="search-login">
+    <SearchLogin v-model="searchTerm" @search="handleSearch" />
 
-      <q-input class="col" v-model="searchArticle" label="Search" label-color="white" input-class="text-white" standout="bg-grey-10 text-white">
+    <q-separator color="grey-10" class="separator" inset />
 
-        <!-- Ícone de lupa no início -->
-        <template v-slot:prepend>
-          <q-img :src="lupa" style="width: 25px; height: 25px; margin: 12px" @click="searchArticle = ''" class="cursor-pointer" contain/>
-        </template>
-      </q-input>
-
-      <div class="col-auto" style="margin-left: 25px">
-        <q-btn
-            :size="hoverBtn === null || hoverBtn === 'signIn' ? '20px' : '16px'"
-            :color="hoverBtn === null || hoverBtn === 'signIn' ? 'yellow-14' : 'grey-10'"
-            :text-color="hoverBtn === null || hoverBtn === 'signIn' ? 'black' : 'yellow-14'"
-            :style="hoverBtn=== null || hoverBtn === 'signIn' ? 'border: solid 1px white' : 'border: none'"
-            label="Sign In"
-            no-caps
-            @mouseenter="hoverBtn = 'signIn'"
-            @mouseleave="hoverBtn = null"
-        />
-        <q-btn
-            :size="hoverBtn === 'signUp' ? '20px' : '16px'"
-            :color="hoverBtn === 'signUp' ? 'yellow-14' : 'grey-10'"
-            :text-color="hoverBtn === 'signUp' ? 'black' : 'yellow-14'"
-            :style="hoverBtn === 'signUp' ? 'border: solid 1px white' : 'border: none'"
-            label="Sign Up"
-            no-caps
-            @mouseenter="hoverBtn = 'signUp'"
-            @mouseleave="hoverBtn = null"
-        />
-      </div>
-
-    </header>
-
-    <q-linear-progress rounded size="1px" query track-color="grey-10" color="grey-8" class="q-mt-sm" style="margin-top: 20px"/>
-
-    <section>
-      <q-card class="my-card">
-        <q-card-section horizontal>
-          <q-img
-              class="col"
-              src="https://cdn.quasar.dev/img/parallax2.jpg"
-          />
-
-          <q-card-actions vertical class="justify-around">
-            <q-btn flat round color="red" icon="favorite" />
-            <q-btn flat round color="accent" icon="bookmark" />
-            <q-btn flat round color="primary" icon="share" />
-          </q-card-actions>
-        </q-card-section>
-      </q-card>
-      <q-card class="my-card">
-        <q-card-section horizontal>
-          <q-img
-              class="col"
-              src="https://cdn.quasar.dev/img/parallax2.jpg"
-          />
-
-          <q-card-actions vertical class="justify-around">
-            <q-btn flat round color="red" icon="favorite" />
-            <q-btn flat round color="accent" icon="bookmark" />
-            <q-btn flat round color="primary" icon="share" />
-          </q-card-actions>
-        </q-card-section>
-      </q-card>
-      <q-card class="my-card">
-        <q-card-section horizontal>
-          <q-img
-              class="col"
-              src="https://cdn.quasar.dev/img/parallax2.jpg"
-          />
-
-          <q-card-actions vertical class="justify-around">
-            <q-btn flat round color="red" icon="favorite" />
-            <q-btn flat round color="accent" icon="bookmark" />
-            <q-btn flat round color="primary" icon="share" />
-          </q-card-actions>
-        </q-card-section>
-      </q-card>
-      <q-card class="my-card">
-        <q-card-section horizontal>
-          <q-img
-              class="col"
-              src="https://cdn.quasar.dev/img/parallax2.jpg"
-          />
-
-          <q-card-actions vertical class="justify-around">
-            <q-btn flat round color="red" icon="favorite" />
-            <q-btn flat round color="accent" icon="bookmark" />
-            <q-btn flat round color="primary" icon="share" />
-          </q-card-actions>
-        </q-card-section>
-      </q-card>
-
-    </section>
-
+    <div ref="quizListingsContainer" class="quiz-listings-wrapper">
+      <QuizListings
+          :quizzes="paginatedQuizzes"
+          :current-page="currentPage"
+          :total-pages="totalPages"
+          :quiz-images="quizMedia.images"
+          :quiz-colors="quizMedia.colors"
+          @update:current-page="handlePageChange"
+          @play="handlePlay"
+      />
+    </div>
   </main>
 </template>
 
@@ -114,26 +172,11 @@ const hoverBtn = ref<string | null>(null)
   padding: 10px
   margin: 5px
 
-  header
-    display: flex
-    flex-direction: row
-    justify-content: space-between
-    flex-wrap: nowrap
+.separator
+  margin-top: 20px
 
-  section
-    display: flex
-    flex-direction: row
-    flex-wrap: wrap
-    justify-content: space-between
-    height: 70vh
-    margin-top: 20px
-    background-color: #292929
-
-  .my-card
-    width: 100%
-    max-width: 350px
-    max-height: 200px
-
-.q-btn
-  transition: all 0.5s ease
+.quiz-listings-wrapper
+  width: 100%
+  height: 333px
+  overflow: hidden
 </style>

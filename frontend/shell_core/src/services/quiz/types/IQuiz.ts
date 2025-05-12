@@ -5,6 +5,6 @@ export interface IQuiz {
     login: string;
     code: string;
     name: string;
-    quizes: Set<IQuizItem>;
-    categories: Set<string>;
+    quizes: IQuizItem[];
+    categories: string[];
 }
