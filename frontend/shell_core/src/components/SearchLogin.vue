@@ -2,6 +2,7 @@
 import { ref, watch } from 'vue'
 import { debounce } from 'quasar'
 import lupa from '../assets/sidebar/lupa.svg'
+import AuthModal from "./AuthModal.vue";
 
 type ButtonActions = 'signIn' | 'signUp'
 
@@ -36,6 +37,14 @@ const handleFocus = () => {
 
 const handleBlur = () => {
   isFocused.value = false
+}
+
+const showModal = ref(false)
+const modalMode = ref<ButtonActions>('signIn')
+
+const openModal = (action: ButtonActions) => {
+  modalMode.value = action
+  showModal.value = true
 }
 </script>
 
@@ -81,9 +90,11 @@ const handleBlur = () => {
           no-caps
           @mouseenter="buttonHoverStates[action as ButtonActions] = true"
           @mouseleave="buttonHoverStates[action as ButtonActions] = false"
+          @click="openModal(action as ButtonActions)"
       />
     </div>
   </section>
+  <AuthModal v-model="showModal" :mode="modalMode" />
 </template>
 
 <style scoped lang="sass">
