@@ -22,6 +22,7 @@
         <module>ms_user</module>
         <module>ms_quiz</module>
         <module>ms_live</module>
+        <module>ms_mono</module>
     </modules>
 
 </project>

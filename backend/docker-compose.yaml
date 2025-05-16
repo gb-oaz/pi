@@ -97,6 +97,26 @@ services:
       - COLLECTION_LIVES=PI-C-Lives
       - REDIS_HOST=redis
       - REDIS_PORT=6379
+  ms_mono:
+    container_name: ms_mono
+    build:
+      context: ./ms_mono
+    restart: on-failure
+    ports:
+      - "8005:8005"
+    networks:
+      - pi_net
+    depends_on:
+      redis:
+        condition: service_healthy
+    environment:
+      - URI_MONGO_DB=mongodb://mongo:27017
+      - DATABASE_MONGO=PI-Database
+      - COLLECTION_USERS=PI-C-Users
+      - COLLECTION_QUIZES=PI-C-Quizes
+      - COLLECTION_LIVES=PI-C-Lives
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
 
 volumes:
   mongo_data:
