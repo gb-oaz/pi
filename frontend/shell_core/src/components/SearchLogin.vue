@@ -1,35 +1,25 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
 import { debounce } from 'quasar'
+import { useAuth } from "../composables/useAuth.ts";
 import lupa from '../assets/sidebar/lupa.svg'
 import AuthModal from "./AuthModal.vue";
 
 type ButtonActions = 'signIn' | 'signUp'
 
-const props = defineProps({
-  modelValue: {
-    type: String,
-    default: ''
-  }
-})
-
+const props = defineProps({ modelValue: { type: String, default: '' }})
 const emit = defineEmits(['update:modelValue', 'search'])
-
 const searchTerm = ref(props.modelValue)
-const buttonHoverStates = ref<Record<ButtonActions, boolean>>({
-  signIn: false,
-  signUp: false
-})
+const buttonHoverStates = ref<Record<ButtonActions, boolean>>({ signIn: false, signUp: false })
 const isFocused = ref(false)
+const showModal = ref(false)
+const modalMode = ref<ButtonActions>('signIn')
+const { isAnonymous, updateScope } = useAuth()
 
 const handleSearch = debounce((value: string | number | null) => {
   emit('update:modelValue', value)
   emit('search', value)
 }, 500)
-
-watch(() => props.modelValue, (newValue) => {
-  searchTerm.value = newValue
-})
 
 const handleFocus = () => {
   isFocused.value = true
@@ -39,13 +29,14 @@ const handleBlur = () => {
   isFocused.value = false
 }
 
-const showModal = ref(false)
-const modalMode = ref<ButtonActions>('signIn')
-
 const openModal = (action: ButtonActions) => {
   modalMode.value = action
   showModal.value = true
 }
+
+watch(() => props.modelValue, (newValue) => {
+  searchTerm.value = newValue
+})
 </script>
 
 <template>
@@ -75,7 +66,7 @@ const openModal = (action: ButtonActions) => {
       </template>
     </q-input>
 
-    <div class="button-group" v-if="!isFocused">
+    <div class="button-group" v-if="!isFocused && isAnonymous">
       <q-btn
           class="custom-button"
           v-for="action in ['signIn', 'signUp']"
@@ -94,7 +85,7 @@ const openModal = (action: ButtonActions) => {
       />
     </div>
   </section>
-  <AuthModal v-model="showModal" :mode="modalMode" />
+  <AuthModal v-model="showModal" :mode="modalMode" @auth-success="updateScope" />
 </template>
 
 <style scoped lang="sass">

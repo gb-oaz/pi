@@ -102,9 +102,11 @@ export class AuthApi {
                     throw new GlobalError(ErrorType.CONNECTION_FAILED, ERROR_DETAIL, ERROR_ACTION, error);
                 });
             let data = await response.json() as IToken;
-            this.clearLocalStorage();
-            localStorage.setItem(GLOBAL_KEY_TOKEN, JSON.stringify(data));
-            await this.initScopeToken(data.token);
+            if (data.token) {
+                this.clearLocalStorage();
+                localStorage.setItem(GLOBAL_KEY_TOKEN, JSON.stringify(data));
+                await this.initScopeToken(data.token);
+            }
         } catch (error) {
             if (error instanceof GlobalError) error.logError();
             new GlobalError(ErrorType.UNEXPECTED_ERROR, GLOBAL_ERROR_UNEXPECT_DETAIL, GLOBAL_ERROR_UNEXPECT_ACTION,error).logError();

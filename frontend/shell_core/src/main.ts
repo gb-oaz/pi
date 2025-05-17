@@ -1,5 +1,5 @@
 import { createApp } from 'vue'
-import { Quasar } from 'quasar'
+import { Quasar, Notify } from 'quasar' // Importe Notify explicitamente
 
 // Import icon libraries
 import '@quasar/extras/material-icons/material-icons.css'
@@ -8,34 +8,44 @@ import '@quasar/extras/material-icons/material-icons.css'
 import 'quasar/src/css/index.sass'
 
 // Assumes your root component is App.vue
-// and placed in same folder as main.js
 import App from './App.vue'
-import { AuthApi } from "./services/auth/AuthApi.ts";
-import router from "./routes.ts";
+import { AuthApi } from "./services/auth/AuthApi.ts"
+import router from "./routes.ts"
 
 (async () => {
     const authApi = new AuthApi()
-    await authApi.initAnonymousToken();
+    await authApi.initAnonymousToken()
 
     const myApp = createApp(App)
 
+    // Configuração completa do Quasar
     myApp.use(Quasar, {
-        plugins: {},
+        plugins: {
+            Notify // Adicione Notify aos plugins
+        },
+        config: {
+            notify: { // Configurações padrão do Notify
+                position: 'top',
+                timeout: 2500,
+                textColor: 'white'
+            }
+        }
     })
 
-    myApp.config.errorHandler = (err, instance, info) => {
-        console.error(`Erro capturado: ${err}`)
-        console.log(`Componente:`, instance)
-        console.log(`Informação:`, info)
+    // Handlers de erro (opcional)
+    myApp.config.errorHandler = (err) => {
+        console.error('Erro capturado:', err)
+        Notify.create({
+            type: 'negative',
+            message: 'Ocorreu um erro inesperado',
+            caption: String(err)
+        })
     }
 
-    myApp.config.warnHandler = (msg, instance, trace) => {
-        console.warn(`Alerta capturado: ${msg}`)
-        console.log(`Componente:`, instance)
-        console.log(`Trace:`, trace)
+    myApp.config.warnHandler = (msg) => {
+        console.warn('Alerta capturado:', msg)
     }
 
-    myApp
-        .use(router)
-        .mount('#app')
+    // Inicialização do app
+    myApp.use(router).mount('#app')
 })()

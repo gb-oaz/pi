@@ -1,10 +1,14 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, computed } from "vue";
 import { random } from '../utils/images/Randon'
-import { useQuasar } from "quasar";
+import { useQuasar} from "quasar";
+import { AuthApi } from "../services/auth/AuthApi.ts";
+import {useAuth} from "../composables/useAuth.ts";
+const { isAuthenticated, updateScope } = useAuth()
 
 const $q = useQuasar()
-const emit = defineEmits(['update:modelValue'])
+const authApi = new AuthApi()
+const emit = defineEmits(['update:modelValue', 'auth-success'])
 const props = defineProps<{ modelValue: boolean, mode: 'signIn' | 'signUp' }>()
 const modelValue = defineModel<boolean>()
 const dialogPosition = computed(() => { return $q.screen.width < 720 ? 'bottom' : 'top' })
@@ -13,12 +17,57 @@ const signInForm = ref({ login: '', code: '', password: '' })
 const signUpForm = ref({ name: '', email: '', login: '', code: '', password: '', confirmPassword: '' })
 const isPwd = ref(true)
 
+// Computed properties to check form validity
+const isSignInValid = computed(() => {
+  return (
+      signInForm.value.login.length >= 8 &&
+      signInForm.value.login.length <= 15 &&
+      /^[^a-z]+$/.test(signInForm.value.login) &&
+      /^\d{6}$/.test(signInForm.value.code) &&
+      signInForm.value.password.length >= 15 &&
+      signInForm.value.password.length <= 25 &&
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!?@#$%&]).{15,25}$/.test(signInForm.value.password)
+  )
+})
+
+const isSignUpValid = computed(() => {
+  return (
+      signUpForm.value.name.length >= 3 &&
+      signUpForm.value.name.length <= 40 &&
+      /^[a-zA-ZÀ-ÿ\s]{3,40}$/.test(signUpForm.value.name) &&
+      /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(signUpForm.value.email) &&
+      signUpForm.value.login.length >= 8 &&
+      signUpForm.value.login.length <= 15 &&
+      /^[^a-z]+$/.test(signUpForm.value.login) &&
+      /^\d{6}$/.test(signUpForm.value.code) &&
+      signUpForm.value.password.length >= 15 &&
+      signUpForm.value.password.length <= 25 &&
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!?@#$%&]).{15,25}$/.test(signUpForm.value.password) &&
+      signUpForm.value.password === signUpForm.value.confirmPassword)
+})
+
 let backgroundInterval: number | null = null
 
-function handleSignIn() {
-  // Handle sign-in logic here
-  console.log('Sign In:', signInForm.value)
-  emit('update:modelValue', false)
+async function handleSignIn() {
+  await authApi.signIn(signInForm.value.login, signInForm.value.code, signInForm.value.password)
+      .then(() => {
+        updateScope()
+        if (isAuthenticated.value) {
+          $q.notify({
+            type: 'positive',
+            message: 'User successfully logged in',
+          })
+          emit('auth-success')
+          emit('update:modelValue', false)
+        } else {
+          $q.notify({
+            type: 'warning',
+            message: 'Login code and password do not match'
+          })
+        }
+      })
+      .catch(error => { console.error('Sign In Error:', error) })
+
   clearForm()
 }
 
@@ -96,7 +145,9 @@ onUnmounted(() => {
               <q-icon :name="isPwd ? 'visibility_off' : 'visibility'" class="cursor-pointer" @click="isPwd = !isPwd"/>
             </template>
           </q-input>
-          <q-btn @click="handleSignIn" label="Sign In" color="primary"/>
+          <div class="row justify-end">
+            <q-btn @click="handleSignIn" label="Sign In" style="color: goldenrod;" outline :disable="!isSignInValid"/>
+          </div>
         </div>
 
       </q-card-section>
@@ -144,14 +195,17 @@ onUnmounted(() => {
                       val => val.length >= 15 || 'Min 15 characters',
                       val => val.length <= 25 || 'Max 25 characters',
                       val => /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!?@#$%&]).{15,25}$/.test(val) ||
-                        'Must contain at least 1 lowercase, 1 uppercase, 1 number, 1 special (!?@#$%&)'
+                        'Must contain at least 1 lowercase, 1 uppercase, 1 number, 1 special (!?@#$%&)',
+                      val => val === signUpForm.password || 'Passwords must match'
                     ]"
                    :type="isPwd ? 'password' : 'text'" label="Confirm Password" color="yellow-14" outlined dense>
             <template v-slot:append>
               <q-icon :name="isPwd ? 'visibility_off' : 'visibility'" class="cursor-pointer" @click="isPwd = !isPwd"/>
             </template>
           </q-input>
-          <q-btn @click="handleSignUp" label="Sign Up" color="primary" />
+          <div class="row justify-end">
+            <q-btn @click="handleSignUp" label="Sign Up" style="color: goldenrod;" outline :disable="!isSignUpValid"/>
+          </div>
         </div>
       </q-card-section>
 
