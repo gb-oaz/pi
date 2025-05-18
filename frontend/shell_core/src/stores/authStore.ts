@@ -17,8 +17,13 @@ export const useAuthStore = defineStore('auth', () => {
     })
 
     const userRole = computed(() => {
-        return scope.value?.scope || 'ANONYMOUS'
+        return scope.value?.scope || ['ANONYMOUS']
     })
+
+    const hasAnyRole = (requiredRoles: string[]) => {
+        if (!scope.value) return false
+        return requiredRoles.some(role => scope.value?.scope.includes(role))
+    }
 
     // Actions
     function updateScope() {
@@ -35,6 +40,7 @@ export const useAuthStore = defineStore('auth', () => {
         isAuthenticated,
         isAnonymous,
         userRole,
-        updateScope
+        updateScope,
+        hasAnyRole
     }
 })

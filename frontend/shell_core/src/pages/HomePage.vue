@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import Sidebar from "../components/Sidebar.vue";
-import Article from "../components/Article.vue";
+
 </script>
 
 <template>
@@ -9,7 +9,7 @@ import Article from "../components/Article.vue";
       <Sidebar />
     </aside>
     <section class="articles">
-      <Article />
+      <router-view></router-view>
     </section>
   </main>
 </template>

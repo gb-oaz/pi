@@ -1,26 +1,47 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
+import { useRouter } from 'vue-router'
 import logo from '../assets/by_gw-q.png'
 import logout from '../assets/sidebar/logout.svg'
 import lupa from '../assets/sidebar/lupa.svg'
 import sinal from '../assets/sidebar/sinal.svg'
 import home from '../assets/sidebar/home.svg'
+import profile from '../assets/sidebar/profile.svg'
+import groups from '../assets/sidebar/groups.svg'
+import dashboard from '../assets/sidebar/dashboard.svg'
 import { AuthApi } from "../services/auth/AuthApi.ts";
 import { useAuthStore } from '../stores/authStore'
 
+const router = useRouter()
 const authStore = useAuthStore()
 const authApi = new AuthApi()
+const isMobile = computed(() => windowWidth.value <= 720)
+const showSidebar = ref(false)
 const searchLive = ref('')
 const windowWidth = ref(window.innerWidth)
+const selectedButton = ref('home')
 
-async function endSession() {
-  await authApi.signOut()
-  authStore.updateScope()
-  // window.location.reload()
+const hasPermission = (requiredRole: string) => {
+  return authStore.hasAnyRole(
+    requiredRole === 'home' ? ['ANONYMOUS', 'STUDENT', 'TEACHER'] :
+          requiredRole === 'profile' ? ['STUDENT', 'TEACHER'] :
+          requiredRole === 'groups' ? ['STUDENT', 'TEACHER'] :
+          ['TEACHER'] // dashboard
+  )
+}
+
+const navigateTo = (routeName: string) => {
+  selectedButton.value = routeName
+  router.push({ name: routeName })
 }
 
 const updateWidth = () => {
   windowWidth.value = window.innerWidth
+}
+
+async function endSession() {
+  await authApi.signOut()
+  authStore.updateScope()
 }
 
 onMounted(() => {
@@ -30,16 +51,13 @@ onMounted(() => {
 onBeforeUnmount(() => {
   window.removeEventListener('resize', updateWidth)
 })
-
-const isMobile = computed(() => windowWidth.value <= 720)
-const showSidebar = ref(false)
 </script>
 
 <template>
   <!-- Versão desktop (sidebar normal) - só aparece acima de 720px -->
   <aside
       v-show="!isMobile"
-      class="sidebar-container q-pa-sm column items-start justify-between full-height"
+      class="sidebar-container column items-start justify-between full-height no-wrap"
   >
     <!-- Conteúdo da sidebar... -->
     <header class="full-width">
@@ -56,21 +74,100 @@ const showSidebar = ref(false)
 
       <div class="text-white text-caption q-mb-sm">Menu</div>
 
-      <q-btn align="between" color="yellow-14" class="full-width" text-color="black" size="17px" label="Home" no-caps>
-        <q-img :src="home" contain style="width: 17px; height: 17px"/>
+      <q-btn
+          v-if="hasPermission('home')"
+          align="between"
+          :color="selectedButton === 'home' ? 'yellow-14' : 'grey-10'"
+          class="full-width"
+          :text-color="selectedButton === 'home' ? 'black' : 'white'"
+          size="md"
+          label="Home"
+          no-caps
+          @click="navigateTo('home')"
+      >
+        <q-img
+            :src="home"
+            contain
+            style="width: 17px; height: 17px;"
+            :style="{ filter: selectedButton === 'home' ? 'invert(0%)' : 'invert(100%)' }"
+        />
       </q-btn>
+
+      <q-btn
+          v-if="hasPermission('profile')"
+          align="between"
+          :color="selectedButton === 'profile' ? 'yellow-14' : 'grey-10'"
+          class="full-width"
+          :text-color="selectedButton === 'profile' ? 'black' : 'white'"
+          size="md"
+          label="Profile"
+          no-caps
+          @click="navigateTo('profile')"
+      >
+        <q-img
+            :src="profile"
+            contain
+            style="width: 17px; height: 16px;"
+            :style="{ filter: selectedButton === 'profile' ? 'invert(0%)' : 'invert(100%)' }"
+        />
+      </q-btn>
+
+      <q-btn
+          v-if="hasPermission('groups')"
+          align="between"
+          :color="selectedButton === 'groups' ? 'yellow-14' : 'grey-10'"
+          class="full-width"
+          :text-color="selectedButton === 'groups' ? 'black' : 'white'"
+          size="md"
+          label="Groups"
+          no-caps
+          @click="navigateTo('groups')"
+      >
+        <q-img
+            :src="groups"
+            contain
+            style="width: 17px; height: 16px;"
+            :style="{ filter: selectedButton === 'groups' ? 'invert(0%)' : 'invert(100%)' }"
+        />
+      </q-btn>
+
+      <q-btn
+          v-if="hasPermission('dashboard')"
+          align="between"
+          :color="selectedButton === 'dashboard' ? 'yellow-14' : 'grey-10'"
+          class="full-width"
+          :text-color="selectedButton === 'dashboard' ? 'black' : 'white'"
+          size="md"
+          label="Dashboard"
+          no-caps
+          @click="navigateTo('dashboard')"
+      >
+        <q-img
+            :src="dashboard"
+            contain
+            style="width: 16px; height: 15px;"
+            :style="{ filter: selectedButton === 'dashboard' ? 'invert(0%)' : 'invert(100%)' }"
+        />
+      </q-btn>
+
     </header>
     <footer class="full-width">
-      <q-btn align="between" class="full-width" size="20px" style="border-radius: 4px" caps fab>
+      <q-btn align="between" class="full-width" style="border-radius: 4px; margin-bottom: 0" caps fab>
         <div class="row items-center justify-between no-wrap full-width">
           <div class="column items-start justify-between no-wrap">
             <span class="text-subtitle1 text-weight-thin" style="color: goldenrod">{{ authStore.scope?.login }}</span>
             <span class="text-subtitle2 text-weight-thin" style="color: white">
               CODE: <span class="text-caption text-weight-thin" style="color: goldenrod">{{ authStore.scope?.code }}</span>
             </span>
+            <span class="text-subtitle2 text-weight-thin" style="color: white">
+              ACCOUNT: <span class="text-caption text-weight-thin" style="color: goldenrod">{{ authStore.scope?.scope[0] }}</span>
+            </span>
           </div>
-          <q-btn round @click="endSession" v-if="!authStore.scope?.scope.includes('ANONYMOUS')">
+          <q-btn round @click="endSession" v-if="!authStore.scope?.scope.includes('ANONYMOUS')" style="margin-bottom: 0">
             <q-img :src="logout" contain style="width: 30px; height: 30px"/>
+            <q-tooltip anchor="top middle" self="bottom middle" :offset="[10, 10]" class="bg-amber text-black" transition-show="scale" transition-hide="scale">
+              <strong>Logout</strong>
+            </q-tooltip>
           </q-btn>
         </div>
       </q-btn>
@@ -107,21 +204,100 @@ const showSidebar = ref(false)
 
           <div class="text-white text-caption q-mb-sm">Menu</div>
 
-          <q-btn align="between" color="yellow-14" class="full-width" text-color="black" size="17px" label="Home" no-caps @click="showSidebar = false">
-            <q-img :src="home" contain style="width: 17px; height: 17px"/>
+          <q-btn
+              v-if="hasPermission('home')"
+              align="between"
+              :color="selectedButton === 'home' ? 'yellow-14' : 'grey-10'"
+              class="full-width"
+              :text-color="selectedButton === 'home' ? 'black' : 'white'"
+              size="md"
+              label="Home"
+              no-caps
+              @click="navigateTo('home'); showSidebar = false"
+          >
+            <q-img
+                :src="home"
+                contain
+                style="width: 17px; height: 17px;"
+                :style="{ filter: selectedButton === 'home' ? 'invert(0%)' : 'invert(100%)' }"
+            />
           </q-btn>
+
+          <q-btn
+              v-if="hasPermission('profile')"
+              align="between"
+              :color="selectedButton === 'profile' ? 'yellow-14' : 'grey-10'"
+              class="full-width"
+              :text-color="selectedButton === 'profile' ? 'black' : 'white'"
+              size="md"
+              label="Profile"
+              no-caps
+              @click="navigateTo('profile'); showSidebar = false"
+          >
+            <q-img
+                :src="profile"
+                contain
+                style="width: 17px; height: 16px;"
+                :style="{ filter: selectedButton === 'profile' ? 'invert(0%)' : 'invert(100%)' }"
+            />
+          </q-btn>
+
+          <q-btn
+              v-if="hasPermission('groups')"
+              align="between"
+              :color="selectedButton === 'groups' ? 'yellow-14' : 'grey-10'"
+              class="full-width"
+              :text-color="selectedButton === 'groups' ? 'black' : 'white'"
+              size="md"
+              label="Groups"
+              no-caps
+              @click="navigateTo('groups'); showSidebar = false"
+          >
+            <q-img
+                :src="groups"
+                contain
+                style="width: 17px; height: 16px;"
+                :style="{ filter: selectedButton === 'groups' ? 'invert(0%)' : 'invert(100%)' }"
+            />
+          </q-btn>
+
+          <q-btn
+              v-if="hasPermission('dashboard')"
+              align="between"
+              :color="selectedButton === 'dashboard' ? 'yellow-14' : 'grey-10'"
+              class="full-width"
+              :text-color="selectedButton === 'dashboard' ? 'black' : 'white'"
+              size="md"
+              label="Dashboard"
+              no-caps
+              @click="navigateTo('dashboard'); showSidebar = false"
+          >
+            <q-img
+                :src="dashboard"
+                contain
+                style="width: 16px; height: 15px;"
+                :style="{ filter: selectedButton === 'dashboard' ? 'invert(0%)' : 'invert(100%)' }"
+            />
+          </q-btn>
+
         </header>
         <footer class="full-width">
-          <q-btn align="between" class="full-width" size="20px" style="border-radius: 4px" caps fab @click="showSidebar = false">
+          <q-btn align="between" class="full-width" style="border-radius: 4px; margin-bottom: 0" caps fab @click="showSidebar = false">
             <div class="row items-center justify-between no-wrap full-width">
               <div class="column items-start justify-between no-wrap">
                 <span class="text-subtitle1 text-weight-thin" style="color: goldenrod">{{ authStore.scope?.login }}</span>
                 <span class="text-subtitle2 text-weight-thin" style="color: white">
-                CODE: <span class="text-caption text-weight-thin" style="color: goldenrod">{{ authStore.scope?.code }}</span>
-            </span>
+                  CODE: <span class="text-caption text-weight-thin" style="color: goldenrod">{{ authStore.scope?.code }}</span>
+                </span>
+                <span class="text-subtitle2 text-weight-thin" style="color: white">
+                  ACCOUNT: <span class="text-caption text-weight-thin" style="color: goldenrod">{{ authStore.scope?.scope[0] }}</span>
+                </span>
               </div>
-              <q-btn round @click="endSession"  v-if="!authStore.scope?.scope.includes('ANONYMOUS')">
+              <q-btn round @click="endSession"  v-if="!authStore.scope?.scope.includes('ANONYMOUS')" style="margin-bottom: 0">
                 <q-img :src="logout" contain style="width: 30px; height: 30px"/>
+                <q-tooltip anchor="top middle" self="bottom middle" :offset="[10, 10]" class="bg-amber text-black" transition-show="scale" transition-hide="scale">
+                  <strong>Logout</strong>
+                </q-tooltip>
               </q-btn>
             </div>
           </q-btn>
@@ -134,7 +310,7 @@ const showSidebar = ref(false)
 <style scoped lang="sass">
 .sidebar-container
   background-color: #242424
-  width: 92%
+  width: 280px
   padding: 20px
   margin: 15px
   border-radius: 5px
@@ -153,6 +329,9 @@ const showSidebar = ref(false)
   background-color: #242424
   width: 280px
   border-radius: 5px
+
+.q-btn
+  margin-bottom: 10px
 
 body.mobile .sidebar-container
   display: none !important

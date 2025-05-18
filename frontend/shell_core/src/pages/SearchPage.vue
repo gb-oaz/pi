@@ -1,12 +1,14 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, watch, onBeforeUnmount, nextTick } from 'vue'
 import { debounce } from 'quasar'
-import type { IPageable } from '../utils/types/IPageable'
-import type { IQuiz } from '../services/quiz/types/IQuiz'
-import { QuizApi } from '../services/quiz/QuizApi'
-import { random } from '../utils/images/Randon'
-import SearchLogin from './SearchLogin.vue'
-import QuizListings from './QuizListings.vue'
+import { useAuthStore } from "../stores/authStore";
+import type { IPageable } from '../utils/types/IPageable.ts'
+import type { IQuiz } from '../services/quiz/types/IQuiz.ts'
+import { QuizApi } from '../services/quiz/QuizApi.ts'
+import { random } from '../utils/images/Randon.ts'
+import router from "../routes.ts";
+import SearchLogin from '../components/SearchLogin.vue'
+import QuizListings from '../components/QuizListings.vue'
 
 // Constants
 const DEFAULT_CARDS_PER_PAGE = 4
@@ -19,10 +21,11 @@ const searchTerm = ref('')
 const currentPage = ref(1)
 const quizListingsContainer = ref<HTMLElement | null>(null)
 const cardsPerPage = ref(DEFAULT_CARDS_PER_PAGE)
-
-const quizApi = new QuizApi()
 const quizPageable = ref<IPageable<IQuiz>>(createEmptyPageable())
 const quizMedia = ref(createEmptyQuizMedia())
+
+const authStore = useAuthStore();
+const quizApi = new QuizApi()
 
 // Computed properties
 const totalPages = computed(() =>
@@ -98,13 +101,6 @@ function handlePageChange(page: number) {
 function handlePlay(quiz: IQuiz) {
   console.log('Playing quiz:', quiz.name)
 }
-
-// Watchers
-watch(searchTerm, debounce(() => {
-  currentPage.value = 1
-  fetchQuizzes()
-}, DEBOUNCE_DELAY))
-
 // Resize observer
 let resizeObserver: ResizeObserver | null = null
 
@@ -132,6 +128,12 @@ function cleanupResizeObserver() {
   }
 }
 
+// Watchers
+watch(searchTerm, debounce(() => {
+  currentPage.value = 1
+  fetchQuizzes()
+}, DEBOUNCE_DELAY))
+
 // Lifecycle hooks
 onMounted(() => {
   nextTick(() => {
@@ -139,6 +141,12 @@ onMounted(() => {
     fetchQuizzes()
     initResizeObserver()
   })
+})
+
+onMounted(() => {
+  if (!authStore.hasAnyRole(['ANONYMOUS', 'STUDENT', 'TEACHER'])) {
+    router.push({ name: 'home' })
+  }
 })
 
 onBeforeUnmount(() => {

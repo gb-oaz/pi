@@ -189,7 +189,7 @@ onUnmounted(() => {
         <div class="q-gutter-md">
           <h2 class="text-h6 text-right">Sign In</h2>
 
-          <div class="row justify-between items-center q-gutter-sm">
+          <div class="row justify-between items-center" style="gap: 8px">
             <q-input
                 class="col"
                 v-model="signInForm.login"
@@ -283,7 +283,7 @@ onUnmounted(() => {
               dense
           />
 
-          <div class="row justify-between items-center q-gutter-sm">
+          <div class="row justify-between items-center" style="gap: 8px">
             <q-input
                 class="col"
                 v-model="signUpForm.login"
