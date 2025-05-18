@@ -16,7 +16,7 @@ const windowWidth = ref(window.innerWidth)
 async function endSession() {
   await authApi.signOut()
   authStore.updateScope()
-  window.location.reload()
+  // window.location.reload()
 }
 
 const updateWidth = () => {
@@ -69,7 +69,7 @@ const showSidebar = ref(false)
               CODE: <span class="text-caption text-weight-thin" style="color: goldenrod">{{ authStore.scope?.code }}</span>
             </span>
           </div>
-          <q-btn round @click="endSession">
+          <q-btn round @click="endSession" v-if="!authStore.scope?.scope.includes('ANONYMOUS')">
             <q-img :src="logout" contain style="width: 30px; height: 30px"/>
           </q-btn>
         </div>
@@ -120,7 +120,7 @@ const showSidebar = ref(false)
                 CODE: <span class="text-caption text-weight-thin" style="color: goldenrod">{{ authStore.scope?.code }}</span>
             </span>
               </div>
-              <q-btn round @click="endSession">
+              <q-btn round @click="endSession"  v-if="!authStore.scope?.scope.includes('ANONYMOUS')">
                 <q-img :src="logout" contain style="width: 30px; height: 30px"/>
               </q-btn>
             </div>
