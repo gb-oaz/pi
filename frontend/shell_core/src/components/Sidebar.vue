@@ -1,12 +1,23 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
 import logo from '../assets/by_gw-q.png'
+import logout from '../assets/sidebar/logout.svg'
 import lupa from '../assets/sidebar/lupa.svg'
 import sinal from '../assets/sidebar/sinal.svg'
 import home from '../assets/sidebar/home.svg'
+import { AuthApi } from "../services/auth/AuthApi.ts";
+import { useAuthStore } from '../stores/authStore'
 
+const authStore = useAuthStore()
+const authApi = new AuthApi()
 const searchLive = ref('')
 const windowWidth = ref(window.innerWidth)
+
+async function endSession() {
+  await authApi.signOut()
+  authStore.updateScope()
+  window.location.reload()
+}
 
 const updateWidth = () => {
   windowWidth.value = window.innerWidth
@@ -28,25 +39,42 @@ const showSidebar = ref(false)
   <!-- Versão desktop (sidebar normal) - só aparece acima de 720px -->
   <aside
       v-show="!isMobile"
-      class="sidebar-container q-pa-sm column items-start justify-start full-height"
+      class="sidebar-container q-pa-sm column items-start justify-between full-height"
   >
     <!-- Conteúdo da sidebar... -->
-    <q-img :src="logo" style="width: 45px; height: 45px" class="q-mb-md" contain />
+    <header class="full-width">
+      <q-img :src="logo" style="width: 45px; height: 45px" class="q-mb-md" contain />
 
-    <q-input v-model="searchLive" color="yellow" bg-color="grey-14" label="Live" label-color="white" class="full-width" input-class="text-white" rounded standout bottom-slots counter>
-      <template v-slot:prepend>
-        <q-img :src="sinal" style="width: 15px; height: 11px; margin: 7px" contain/>
-      </template>
-      <template v-slot:append>
-        <q-img :src="lupa" style="width: 20px; height: 20px; margin: 7px" @click="searchLive = ''" class="cursor-pointer" contain/>
-      </template>
-    </q-input>
+      <q-input v-model="searchLive" color="yellow" bg-color="grey-14" label="Live" label-color="white" class="full-width" input-class="text-white" rounded standout bottom-slots counter>
+        <template v-slot:prepend>
+          <q-img :src="sinal" style="width: 15px; height: 11px; margin: 7px" contain/>
+        </template>
+        <template v-slot:append>
+          <q-img :src="lupa" style="width: 20px; height: 20px; margin: 7px" @click="searchLive = ''" class="cursor-pointer" contain/>
+        </template>
+      </q-input>
 
-    <div class="text-white text-caption q-mb-sm">Menu</div>
+      <div class="text-white text-caption q-mb-sm">Menu</div>
 
-    <q-btn align="between" color="yellow-14" class="full-width" text-color="black" size="17px" label="Home" no-caps>
-      <q-img :src="home" contain style="width: 17px; height: 17px"/>
-    </q-btn>
+      <q-btn align="between" color="yellow-14" class="full-width" text-color="black" size="17px" label="Home" no-caps>
+        <q-img :src="home" contain style="width: 17px; height: 17px"/>
+      </q-btn>
+    </header>
+    <footer class="full-width">
+      <q-btn align="between" class="full-width" size="20px" style="border-radius: 4px" caps fab>
+        <div class="row items-center justify-between no-wrap full-width">
+          <div class="column items-start justify-between no-wrap">
+            <span class="text-subtitle1 text-weight-thin" style="color: goldenrod">{{ authStore.scope?.login }}</span>
+            <span class="text-subtitle2 text-weight-thin" style="color: white">
+              CODE: <span class="text-caption text-weight-thin" style="color: goldenrod">{{ authStore.scope?.code }}</span>
+            </span>
+          </div>
+          <q-btn round @click="endSession">
+            <q-img :src="logout" contain style="width: 30px; height: 30px"/>
+          </q-btn>
+        </div>
+      </q-btn>
+    </footer>
   </aside>
 
   <!-- Versão mobile (apenas FAB) -->
@@ -62,25 +90,42 @@ const showSidebar = ref(false)
   />
 
   <!-- Dialog com o conteúdo da sidebar -->
-  <q-dialog v-model="showSidebar">
+  <q-dialog v-model="showSidebar" full-height>
     <q-card class="sidebar-dialog">
-      <q-card-section class="column items-start justify-start">
-        <q-img :src="logo" style="width: 45px; height: 45px" class="q-mb-md" contain />
+      <q-card-section class="column items-start justify-between full-height">
+        <header class="full-width" style="margin-bottom: 10px">
+          <q-img :src="logo" style="width: 45px; height: 45px" class="q-mb-md" contain />
 
-        <q-input v-model="searchLive" color="yellow" bg-color="grey-14" label="Live" label-color="white" class="full-width" input-class="text-white" rounded standout bottom-slots counter>
-          <template v-slot:prepend>
-            <q-img :src="sinal" style="width: 15px; height: 11px; margin: 7px" contain/>
-          </template>
-          <template v-slot:append>
-            <q-img :src="lupa" style="width: 20px; height: 20px; margin: 7px" @click="searchLive = ''" class="cursor-pointer" contain/>
-          </template>
-        </q-input>
+          <q-input v-model="searchLive" color="yellow" bg-color="grey-14" label="Live" label-color="white" class="full-width" input-class="text-white" rounded standout bottom-slots counter>
+            <template v-slot:prepend>
+              <q-img :src="sinal" style="width: 15px; height: 11px; margin: 7px" contain/>
+            </template>
+            <template v-slot:append>
+              <q-img :src="lupa" style="width: 20px; height: 20px; margin: 7px" @click="searchLive = ''" class="cursor-pointer" contain/>
+            </template>
+          </q-input>
 
-        <div class="text-white text-caption q-mb-sm">Menu</div>
+          <div class="text-white text-caption q-mb-sm">Menu</div>
 
-        <q-btn align="between" color="yellow-14" class="full-width" text-color="black" size="17px" label="Home" no-caps @click="showSidebar = false">
-          <q-img :src="home" contain style="width: 17px; height: 17px"/>
-        </q-btn>
+          <q-btn align="between" color="yellow-14" class="full-width" text-color="black" size="17px" label="Home" no-caps @click="showSidebar = false">
+            <q-img :src="home" contain style="width: 17px; height: 17px"/>
+          </q-btn>
+        </header>
+        <footer class="full-width">
+          <q-btn align="between" class="full-width" size="20px" style="border-radius: 4px" caps fab @click="showSidebar = false">
+            <div class="row items-center justify-between no-wrap full-width">
+              <div class="column items-start justify-between no-wrap">
+                <span class="text-subtitle1 text-weight-thin" style="color: goldenrod">{{ authStore.scope?.login }}</span>
+                <span class="text-subtitle2 text-weight-thin" style="color: white">
+                CODE: <span class="text-caption text-weight-thin" style="color: goldenrod">{{ authStore.scope?.code }}</span>
+            </span>
+              </div>
+              <q-btn round @click="endSession">
+                <q-img :src="logout" contain style="width: 30px; height: 30px"/>
+              </q-btn>
+            </div>
+          </q-btn>
+        </footer>
       </q-card-section>
     </q-card>
   </q-dialog>

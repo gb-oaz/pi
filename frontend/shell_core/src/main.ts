@@ -1,5 +1,6 @@
 import { createApp } from 'vue'
-import { Quasar, Notify } from 'quasar' // Importe Notify explicitamente
+import { Quasar, Notify } from 'quasar'
+import { createPinia } from 'pinia' // Importe o Pinia
 
 // Import icon libraries
 import '@quasar/extras/material-icons/material-icons.css'
@@ -17,14 +18,15 @@ import router from "./routes.ts"
     await authApi.initAnonymousToken()
 
     const myApp = createApp(App)
+    const pinia = createPinia() // Crie a instância do Pinia
 
     // Configuração completa do Quasar
     myApp.use(Quasar, {
         plugins: {
-            Notify // Adicione Notify aos plugins
+            Notify
         },
         config: {
-            notify: { // Configurações padrão do Notify
+            notify: {
                 position: 'top',
                 timeout: 2500,
                 textColor: 'white'
@@ -46,6 +48,8 @@ import router from "./routes.ts"
         console.warn('Alerta capturado:', msg)
     }
 
-    // Inicialização do app
-    myApp.use(router).mount('#app')
+    myApp
+        .use(pinia) // Adicione o Pinia antes do router
+        .use(router)
+        .mount('#app')
 })()

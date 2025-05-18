@@ -1,21 +1,32 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { computed, ref, watch} from 'vue'
 import { debounce } from 'quasar'
-import { useAuth } from "../composables/useAuth.ts";
 import lupa from '../assets/sidebar/lupa.svg'
-import AuthModal from "./AuthModal.vue";
+import AuthModal from "./AuthModal.vue"
+import { useAuthStore } from '../stores/authStore'
 
 type ButtonActions = 'signIn' | 'signUp'
 
 const props = defineProps({ modelValue: { type: String, default: '' }})
 const emit = defineEmits(['update:modelValue', 'search'])
+
+// Refs
 const searchTerm = ref(props.modelValue)
-const buttonHoverStates = ref<Record<ButtonActions, boolean>>({ signIn: false, signUp: false })
+const buttonHoverStates = ref<Record<ButtonActions, boolean>>({
+  signIn: false,
+  signUp: false
+})
 const isFocused = ref(false)
 const showModal = ref(false)
 const modalMode = ref<ButtonActions>('signIn')
-const { isAnonymous, updateScope } = useAuth()
 
+// Store
+const authStore = useAuthStore()
+
+// Computed
+const isAnonymous = computed(() => authStore.isAnonymous)
+
+// Methods
 const handleSearch = debounce((value: string | number | null) => {
   emit('update:modelValue', value)
   emit('search', value)
@@ -34,6 +45,7 @@ const openModal = (action: ButtonActions) => {
   showModal.value = true
 }
 
+// Watchers
 watch(() => props.modelValue, (newValue) => {
   searchTerm.value = newValue
 })
@@ -52,8 +64,8 @@ watch(() => props.modelValue, (newValue) => {
         @focus="handleFocus"
         @blur="handleBlur"
         :style="{
-          width: isFocused ? '100%' : ''
-        }"
+        width: isFocused ? '100%' : ''
+      }"
     >
       <template v-slot:prepend>
         <q-img
@@ -74,9 +86,9 @@ watch(() => props.modelValue, (newValue) => {
           :color="buttonHoverStates[action as ButtonActions] ? 'yellow-14' : 'grey-10'"
           :text-color="buttonHoverStates[action as ButtonActions] ? 'black' : 'yellow-14'"
           :style="{
-            border: buttonHoverStates[action as ButtonActions] ? 'solid 1px white' : 'none',
-            height: buttonHoverStates[action as ButtonActions] ? '50px' : '40px'
-          }"
+          border: buttonHoverStates[action as ButtonActions] ? 'solid 1px white' : 'none',
+          height: buttonHoverStates[action as ButtonActions] ? '50px' : '40px'
+        }"
           :label="action === 'signIn' ? 'Sign In' : 'Sign Up'"
           no-caps
           @mouseenter="buttonHoverStates[action as ButtonActions] = true"
@@ -85,7 +97,12 @@ watch(() => props.modelValue, (newValue) => {
       />
     </div>
   </section>
-  <AuthModal v-model="showModal" :mode="modalMode" @auth-success="updateScope" />
+
+  <AuthModal
+      v-model="showModal"
+      :mode="modalMode"
+      @auth-success="authStore.updateScope"
+  />
 </template>
 
 <style scoped lang="sass">
