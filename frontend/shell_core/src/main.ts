@@ -1,5 +1,5 @@
 import { createApp } from 'vue'
-import { Quasar, Notify } from 'quasar'
+import { Quasar, Notify, BottomSheet } from 'quasar'
 import { createPinia } from 'pinia' // Importe o Pinia
 
 // Import icon libraries
@@ -23,7 +23,8 @@ import router from "./routes.ts"
     // Configuração completa do Quasar
     myApp.use(Quasar, {
         plugins: {
-            Notify
+            Notify,
+            BottomSheet
         },
         config: {
             notify: {

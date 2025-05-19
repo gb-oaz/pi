@@ -14,8 +14,8 @@
 html, body
   margin: 0
   padding: 0
-  height: 200vh
   width: 100%
+  height: 100%
   background-color: #3f3f3f
 
 </style>

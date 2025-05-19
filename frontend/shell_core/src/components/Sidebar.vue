@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
 import { useRouter } from 'vue-router'
+import CreateQuizModal from '../components/CreateQuizModal.vue'
 import logo from '../assets/by_gw-q.png'
 import logout from '../assets/sidebar/logout.svg'
 import lupa from '../assets/sidebar/lupa.svg'
@@ -20,6 +21,7 @@ const showSidebar = ref(false)
 const searchLive = ref('')
 const windowWidth = ref(window.innerWidth)
 const selectedButton = ref('home')
+const createQuizModalRef = ref<InstanceType<typeof CreateQuizModal> | null>(null)
 
 const hasPermission = (requiredRole: string) => {
   return authStore.hasAnyRole(
@@ -37,6 +39,11 @@ const navigateTo = (routeName: string) => {
 
 const updateWidth = () => {
   windowWidth.value = window.innerWidth
+}
+
+const openQuizModal = () => {
+  createQuizModalRef.value?.open()
+  showSidebar.value = false
 }
 
 async function endSession() {
@@ -149,6 +156,44 @@ onBeforeUnmount(() => {
             :style="{ filter: selectedButton === 'dashboard' ? 'invert(0%)' : 'invert(100%)' }"
         />
       </q-btn>
+
+      <q-separator color="yellow-14" class="separator" inset />
+
+      <div v-if="hasPermission('teacher-group')" class="accordion-teacher">
+        <q-list bordered>
+          <q-expansion-item group="teacher-group" label="Quiz Actions" header-class="text-white">
+            <div style="padding: 10px">
+              <q-btn class="full-width text-justify" size="md" color="gray-10" text-color="white" label="Flashcard" no-caps>
+                <strong class="text-caption text-weight-thin">(Create cards for study)</strong>
+              </q-btn>
+              <q-btn class="full-width text-justify" size="md" color="gray-10" text-color="white" label="Quiz" no-caps @click="openQuizModal">
+                <strong class="text-caption text-weight-thin">(Create lesson for home work)</strong>
+              </q-btn>
+              <q-btn class="full-width text-justify" size="md" color="gray-10" text-color="white" label="Live class" no-caps>
+                <strong class="text-caption text-weight-thin">(Create a live action class)</strong>
+              </q-btn>
+            </div>
+          </q-expansion-item>
+
+          <q-separator />
+
+          <q-expansion-item group="teacher-group" label="Group Actions" header-class="text-white">
+            <div style="padding: 10px">
+              <q-btn class="full-width text-justify" size="md" color="gray-10" text-color="white" label="Study" no-caps>
+                <strong class="text-caption text-weight-thin">(Create a small group 1 to 3)</strong>
+              </q-btn>
+              <q-btn class="full-width text-justify" size="md" color="gray-10" text-color="white" label="Team" no-caps>
+                <strong class="text-caption text-weight-thin">(Create a medium group 5 to 10)</strong>
+              </q-btn>
+              <q-btn class="full-width text-justify" size="md" color="gray-10" text-color="white" label="Class room" no-caps>
+                <strong class="text-caption text-weight-thin">(Create a big group 10 +)</strong>
+              </q-btn>
+            </div>
+          </q-expansion-item>
+
+        </q-list>
+      </div>
+
 
     </header>
     <footer class="full-width">
@@ -305,6 +350,8 @@ onBeforeUnmount(() => {
       </q-card-section>
     </q-card>
   </q-dialog>
+
+  <CreateQuizModal ref="createQuizModalRef" />
 </template>
 
 <style scoped lang="sass">
@@ -332,6 +379,14 @@ onBeforeUnmount(() => {
 
 .q-btn
   margin-bottom: 10px
+
+.separator
+  margin-top: 10px
+  margin-bottom: 15px
+
+.accordion-teacher
+  margin-bottom: 10px
+  width: 100%
 
 body.mobile .sidebar-container
   display: none !important
