@@ -2,7 +2,7 @@
 import { ref } from 'vue'
 import { useQuasar } from 'quasar'
 import { useCreateQuizStore } from '../stores/useCreateQuizStore'
-import QuizItemEditor from "./QuizItemEditor.vue";
+import QuizItemEditorModal from "./QuizItemEditorModal.vue";
 
 const $q = useQuasar()
 const createQuizStore = useCreateQuizStore()
@@ -140,7 +140,7 @@ defineExpose({
       </q-card-section>
 
       <!-- Modal de edição -->
-      <QuizItemEditor
+      <QuizItemEditorModal
           v-if="currentItemType"
           :item="currentEditingIndex !== null ? createQuizStore.quiz.quizes[currentEditingIndex] : null"
           :type="currentItemType"
