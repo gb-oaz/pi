@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { IQuiz } from "../services/quiz/types/IQuiz.ts";
+import type { IQuiz } from "../../services/quiz/types/IQuiz.ts";
 import { ref } from "vue";
 
 interface Props {

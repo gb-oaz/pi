@@ -1,17 +1,17 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
 import { useRouter } from 'vue-router'
-import CreateQuizModal from '../components/CreateQuizModal.vue'
-import logo from '../assets/by_gw-q.png'
-import logout from '../assets/sidebar/logout.svg'
-import lupa from '../assets/sidebar/lupa.svg'
-import sinal from '../assets/sidebar/sinal.svg'
-import home from '../assets/sidebar/home.svg'
-import profile from '../assets/sidebar/profile.svg'
-import groups from '../assets/sidebar/groups.svg'
-import dashboard from '../assets/sidebar/dashboard.svg'
-import { AuthApi } from "../services/auth/AuthApi.ts";
-import { useAuthStore } from '../stores/authStore'
+import CreateQuizModal from '../modals/CreateQuizModal.vue'
+import logo from '../../assets/by_gw-q.png'
+import logout from '../../assets/sidebar/logout.svg'
+import lupa from '../../assets/sidebar/lupa.svg'
+import sinal from '../../assets/sidebar/sinal.svg'
+import home from '../../assets/sidebar/home.svg'
+import profile from '../../assets/sidebar/profile.svg'
+import groups from '../../assets/sidebar/groups.svg'
+import dashboard from '../../assets/sidebar/dashboard.svg'
+import { AuthApi } from "../../services/auth/AuthApi.ts";
+import { useAuthStore } from '../../stores/authStore.ts'
 
 const router = useRouter()
 const authStore = useAuthStore()

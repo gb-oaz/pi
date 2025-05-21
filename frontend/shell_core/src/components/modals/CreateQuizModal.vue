@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useQuasar } from 'quasar'
-import { useCreateQuizStore } from '../stores/useCreateQuizStore'
+import { useCreateQuizStore } from '../../stores/useCreateQuizStore.ts'
 import QuizItemEditorModal from "./QuizItemEditorModal.vue";
 
 const $q = useQuasar()
@@ -12,10 +12,10 @@ const maximizedToggle = ref(true)
 const currentEditingIndex = ref<number | null>(null)
 const currentItemType = ref<string>('')
 
-const open = () => { dialog.value = true }
-const close = () => { dialog.value = false }
+function open(){ dialog.value = true }
+function close(){ dialog.value = false }
 
-const openQuizTypeSelector = () => {
+function openQuizTypeSelector() {
   $q.bottomSheet({
     dark: true,
     title: 'Select Quiz Type',
@@ -41,20 +41,18 @@ const openQuizTypeSelector = () => {
   })
 }
 
-const openQuizEditor = (type: string) => {
+function openQuizEditor(type: string) {
   currentItemType.value = type
   if (currentEditingIndex.value !== null) {
-    // Estamos editando um item existente
     const existingItem = createQuizStore.quiz.quizes[currentEditingIndex.value]
     if (existingItem.type !== type) {
-      // Tipo mudou - criar novo item com o tipo selecionado
       createQuizStore.removeQuizItem(currentEditingIndex.value)
       currentEditingIndex.value = null
     }
   }
 }
 
-const handleSaveItem = (itemData: any) => {
+function handleSaveItem(itemData: any) {
   if (currentEditingIndex.value !== null) {
     createQuizStore.updateQuizItem(currentEditingIndex.value, itemData)
   } else {
@@ -63,16 +61,22 @@ const handleSaveItem = (itemData: any) => {
   currentEditingIndex.value = null
 }
 
-const editItem = (index: number) => {
+function editItem(index: number) {
   currentEditingIndex.value = index
   currentItemType.value = createQuizStore.quiz.quizes[index].type
 }
 
-const getItemPreview = (item: any) => {
+function getItemPreview(item: any) {
   if (item.contentQuestion) return item.contentQuestion
   if (item.contentTitle) return item.contentTitle
   if (item.contentHeader) return item.contentHeader
   return 'Quiz item'
+}
+
+function formatTypeName(type: string) {
+  return type.replace(/_/g, ' ')
+      .toLowerCase()
+      .replace(/\b\w/g, c => c.toUpperCase())
 }
 
 defineExpose({
@@ -126,7 +130,7 @@ defineExpose({
             <q-card-section>
               <div class="row items-center">
                 <div class="col">
-                  <div class="text-subtitle1">{{ item.type }}</div>
+                  <div class="text-subtitle1">{{ formatTypeName(item.type) }}</div>
                   <div class="text-caption text-grey-4">{{ getItemPreview(item) }}</div>
                 </div>
                 <div class="col-auto">

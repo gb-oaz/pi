@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { computed, ref, watch} from 'vue'
 import { debounce } from 'quasar'
-import lupa from '../assets/sidebar/lupa.svg'
-import AuthModal from "./AuthModal.vue"
-import { useAuthStore } from '../stores/authStore'
+import lupa from '../../assets/sidebar/lupa.svg'
+import AuthModal from "../modals/AuthModal.vue"
+import { useAuthStore } from '../../stores/authStore.ts'
 
 type ButtonActions = 'signIn' | 'signUp'
 

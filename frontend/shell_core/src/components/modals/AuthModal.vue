@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, computed } from "vue";
-import { random } from '../utils/images/Randon'
+import { random } from '../../utils/images/Randon.ts'
 import { useQuasar } from "quasar";
-import { AuthApi } from "../services/auth/AuthApi.ts";
-import { UserApi } from "../services/user/UserApi.ts";
-import { useAuthStore } from "../stores/authStore";
+import { AuthApi } from "../../services/auth/AuthApi.ts";
+import { UserApi } from "../../services/user/UserApi.ts";
+import { useAuthStore } from "../../stores/authStore.ts";
 
 const $q = useQuasar()
 const authApi = new AuthApi()

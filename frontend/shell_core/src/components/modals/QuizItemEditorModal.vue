@@ -1,6 +1,14 @@
 <script setup lang="ts">
 import { ref, watch, computed } from 'vue'
-import type {IQuizItem} from "../services/quiz/types/IQuizItem.ts";
+import type {IQuizItem} from "../../services/quiz/types/IQuizItem.ts";
+import QuizPreview from '../previews/QuizPreview.vue'
+import SlidePreview from '../previews/SlidePreview.vue'
+import { useQuasar } from 'quasar'
+
+const $q = useQuasar()
+const fileInput = ref<HTMLInputElement | null>(null)
+const fileInput1 = ref<HTMLInputElement | null>(null)
+const fileInput2 = ref<HTMLInputElement | null>(null)
 
 const props = defineProps({
   item: {
@@ -68,6 +76,44 @@ function getDefaultData(type: string) {
       answers: [],
       timerSeconds: 30,
       reward: 50
+    },
+    SLIDE_TITLE_1: {
+      type: 'SLIDE_TITLE_1',
+      contentTitle: ''
+    },
+    SLIDE_TITLE_2: {
+      type: 'SLIDE_TITLE_2',
+      contentTitle: '',
+      contentDescription: ''
+    },
+    SLIDE_TEXT_1: {
+      type: 'SLIDE_TEXT_1',
+      contentHeader: '',
+      contentSubHeaderOne: '',
+      contentTextOne: ''
+    },
+    SLIDE_TEXT_2: {
+      type: 'SLIDE_TEXT_2',
+      contentHeader: '',
+      contentSubHeaderOne: '',
+      contentTextOne: '',
+      contentSubHeaderTwo: '',
+      contentTextTwo: ''
+    },
+    SLIDE_TEXT_MEDIA_1: {
+      type: 'SLIDE_TEXT_MEDIA_1',
+      contentHeader: '',
+      contentTextOne: '',
+      contentMediaOne: ''
+    },
+    SLIDE_TEXT_MEDIA_2: {
+      type: 'SLIDE_TEXT_MEDIA_2',
+      contentSubHeaderOne: '',
+      contentTextOne: '',
+      contentMediaOne: '',
+      contentSubHeaderTwo: '',
+      contentTextTwo: '',
+      contentMediaTwo: ''
     }
     // ... Outros tipos permanecem iguais
   }
@@ -120,6 +166,52 @@ function removeAlternative(index: number) {
   )
 }
 
+function triggerFileInput(refName: string) {
+  if (refName === 'fileInput1') {
+    fileInput1.value?.click()
+  } else if (refName === 'fileInput2') {
+    fileInput2.value?.click()
+  } else {
+    fileInput.value?.click()
+  }
+}
+
+function handleImageUpload(event: Event, field: string) {
+  const input = event.target as HTMLInputElement
+  if (input.files && input.files[0]) {
+    const file = input.files[0]
+
+    // Verifica se é uma imagem
+    if (!file.type.match('image.*')) {
+      $q.notify({
+        type: 'negative',
+        message: 'Por favor, selecione um arquivo de imagem válido (JPEG, PNG, GIF)'
+      })
+      return
+    }
+
+    // Verifica o tamanho do arquivo (limite de 2MB)
+    if (file.size > 2 * 1024 * 1024) {
+      $q.notify({
+        type: 'negative',
+        message: 'A imagem deve ter menos de 2MB'
+      })
+      return
+    }
+
+    // Converte para base64
+    const reader = new FileReader()
+    reader.onload = (e) => {
+      formData.value[field] = e.target?.result as string
+    }
+    reader.readAsDataURL(file)
+  }
+}
+
+function removeImage(field: string) {
+  formData.value[field] = ''
+}
+
 watch(() => show.value, (val) => {
   if (!val) {
     emit('close')
@@ -139,6 +231,7 @@ watch(() => show.value, (val) => {
       </q-bar>
 
       <q-card-section>
+        <!-- Quiz Types -->
         <div v-if="type.startsWith('QUIZ_')">
           <!-- Question Input -->
           <q-input
@@ -548,6 +641,384 @@ watch(() => show.value, (val) => {
           </div>
 
         </div>
+
+        <!-- Slide Types -->
+        <div v-else-if="type.startsWith('SLIDE_')">
+          <!-- Title Slide Implementation -->
+          <div v-if="type === 'SLIDE_TITLE_1'">
+            <q-input
+                v-model="formData.contentTitle"
+                label="Slide Title"
+                color="yellow-14"
+                class="q-mb-md"
+                type="text"
+                :rules="[val => !!val.trim() || 'Title is required']"
+            />
+
+            <div class="text-caption text-grey-4 q-mt-sm">
+              This is a title slide that starts your presentation
+            </div>
+          </div>
+
+          <!-- Title Slide 2 Implementation -->
+          <div v-else-if="type === 'SLIDE_TITLE_2'">
+            <q-input
+                v-model="formData.contentTitle"
+                label="Slide Title"
+                color="yellow-14"
+                class="q-mb-md"
+                type="text"
+                :rules="[val => !!val.trim() || 'Title is required']"
+            />
+
+            <q-input
+                v-model="formData.contentDescription"
+                label="Description"
+                color="yellow-14"
+                type="textarea"
+                autogrow
+                class="q-mb-md"
+                :rules="[val => !!val.trim() || 'Description is required']"
+            />
+
+            <div class="text-caption text-grey-4 q-mt-sm">
+              This is a title slide with subtitle for your presentation
+            </div>
+          </div>
+
+          <!-- Text Slide Implementation -->
+          <div v-else-if="type === 'SLIDE_TEXT_1'">
+            <q-input
+                v-model="formData.contentHeader"
+                label="Header"
+                color="yellow-14"
+                class="q-mb-md"
+                type="text"
+                :rules="[val => !!val.trim() || 'Header is required']"
+            />
+
+            <q-input
+                v-model="formData.contentSubHeaderOne"
+                label="Subheader"
+                color="yellow-14"
+                class="q-mb-md"
+                type="text"
+            />
+
+            <q-input
+                v-model="formData.contentTextOne"
+                label="Main Text"
+                color="yellow-14"
+                type="textarea"
+                autogrow
+                class="q-mb-md"
+                :rules="[val => !!val.trim() || 'Main text is required']"
+            />
+
+            <div class="text-caption text-grey-4 q-mt-sm">
+              This is a text slide for detailed content in your presentation
+            </div>
+          </div>
+
+          <!-- Text Slide 2 Implementation -->
+          <div v-else-if="type === 'SLIDE_TEXT_2'">
+            <q-input
+                v-model="formData.contentHeader"
+                label="Header"
+                color="yellow-14"
+                class="q-mb-md"
+                type="text"
+                :rules="[val => !!val.trim() || 'Header is required']"
+            />
+
+            <div class="q-mb-md">
+              <div class="text-subtitle2 q-mb-sm">First Content Section</div>
+              <q-input
+                  v-model="formData.contentSubHeaderOne"
+                  label="Subheader"
+                  color="yellow-14"
+                  class="q-mb-sm"
+                  type="text"
+              />
+              <q-input
+                  v-model="formData.contentTextOne"
+                  label="Content Text"
+                  color="yellow-14"
+                  type="textarea"
+                  autogrow
+                  :rules="[val => !!val.trim() || 'Content text is required']"
+              />
+            </div>
+
+            <div class="q-mb-md">
+              <div class="text-subtitle2 q-mb-sm">Second Content Section</div>
+              <q-input
+                  v-model="formData.contentSubHeaderTwo"
+                  label="Subheader"
+                  color="yellow-14"
+                  class="q-mb-sm"
+                  type="text"
+              />
+              <q-input
+                  v-model="formData.contentTextTwo"
+                  label="Content Text"
+                  color="yellow-14"
+                  type="textarea"
+                  autogrow
+                  :rules="[val => !!val.trim() || 'Content text is required']"
+              />
+            </div>
+
+            <div class="text-caption text-grey-4 q-mt-sm">
+              This slide contains two content sections with their own subheaders and text
+            </div>
+          </div>
+
+          <!-- Slide Text Media 1 Implementation -->
+          <div v-else-if="type === 'SLIDE_TEXT_MEDIA_1'">
+            <q-input
+                v-model="formData.contentHeader"
+                label="Header"
+                color="yellow-14"
+                class="q-mb-md"
+                type="text"
+                :rules="[val => !!val.trim() || 'Header is required']"
+            />
+
+            <q-input
+                v-model="formData.contentTextOne"
+                label="Main Text"
+                color="yellow-14"
+                type="textarea"
+                autogrow
+                class="q-mb-md"
+                :rules="[val => !!val.trim() || 'Main text is required']"
+            />
+
+            <div class="q-mt-md">
+              <div class="text-subtitle1 q-mb-sm">Media Content</div>
+              <q-card bordered flat class="bg-grey-8 q-pa-sm">
+                <!-- Input de arquivo invisível -->
+                <input
+                    type="file"
+                    ref="fileInput"
+                    accept="image/*"
+                    @change="(e) => handleImageUpload(e, 'contentMediaOne')"
+                    style="display: none"
+                />
+
+                <div v-if="!formData.contentMediaOne">
+                  <q-btn
+                      label="Upload Image"
+                      color="yellow-14"
+                      text-color="black"
+                      icon="upload"
+                      @click="triggerFileInput('fileInput')"
+                      class="q-mb-sm"
+                  />
+                  <div class="text-caption text-grey-4">
+                    Formatos suportados: JPG, PNG, GIF. Tamanho máximo: 2MB
+                  </div>
+                </div>
+
+                <div v-else>
+                  <div class="row items-center q-mb-sm">
+                    <q-img
+                        :src="formData.contentMediaOne"
+                        style="max-height: 100px; max-width: 150px"
+                        class="q-mr-sm"
+                    />
+                    <q-btn
+                        label="Change Image"
+                        color="yellow-14"
+                        text-color="black"
+                        size="sm"
+                        @click="triggerFileInput('fileInput')"
+                        class="q-mr-sm"
+                    />
+                    <q-btn
+                        label="Remove"
+                        color="negative"
+                        size="sm"
+                        @click="removeImage('contentMediaOne')"
+                    />
+                  </div>
+                </div>
+              </q-card>
+            </div>
+
+            <div class="text-caption text-grey-4 q-mt-sm">
+              This is a slide with text and media content
+            </div>
+          </div>
+
+          <!-- Slide Text Media 2 Implementation -->
+          <div v-else-if="type === 'SLIDE_TEXT_MEDIA_2'">
+            <!-- First Section -->
+            <div class="q-mb-md">
+              <div class="text-subtitle2 q-mb-sm">First Content Section</div>
+              <q-input
+                  v-model="formData.contentSubHeaderOne"
+                  label="Subheader"
+                  color="yellow-14"
+                  class="q-mb-sm"
+                  type="text"
+              />
+              <q-input
+                  v-model="formData.contentTextOne"
+                  label="Content Text"
+                  color="yellow-14"
+                  type="textarea"
+                  autogrow
+                  class="q-mb-sm"
+              />
+
+              <div class="q-mt-sm">
+                <div class="text-subtitle3 q-mb-xs">Media Content</div>
+                <q-card bordered flat class="bg-grey-8 q-pa-sm">
+                  <!-- Input de arquivo invisível para a primeira imagem -->
+                  <input
+                      type="file"
+                      ref="fileInput1"
+                      accept="image/*"
+                      @change="(e) => handleImageUpload(e, 'contentMediaOne')"
+                      style="display: none"
+                  />
+
+                  <div v-if="!formData.contentMediaOne">
+                    <q-btn
+                        label="Upload Image"
+                        color="yellow-14"
+                        text-color="black"
+                        icon="upload"
+                        @click="() => triggerFileInput('fileInput1')"
+                        class="q-mb-sm"
+                    />
+                    <div class="text-caption text-grey-4">
+                      Formatos suportados: JPG, PNG, GIF. Tamanho máximo: 2MB
+                    </div>
+                  </div>
+
+                  <div v-else>
+                    <div class="row items-center q-mb-sm">
+                      <q-img
+                          :src="formData.contentMediaOne"
+                          style="max-height: 100px; max-width: 150px"
+                          class="q-mr-sm"
+                      />
+                      <q-btn
+                          label="Change Image"
+                          color="yellow-14"
+                          text-color="black"
+                          size="sm"
+                          @click="() => triggerFileInput('fileInput1')"
+                          class="q-mr-sm"
+                      />
+                      <q-btn
+                          label="Remove"
+                          color="negative"
+                          size="sm"
+                          @click="() => removeImage('contentMediaOne')"
+                      />
+                    </div>
+                  </div>
+                </q-card>
+              </div>
+            </div>
+
+            <!-- Second Section -->
+            <div class="q-mb-md">
+              <div class="text-subtitle2 q-mb-sm">Second Content Section</div>
+              <q-input
+                  v-model="formData.contentSubHeaderTwo"
+                  label="Subheader"
+                  color="yellow-14"
+                  class="q-mb-sm"
+                  type="text"
+              />
+              <q-input
+                  v-model="formData.contentTextTwo"
+                  label="Content Text"
+                  color="yellow-14"
+                  type="textarea"
+                  autogrow
+                  class="q-mb-sm"
+              />
+
+              <div class="q-mt-sm">
+                <div class="text-subtitle3 q-mb-xs">Media Content</div>
+                <q-card bordered flat class="bg-grey-8 q-pa-sm">
+                  <!-- Input de arquivo invisível para a segunda imagem -->
+                  <input
+                      type="file"
+                      ref="fileInput2"
+                      accept="image/*"
+                      @change="(e) => handleImageUpload(e, 'contentMediaTwo')"
+                      style="display: none"
+                  />
+
+                  <div v-if="!formData.contentMediaTwo">
+                    <q-btn
+                        label="Upload Image"
+                        color="yellow-14"
+                        text-color="black"
+                        icon="upload"
+                        @click="() => triggerFileInput('fileInput2')"
+                        class="q-mb-sm"
+                    />
+                    <div class="text-caption text-grey-4">
+                      Formatos suportados: JPG, PNG, GIF. Tamanho máximo: 2MB
+                    </div>
+                  </div>
+
+                  <div v-else>
+                    <div class="row items-center q-mb-sm">
+                      <q-img
+                          :src="formData.contentMediaTwo"
+                          style="max-height: 100px; max-width: 150px"
+                          class="q-mr-sm"
+                      />
+                      <q-btn
+                          label="Change Image"
+                          color="yellow-14"
+                          text-color="black"
+                          size="sm"
+                          @click="() => triggerFileInput('fileInput2')"
+                          class="q-mr-sm"
+                      />
+                      <q-btn
+                          label="Remove"
+                          color="negative"
+                          size="sm"
+                          @click="() => removeImage('contentMediaTwo')"
+                      />
+                    </div>
+                  </div>
+                </q-card>
+              </div>
+            </div>
+
+            <div class="text-caption text-grey-4 q-mt-sm">
+              This is a slide with two content sections, each with text and media
+            </div>
+          </div>
+
+        </div>
+      </q-card-section>
+
+      <!-- Preview -->
+      <q-card-section class="bg-grey-8 q-pa-md">
+        <div class="text-subtitle2 q-mb-sm">Live Preview</div>
+        <QuizPreview
+            v-if="type.startsWith('QUIZ_')"
+            :type="type"
+            :data="formData"
+        />
+        <SlidePreview
+            v-else-if="type.startsWith('SLIDE_')"
+            :type="type"
+            :data="formData"
+        />
       </q-card-section>
 
       <q-card-actions align="right">

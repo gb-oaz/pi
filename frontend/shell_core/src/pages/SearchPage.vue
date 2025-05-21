@@ -7,8 +7,8 @@ import type { IQuiz } from '../services/quiz/types/IQuiz.ts'
 import { QuizApi } from '../services/quiz/QuizApi.ts'
 import { random } from '../utils/images/Randon.ts'
 import router from "../routes.ts";
-import SearchLogin from '../components/SearchLogin.vue'
-import QuizListings from '../components/QuizListings.vue'
+import SearchLogin from '../components/login/SearchLogin.vue'
+import QuizListings from '../components/lists/QuizListings.vue'
 
 // Constants
 const DEFAULT_CARDS_PER_PAGE = 4
