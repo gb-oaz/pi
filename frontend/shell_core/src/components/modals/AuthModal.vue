@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, computed } from "vue";
-import { random } from '../../utils/images/Randon.ts'
+import { random } from '../../utils/images/Random.ts'
 import { useQuasar } from "quasar";
 import { AuthApi } from "../../services/auth/AuthApi.ts";
 import { UserApi } from "../../services/user/UserApi.ts";

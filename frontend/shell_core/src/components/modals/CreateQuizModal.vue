@@ -11,6 +11,8 @@ const dialog = ref(false)
 const maximizedToggle = ref(true)
 const currentEditingIndex = ref<number | null>(null)
 const currentItemType = ref<string>('')
+const dragItemIndex = ref<number | null>(null)
+const dragOverItemIndex = ref<number | null>(null)
 
 function open(){ dialog.value = true }
 function close(){ dialog.value = false }
@@ -79,6 +81,30 @@ function formatTypeName(type: string) {
       .replace(/\b\w/g, c => c.toUpperCase())
 }
 
+function onDragStart(index: number) {
+  dragItemIndex.value = index
+}
+
+function onDragOver(event: DragEvent, index: number) {
+  event.preventDefault()
+  dragOverItemIndex.value = index
+}
+
+function onDrop(index: number) {
+  if (dragItemIndex.value === null || dragItemIndex.value === index) return
+  const itemToMove = createQuizStore.quiz.quizes[dragItemIndex.value]
+  createQuizStore.quiz.quizes.splice(dragItemIndex.value, 1)
+  createQuizStore.quiz.quizes.splice(index, 0, itemToMove)
+
+  dragItemIndex.value = null
+  dragOverItemIndex.value = null
+}
+
+function onDragEnd() {
+  dragItemIndex.value = null
+  dragOverItemIndex.value = null
+}
+
 defineExpose({
   open,
   close
@@ -124,22 +150,39 @@ defineExpose({
             style="height: 80px; font-size: 1.2rem;"
         />
 
-        <!-- Lista de itens do quiz -->
-        <div v-for="(item, index) in createQuizStore.quiz.quizes" :key="index" class="q-mb-sm">
-          <q-card class="bg-grey-8">
-            <q-card-section>
-              <div class="row items-center">
-                <div class="col">
-                  <div class="text-subtitle1">{{ formatTypeName(item.type) }}</div>
-                  <div class="text-caption text-grey-4">{{ getItemPreview(item) }}</div>
+        <!-- Lista de itens do quiz como grid com drag and drop -->
+        <div class="row q-col-gutter-md">
+          <div
+              v-for="(item, index) in createQuizStore.quiz.quizes"
+              :key="index"
+              class="col-xs-12 col-sm-6 col-md-4 col-lg-3"
+          >
+            <q-card
+                class="bg-grey-8 cursor-grab"
+                draggable="true"
+                @dragstart="onDragStart(index)"
+                @dragover="onDragOver($event, index)"
+                @drop="onDrop(index)"
+                @dragend="onDragEnd"
+                :class="{ 'drag-over': dragOverItemIndex === index, 'dragging': dragItemIndex === index }"
+            >
+              <q-card-section>
+                <div class="row items-center">
+                  <div class="col">
+                    <div class="text-subtitle1 text-truncate">{{ formatTypeName(item.type) }}</div>
+                    <div class="text-caption text-grey-4 text-truncate">{{ getItemPreview(item) }}</div>
+                  </div>
+                  <div class="col-auto">
+                    <q-btn flat round icon="edit" @click.stop="editItem(index)" />
+                    <q-btn flat round icon="delete" @click.stop="createQuizStore.removeQuizItem(index)" />
+                  </div>
                 </div>
-                <div class="col-auto">
-                  <q-btn flat round icon="edit" @click="editItem(index)" />
-                  <q-btn flat round icon="delete" @click="createQuizStore.removeQuizItem(index)" />
-                </div>
-              </div>
-            </q-card-section>
-          </q-card>
+              </q-card-section>
+              <q-tooltip>
+                {{ getItemPreview(item) }}
+              </q-tooltip>
+            </q-card>
+          </div>
         </div>
       </q-card-section>
 
@@ -156,5 +199,23 @@ defineExpose({
 </template>
 
 <style scoped lang="sass">
+.cursor-grab
+  cursor: grab
+  &:active
+    cursor: grabbing
 
+.q-card
+  height: 100%
+  transition: transform 0.2s, opacity 0.2s
+  &:hover
+    transform: translateY(-2px)
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2)
+
+.drag-over
+  border: 2px dashed $yellow-6
+  opacity: 0.7
+
+.dragging
+  opacity: 0.5
+  transform: scale(0.95)
 </style>

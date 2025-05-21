@@ -5,7 +5,7 @@ import { useAuthStore } from "../stores/authStore";
 import type { IPageable } from '../utils/types/IPageable.ts'
 import type { IQuiz } from '../services/quiz/types/IQuiz.ts'
 import { QuizApi } from '../services/quiz/QuizApi.ts'
-import { random } from '../utils/images/Randon.ts'
+import { random } from '../utils/images/Random.ts'
 import router from "../routes.ts";
 import SearchLogin from '../components/login/SearchLogin.vue'
 import QuizListings from '../components/lists/QuizListings.vue'
