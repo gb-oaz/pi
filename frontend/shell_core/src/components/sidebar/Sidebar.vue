@@ -234,7 +234,7 @@ onBeforeUnmount(() => {
   <!-- Dialog com o conteúdo da sidebar -->
   <q-dialog v-model="showSidebar" full-height>
     <q-card class="sidebar-dialog">
-      <q-card-section class="column items-start justify-between full-height">
+      <q-card-section class="column items-start justify-between full-height no-wrap">
         <header class="full-width" style="margin-bottom: 10px">
           <q-img :src="logo" style="width: 45px; height: 45px" class="q-mb-md" contain />
 
@@ -325,9 +325,46 @@ onBeforeUnmount(() => {
             />
           </q-btn>
 
+          <q-separator color="yellow-14" class="separator" inset />
+
+          <div v-if="hasPermission('teacher-group')" class="accordion-teacher">
+            <q-list bordered>
+              <q-expansion-item group="teacher-group" label="Quiz Actions" header-class="text-white">
+                <div style="padding: 10px">
+                  <q-btn class="full-width text-justify" size="md" color="gray-10" text-color="white" label="Flashcard" no-caps>
+                    <strong class="text-caption text-weight-thin">(Create cards for study)</strong>
+                  </q-btn>
+                  <q-btn class="full-width text-justify" size="md" color="gray-10" text-color="white" label="Quiz" no-caps @click="openQuizModal">
+                    <strong class="text-caption text-weight-thin">(Create lesson for home work)</strong>
+                  </q-btn>
+                  <q-btn class="full-width text-justify" size="md" color="gray-10" text-color="white" label="Live class" no-caps>
+                    <strong class="text-caption text-weight-thin">(Create a live action class)</strong>
+                  </q-btn>
+                </div>
+              </q-expansion-item>
+
+              <q-separator />
+
+              <q-expansion-item group="teacher-group" label="Group Actions" header-class="text-white">
+                <div style="padding: 10px">
+                  <q-btn class="full-width text-justify" size="md" color="gray-10" text-color="white" label="Study" no-caps>
+                    <strong class="text-caption text-weight-thin">(Create a small group 1 to 3)</strong>
+                  </q-btn>
+                  <q-btn class="full-width text-justify" size="md" color="gray-10" text-color="white" label="Team" no-caps>
+                    <strong class="text-caption text-weight-thin">(Create a medium group 5 to 10)</strong>
+                  </q-btn>
+                  <q-btn class="full-width text-justify" size="md" color="gray-10" text-color="white" label="Class room" no-caps>
+                    <strong class="text-caption text-weight-thin">(Create a big group 10 +)</strong>
+                  </q-btn>
+                </div>
+              </q-expansion-item>
+
+            </q-list>
+          </div>
+
         </header>
         <footer class="full-width">
-          <q-btn align="between" class="full-width" style="border-radius: 4px; margin-bottom: 0" caps fab @click="showSidebar = false">
+          <q-btn align="between" class="full-width" style="border-radius: 4px; margin-bottom: 10px" caps fab @click="showSidebar = false">
             <div class="row items-center justify-between no-wrap full-width">
               <div class="column items-start justify-between no-wrap">
                 <span class="text-subtitle1 text-weight-thin" style="color: goldenrod">{{ authStore.scope?.login }}</span>

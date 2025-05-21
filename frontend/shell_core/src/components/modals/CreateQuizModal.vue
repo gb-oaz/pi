@@ -3,6 +3,11 @@ import { ref } from 'vue'
 import { useQuasar } from 'quasar'
 import { useCreateQuizStore } from '../../stores/useCreateQuizStore.ts'
 import QuizItemEditorModal from "./QuizItemEditorModal.vue";
+import { random } from '../../utils/images/Random.ts'
+
+const randomBg = random.backgroundImages;
+document.documentElement.style.setProperty('--random-background-cp', `url(${randomBg[1]})`);
+document.documentElement.style.setProperty('--random-background-qp', `url(${randomBg[3]})`);
 
 const $q = useQuasar()
 const createQuizStore = useCreateQuizStore()
@@ -233,24 +238,36 @@ defineExpose({
   transform: scale(0.95)
 
 // Quiz types
-.type-quiz-multiple-choice
-  background: linear-gradient(to bottom right, $indigo-6, $indigo-8)
-.type-quiz-fill-space
-  background: linear-gradient(to bottom right, $teal-6, $teal-8)
-.type-quiz-true-false
-  background: linear-gradient(to bottom right, $purple-6, $purple-8)
-.type-quiz-open
-  background: linear-gradient(to bottom right, $blue-6, $blue-8)
-.type-quiz-poll
-  background: linear-gradient(to bottom right, $orange-6, $orange-8)
+.type-quiz-multiple-choice,
+.type-quiz-fill-space,
+.type-quiz-true-false,
+.type-quiz-open,
+.type-quiz-poll,
 .type-quiz-word-cloud
-  background: linear-gradient(to bottom right, $cyan-6, $cyan-8)
-
-// Slide types
-.type-slide-title-1, .type-slide-title-2
-  background: linear-gradient(to bottom right, $red-6, $red-8)
-.type-slide-text-1, .type-slide-text-2
-  background: linear-gradient(to bottom right, $green-6, $green-8)
-.type-slide-text-media-1, .type-slide-text-media-2
-  background: linear-gradient(to bottom right, $amber-6, $amber-8)
+  background-image: var(--random-background-cp)
+  background-size: cover
+  background-position: center
+  background-color: rgba(89, 84, 45, 0.56)
+  text-shadow: #1D1D1D 0 0 5px
+.type-slide-title-1,
+.type-slide-title-2
+  background-image: var(--random-background-qp)
+  background-size: cover
+  background-position: center
+  background-color: rgba(61, 89, 46, 0.56)
+  text-shadow: #1D1D1D 0 0 5px
+.type-slide-text-1,
+.type-slide-text-2
+  background-image: var(--random-background-qp)
+  background-size: cover
+  background-position: center
+  background-color: rgba(46, 53, 89, 0.56)
+  text-shadow: #1D1D1D 0 0 5px
+.type-slide-text-media-1,
+.type-slide-text-media-2
+  background-image: var(--random-background-qp)
+  background-size: cover
+  background-position: center
+  background-color: rgba(89, 46, 51, 0.56)
+  text-shadow: #1D1D1D 0 0 5px
 </style>

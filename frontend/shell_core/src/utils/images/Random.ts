@@ -14,6 +14,7 @@ type RandomImageAndColor = {
     getRandomColor: () => string;
     getRandomBackground: () => string;
     getFormStatusColor: (form: Record<string, string>, requiredFields?: string[]) => string;
+    backgroundImages: string[];
 };
 
 const cardImages = [cardImage1, cardImage2, cardImage3, cardImage4];
@@ -46,5 +47,6 @@ export const random: RandomImageAndColor = {
     getRandomImage,
     getRandomColor,
     getRandomBackground,
-    getFormStatusColor
+    getFormStatusColor,
+    backgroundImages
 };
