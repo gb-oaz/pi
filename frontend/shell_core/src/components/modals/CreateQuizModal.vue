@@ -105,6 +105,10 @@ function onDragEnd() {
   dragOverItemIndex.value = null
 }
 
+function getTypeClass(type: string) {
+  return `type-${type.toLowerCase().replace(/_/g, '-')}`
+}
+
 defineExpose({
   open,
   close
@@ -158,13 +162,16 @@ defineExpose({
               class="col-xs-12 col-sm-6 col-md-4 col-lg-3"
           >
             <q-card
-                class="bg-grey-8 cursor-grab"
+                class="cursor-grab"
+                :class="[
+                    getTypeClass(item.type),
+                    { 'drag-over': dragOverItemIndex === index, 'dragging': dragItemIndex === index }
+                ]"
                 draggable="true"
                 @dragstart="onDragStart(index)"
                 @dragover="onDragOver($event, index)"
                 @drop="onDrop(index)"
                 @dragend="onDragEnd"
-                :class="{ 'drag-over': dragOverItemIndex === index, 'dragging': dragItemIndex === index }"
             >
               <q-card-section>
                 <div class="row items-center">
@@ -207,15 +214,43 @@ defineExpose({
 .q-card
   height: 100%
   transition: transform 0.2s, opacity 0.2s
+  background: $grey-8  // Cor de fallback
+  .text-subtitle1, .text-caption
+    color: white
+  .text-grey-4
+    color: rgba(255, 255, 255, 0.7)
   &:hover
     transform: translateY(-2px)
-    box-shadow: 0 4px 8px rgba(0,0,0,0.2)
+    box-shadow: 0 4px 8px rgba(0,0,0,0.3)
 
 .drag-over
   border: 2px dashed $yellow-6
   opacity: 0.7
+  background: $grey-7
 
 .dragging
   opacity: 0.5
   transform: scale(0.95)
+
+// Quiz types
+.type-quiz-multiple-choice
+  background: linear-gradient(to bottom right, $indigo-6, $indigo-8)
+.type-quiz-fill-space
+  background: linear-gradient(to bottom right, $teal-6, $teal-8)
+.type-quiz-true-false
+  background: linear-gradient(to bottom right, $purple-6, $purple-8)
+.type-quiz-open
+  background: linear-gradient(to bottom right, $blue-6, $blue-8)
+.type-quiz-poll
+  background: linear-gradient(to bottom right, $orange-6, $orange-8)
+.type-quiz-word-cloud
+  background: linear-gradient(to bottom right, $cyan-6, $cyan-8)
+
+// Slide types
+.type-slide-title-1, .type-slide-title-2
+  background: linear-gradient(to bottom right, $red-6, $red-8)
+.type-slide-text-1, .type-slide-text-2
+  background: linear-gradient(to bottom right, $green-6, $green-8)
+.type-slide-text-media-1, .type-slide-text-media-2
+  background: linear-gradient(to bottom right, $amber-6, $amber-8)
 </style>
