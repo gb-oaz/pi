@@ -128,6 +128,195 @@ function formatTypeName(type: string) {
 }
 
 function saveItem() {
+  // Validação para QUIZ types - usar props.type em vez de type
+  if (props.type.startsWith('QUIZ_')) {
+    // Validação comum para todos os tipos de QUIZ
+    if (!formData.value.contentQuestion?.trim()) {
+      $q.notify({
+        type: 'warning',
+        message: 'Question is required'
+      })
+      return
+    }
+
+    // Validações específicas para cada tipo de QUIZ
+    if (props.type === 'QUIZ_MULTIPLE_CHOICE') {
+      if (validAlternatives.value.length < 2) {
+        $q.notify({
+          type: 'warning',
+          message: 'At least 2 alternatives are required'
+        })
+        return
+      }
+
+      if (formData.value.answers.length === 0) {
+        $q.notify({
+          type: 'warning',
+          message: 'At least one correct answer must be selected'
+        })
+        return
+      }
+    }
+    else if (props.type === 'QUIZ_FILL_SPACE' || props.type === 'QUIZ_POLL' || props.type === 'QUIZ_OPEN' || props.type === 'QUIZ_WORD_CLOUD') {
+      if (formData.value.answers.length < 1) {
+        $q.notify({
+          type: 'warning',
+          message: 'At least one answer/option is required'
+        })
+        return
+      }
+
+      // Verifica se todas as respostas estão preenchidas
+      const emptyAnswers = formData.value.answers.some((answer: string) => !answer.trim())
+      if (emptyAnswers) {
+        $q.notify({
+          type: 'warning',
+          message: 'All answers/options must be filled'
+        })
+        return
+      }
+    }
+    else if (props.type === 'QUIZ_TRUE_FALSE') {
+      if (!formData.value.answers[0]) {
+        $q.notify({
+          type: 'warning',
+          message: 'Please select the correct answer'
+        })
+        return
+      }
+    }
+
+    // Validação para timer e reward
+    if (formData.value.timerSeconds < 5 || formData.value.timerSeconds > 120) {
+      $q.notify({
+        type: 'warning',
+        message: 'Timer must be between 5 and 120 seconds'
+      })
+      return
+    }
+
+    if (formData.value.reward < 10 || formData.value.reward > 100) {
+      $q.notify({
+        type: 'warning',
+        message: 'Reward must be between 10 and 100 points'
+      })
+      return
+    }
+  }
+
+  // Validação para SLIDE types - usar props.type em vez de type
+  else if (props.type.startsWith('SLIDE_')) {
+    if (props.type === 'SLIDE_TITLE_1' || props.type === 'SLIDE_TITLE_2') {
+      if (!formData.value.contentTitle?.trim()) {
+        $q.notify({
+          type: 'warning',
+          message: 'Title is required'
+        })
+        return
+      }
+
+      if (props.type === 'SLIDE_TITLE_2' && !formData.value.contentDescription?.trim()) {
+        $q.notify({
+          type: 'warning',
+          message: 'Description is required'
+        })
+        return
+      }
+    }
+    else if (props.type === 'SLIDE_TEXT_1') {
+      if (!formData.value.contentHeader?.trim()) {
+        $q.notify({
+          type: 'warning',
+          message: 'Header is required'
+        })
+        return
+      }
+
+      if (!formData.value.contentSubHeaderOne?.trim()) {
+        $q.notify({
+          type: 'warning',
+          message: 'Sub header is required'
+        })
+        return
+      }
+
+      if (!formData.value.contentTextOne?.trim()) {
+        $q.notify({
+          type: 'warning',
+          message: 'Main text is required'
+        })
+        return
+      }
+    }
+    else if (props.type === 'SLIDE_TEXT_2') {
+      if (!formData.value.contentHeader?.trim()) {
+        $q.notify({
+          type: 'warning',
+          message: 'Header is required'
+        })
+        return
+      }
+
+      if (!formData.value.contentSubHeaderOne?.trim() || !formData.value.contentSubHeaderTwo?.trim()) {
+        $q.notify({
+          type: 'warning',
+          message: 'Sub header is required'
+        })
+        return
+      }
+
+      if (!formData.value.contentTextOne?.trim() || !formData.value.contentTextTwo?.trim()) {
+        $q.notify({
+          type: 'warning',
+          message: 'Both content sections must be filled'
+        })
+        return
+      }
+    }
+    else if (props.type === 'SLIDE_TEXT_MEDIA_1') {
+      if (!formData.value.contentHeader?.trim()) {
+        $q.notify({
+          type: 'warning',
+          message: 'Header is required'
+        })
+        return
+      }
+
+      if (!formData.value.contentTextOne?.trim()) {
+        $q.notify({
+          type: 'warning',
+          message: 'Main text is required'
+        })
+        return
+      }
+
+      if (!formData.value.contentMediaOne) {
+        $q.notify({
+          type: 'warning',
+          message: 'Media content is required'
+        })
+        return
+      }
+    }
+    else if (props.type === 'SLIDE_TEXT_MEDIA_2') {
+      if (!formData.value.contentTextOne?.trim() || !formData.value.contentTextTwo?.trim()) {
+        $q.notify({
+          type: 'warning',
+          message: 'Both content texts are required'
+        })
+        return
+      }
+
+      if (!formData.value.contentMediaOne || !formData.value.contentMediaTwo) {
+        $q.notify({
+          type: 'warning',
+          message: 'Both media contents are required'
+        })
+        return
+      }
+    }
+  }
+
   // Para QUIZ_MULTIPLE_CHOICE
   if (formData.value.type === 'QUIZ_MULTIPLE_CHOICE') {
     formData.value.alternatives = validAlternatives.value
@@ -388,7 +577,7 @@ watch(() => show.value, (val) => {
             <!-- Sample Answers -->
             <div class="q-mt-md">
               <div class="text-subtitle1 q-mb-sm flex items-center justify-between">
-                <span>Sample Correct Answers (optional)</span>
+                <span>Sample Correct Answers</span>
                 <q-btn
                     label="Add Sample"
                     color="yellow-14"
@@ -534,7 +723,7 @@ watch(() => show.value, (val) => {
             <!-- Sample Words -->
             <div class="q-mt-md">
               <div class="text-subtitle1 q-mb-sm flex items-center justify-between">
-                <span>Example Words (optional)</span>
+                <span>Sample example correct Words</span>
                 <q-btn
                     label="Add Word"
                     color="yellow-14"
@@ -652,7 +841,10 @@ watch(() => show.value, (val) => {
                 color="yellow-14"
                 class="q-mb-md"
                 type="text"
-                :rules="[val => !!val.trim() || 'Title is required']"
+                :rules="[
+                  val => !!val?.trim() || 'Field is required',
+                  val => val?.length <= 100 || 'Maximum 100 characters'
+                ]"
             />
 
             <div class="text-caption text-grey-4 q-mt-sm">
@@ -668,7 +860,10 @@ watch(() => show.value, (val) => {
                 color="yellow-14"
                 class="q-mb-md"
                 type="text"
-                :rules="[val => !!val.trim() || 'Title is required']"
+                :rules="[
+                  val => !!val?.trim() || 'Field is required',
+                  val => val?.length <= 100 || 'Maximum 100 characters'
+                ]"
             />
 
             <q-input
@@ -712,7 +907,10 @@ watch(() => show.value, (val) => {
                 type="textarea"
                 autogrow
                 class="q-mb-md"
-                :rules="[val => !!val.trim() || 'Main text is required']"
+                :rules="[
+                  val => !!val?.trim() || 'Field is required',
+                  val => val?.length <= 500 || 'Maximum 500 characters'
+                ]"
             />
 
             <div class="text-caption text-grey-4 q-mt-sm">
@@ -746,7 +944,10 @@ watch(() => show.value, (val) => {
                   color="yellow-14"
                   type="textarea"
                   autogrow
-                  :rules="[val => !!val.trim() || 'Content text is required']"
+                  :rules="[
+                    val => !!val?.trim() || 'Field is required',
+                    val => val?.length <= 500 || 'Maximum 500 characters'
+                  ]"
               />
             </div>
 
@@ -782,7 +983,10 @@ watch(() => show.value, (val) => {
                 color="yellow-14"
                 class="q-mb-md"
                 type="text"
-                :rules="[val => !!val.trim() || 'Header is required']"
+                :rules="[
+                  val => !!val?.trim() || 'Field is required',
+                  val => val?.length <= 100 || 'Maximum 100 characters'
+                ]"
             />
 
             <q-input
@@ -792,7 +996,10 @@ watch(() => show.value, (val) => {
                 type="textarea"
                 autogrow
                 class="q-mb-md"
-                :rules="[val => !!val.trim() || 'Main text is required']"
+                :rules="[
+                  val => !!val?.trim() || 'Field is required',
+                  val => val?.length <= 500 || 'Maximum 500 characters'
+                ]"
             />
 
             <div class="q-mt-md">
@@ -863,6 +1070,10 @@ watch(() => show.value, (val) => {
                   color="yellow-14"
                   class="q-mb-sm"
                   type="text"
+                  :rules="[
+                    val => !!val?.trim() || 'Field is required',
+                    val => val?.length <= 100 || 'Maximum 100 characters'
+                  ]"
               />
               <q-input
                   v-model="formData.contentTextOne"
@@ -871,6 +1082,10 @@ watch(() => show.value, (val) => {
                   type="textarea"
                   autogrow
                   class="q-mb-sm"
+                  :rules="[
+                    val => !!val?.trim() || 'Field is required',
+                    val => val?.length <= 500 || 'Maximum 500 characters'
+                  ]"
               />
 
               <div class="q-mt-sm">
@@ -935,6 +1150,10 @@ watch(() => show.value, (val) => {
                   color="yellow-14"
                   class="q-mb-sm"
                   type="text"
+                  :rules="[
+                    val => !!val?.trim() || 'Field is required',
+                    val => val?.length <= 100 || 'Maximum 100 characters'
+                  ]"
               />
               <q-input
                   v-model="formData.contentTextTwo"
@@ -943,6 +1162,10 @@ watch(() => show.value, (val) => {
                   type="textarea"
                   autogrow
                   class="q-mb-sm"
+                  :rules="[
+                    val => !!val?.trim() || 'Field is required',
+                    val => val?.length <= 500 || 'Maximum 500 characters'
+                  ]"
               />
 
               <div class="q-mt-sm">

@@ -1,6 +1,6 @@
 import { createApp } from 'vue'
-import { Quasar, Notify, BottomSheet } from 'quasar'
-import { createPinia } from 'pinia' // Importe o Pinia
+import { Quasar, Notify, BottomSheet, Loading, Dialog } from 'quasar'
+import { createPinia } from 'pinia'
 
 // Import icon libraries
 import '@quasar/extras/material-icons/material-icons.css'
@@ -18,19 +18,27 @@ import router from "./routes.ts"
     await authApi.initAnonymousToken()
 
     const myApp = createApp(App)
-    const pinia = createPinia() // Crie a instância do Pinia
+    const pinia = createPinia()
 
     // Configuração completa do Quasar
     myApp.use(Quasar, {
         plugins: {
             Notify,
-            BottomSheet
+            BottomSheet,
+            Loading,
+            Dialog
         },
         config: {
             notify: {
                 position: 'top',
                 timeout: 2500,
                 textColor: 'white'
+            },
+            loading: {
+                spinnerColor: 'yellow',
+                spinnerSize: 60,
+                backgroundColor: 'grey-10',
+                messageColor: 'white'
             }
         }
     })
@@ -50,7 +58,7 @@ import router from "./routes.ts"
     }
 
     myApp
-        .use(pinia) // Adicione o Pinia antes do router
+        .use(pinia)
         .use(router)
         .mount('#app')
 })()

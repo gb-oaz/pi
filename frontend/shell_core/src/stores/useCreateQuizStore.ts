@@ -52,6 +52,21 @@ export const useCreateQuizStore = defineStore('createQuiz', () => {
         // O watch vai pegar essa mudança e salvar automaticamente
     }
 
+    const setQuizName = (name: string) => {
+        quiz.value.name = name
+        // Não precisa chamar saveToStorage() pois o watch já faz isso
+    }
+
+    const setQuizCategories = (categories: string[]) => {
+        quiz.value.categories = categories
+        // Não precisa chamar saveToStorage() pois o watch já faz isso
+    }
+
+    const setQuizKey = (key: string) => {
+        quiz.value.key = key
+        // Não precisa chamar saveToStorage() pois o watch já faz isso
+    }
+
     // Método para limpar o localStorage quando necessário
     const clearStorage = () => {
         localStorage.removeItem(STORAGE_KEY)
@@ -70,6 +85,9 @@ export const useCreateQuizStore = defineStore('createQuiz', () => {
         addQuizItem,
         updateQuizItem,
         removeQuizItem,
+        setQuizName,
+        setQuizCategories,
+        setQuizKey,
         clearStorage
     }
 })
