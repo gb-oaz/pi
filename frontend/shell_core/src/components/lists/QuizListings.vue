@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { IQuiz } from "../../services/quiz/types/IQuiz.ts";
 import { ref } from "vue";
+import { useAuthStore } from "../../stores/authStore.ts";
 
 interface Props {
   quizzes: IQuiz[];
@@ -14,9 +15,14 @@ const { quizzes, currentPage, totalPages, quizImages, quizColors } = defineProps
 const emit = defineEmits(['update:currentPage', 'play']);
 
 const hoveredCard = ref<string | null>(null);
+const authStore = useAuthStore();
 
 const handlePageChange = (page: number) => emit('update:currentPage', page);
 const handlePlay = (quiz: IQuiz) => emit('play', quiz);
+
+const isTeacher = () => {
+  return authStore.hasAnyRole(['TEACHER']);
+};
 </script>
 
 <template>
@@ -43,10 +49,10 @@ const handlePlay = (quiz: IQuiz) => emit('play', quiz);
               :key="quiz.key"
               :class="`bg-${quizColors[quiz.key]}`"
               class="quiz-card"
-              @mouseenter="hoveredCard = quiz.key"
-              @mouseleave="hoveredCard = null"
+              @mouseenter="isTeacher() ? hoveredCard = quiz.key : null"
+              @mouseleave="isTeacher() ? hoveredCard = null : null"
           >
-            <div v-if="hoveredCard === quiz.key" class="quiz-card__overlay">
+            <div v-if="hoveredCard === quiz.key && isTeacher()" class="quiz-card__overlay">
               <q-btn color="green" label="Play" @click.stop="handlePlay(quiz)" size="45px" caps round/>
             </div>
 
@@ -76,6 +82,7 @@ const handlePlay = (quiz: IQuiz) => emit('play', quiz);
 </template>
 
 <style scoped lang="sass">
+/* Seus estilos permanecem os mesmos */
 .quiz-listings
   margin-top: 20px
   width: 100%
@@ -159,7 +166,7 @@ const handlePlay = (quiz: IQuiz) => emit('play', quiz);
     max-height: 250px
     min-height: 250px
     .q-btn
-     animation: pulse 2s infinite
+      animation: pulse 2s infinite
 
     @container (max-width: 400px)
       min-height: 200px

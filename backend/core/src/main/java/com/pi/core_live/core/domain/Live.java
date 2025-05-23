@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.pi.core_quiz.core.domain.Quiz;
 import com.pi.core_quiz.core.domain.itens.IOperationsQuiz;
 import com.pi.core_quiz.core.domain.itens.IQuizItem;
+import com.pi.core_quiz.core.domain.quiz.QuizOpen;
+import com.pi.core_quiz.core.domain.quiz.QuizWordCloud;
 import com.pi.core_quiz.core.enums.QuizType;
 import com.pi.utils.services.Utils;
 
@@ -86,9 +88,16 @@ public class Live {
 
     protected void validateAnswer(String login, String code, List<String> answerItem, IQuizItem item) {
         var answers = ((IOperationsQuiz<?>) item).getAnswers();
-        var hit = new HashSet<String>(answerItem).containsAll(answers);
+        boolean hit = isHit(answerItem, item, answers);
         evaluation.addEvaluation(login + "#" + code, item.getPosition(), answerItem, hit);
         updateOn = Utils.now();
+    }
+
+    protected static boolean isHit(List<String> answerItem, IQuizItem item, List<String> answers) {
+        if (item instanceof QuizWordCloud || item instanceof QuizOpen) {
+            return !answers.contains("NOT_ANSWERED");
+        }
+        return new HashSet<String>(answerItem).containsAll(answers);
     }
 
     protected void calculateEngagementAndUpdate() {
