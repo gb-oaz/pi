@@ -10,6 +10,8 @@ const $q = useQuasar()
 const dialog = ref(false)
 const quizKey = ref('')
 const sidebarVisible = ref(true)
+const confirmEndDialog = ref(false)
+const confirmEndInput = ref('')
 
 const liveApi = new LiveApi()
 const authStore = useAuthStore()
@@ -30,23 +32,17 @@ const isOwnerTeacher = computed(() => {
   )
 })
 
+const currentPosition = computed(() => currentLive.value?.teacher?.control?.currentPosition ?? 0)
+
+const liveKeyDisplay = computed(() => {
+  const teacher = currentLive.value?.teacher
+  if (!teacher?.login || !teacher?.code) return ''
+  return `${teacher.login}#${teacher.code}`
+})
+
 const lobbyList = computed(() => currentLive.value?.lobby || [])
 
 let lobbyTimeout: ReturnType<typeof setTimeout> | null = null
-
-watch(lobbyList, (newLobby) => {
-  const { login, code, scope } = authStore.scope || {}
-  // Só valida para quem NÃO é TEACHER
-  if (scope && scope.includes('TEACHER')) return
-  if (!login || !code) return
-  if (lobbyTimeout) clearTimeout(lobbyTimeout)
-  lobbyTimeout = setTimeout(() => {
-    const userKey = `${login}#${code}`
-    if (!newLobby.includes(userKey)) {
-      close()
-    }
-  }, 5000)
-})
 
 async function removePupil(pupil: string) {
   const teacher = currentLive.value?.teacher
@@ -122,6 +118,29 @@ async function endLive() {
   }
 }
 
+function confirmEnd() {
+  confirmEndDialog.value = true
+  confirmEndInput.value = ''
+}
+
+function cancelEnd() {
+  confirmEndDialog.value = false
+  confirmEndInput.value = ''
+}
+
+function proceedEnd() {
+  confirmEndDialog.value = false
+  confirmEndInput.value = ''
+  endLive()
+}
+
+const myLoginCode = computed(() => {
+  const { login, code } = authStore.scope || {}
+  return login && code ? `${login}#${code}` : ''
+})
+
+const canConfirmEnd = computed(() => confirmEndInput.value.trim() === myLoginCode.value)
+
 // Funções de navegação do professor
 async function goToNextPosition() {
   const { login, code } = authStore.scope || {}
@@ -141,7 +160,19 @@ async function startSession() {
   await goToNextPosition()
 }
 
-const currentPosition = computed(() => currentLive.value?.teacher?.control?.currentPosition ?? 0)
+watch(lobbyList, (newLobby) => {
+  const { login, code, scope } = authStore.scope || {}
+  // Só valida para quem NÃO é TEACHER
+  if (scope && scope.includes('TEACHER')) return
+  if (!login || !code) return
+  if (lobbyTimeout) clearTimeout(lobbyTimeout)
+  lobbyTimeout = setTimeout(() => {
+    const userKey = `${login}#${code}`
+    if (!newLobby.includes(userKey)) {
+      close()
+    }
+  }, 5000)
+})
 
 onMounted(() => {
   // Se a live estiver finalizada, limpa o store imediatamente
@@ -168,8 +199,11 @@ defineExpose({
       maximized
   >
     <q-card class="bg-grey-10 text-white live-modal-card">
-      <q-bar>
-        <div>Live Quiz: {{ quizKey }}</div>
+      <q-bar class="live-bar">
+        <div class="row items-center">
+          <span class="live-dot" />
+          <q-badge class="live-key-badge" style="backdrop-filter: blur(2px);" :style="'background: rgba(34,34,34,0.24); color: #fff; border: 1px solid #ffe066;'" >{{ liveKeyDisplay }}</q-badge>
+        </div>
         <q-space />
         <q-btn dense flat icon="close" @click="close">
           <q-tooltip class="bg-white text-primary">Close</q-tooltip>
@@ -198,7 +232,7 @@ defineExpose({
               <q-item-section>
                 <div class="row items-center">
                   <span class="pupil-login">{{ pupil.split('#')[0] }}</span>
-                  <q-badge class="q-ml-sm pupil-code" color="yellow-14" text-color="black">#{{ pupil.split('#')[1] }}</q-badge>
+                  <q-badge class="q-ml-sm pupil-code" color="#ffe066" text-color="#222">#{{ pupil.split('#')[1] }}</q-badge>
                 </div>
               </q-item-section>
               <q-item-section side>
@@ -217,16 +251,50 @@ defineExpose({
           </div>
         </template>
       </div>
-      <div v-if="isOwnerTeacher" class="live-controls-footer row items-center justify-between full-width no-wrap">
-        <div>
-          <q-btn v-if="currentPosition === 0" color="yellow-14" text-color="black" label="Start Live Session" @click="startSession" />
-        </div>
-        <div class="row items-center justify-end no-wrap">
-          <q-btn color="grey-10" text-color="white" label="Anterior" @click="goToPreviousPosition" :disable="currentPosition <= 1" class="q-mr-sm" />
-          <q-btn color="yellow-14" text-color="black" label="Próximo" @click="goToNextPosition" :disable="currentPosition === 0" class="q-mr-sm" />
-          <q-btn color="negative" text-color="white" label="Finalizar Live" @click="endLive" />
+      <div v-if="isOwnerTeacher" class="live-controls-footer row items-center full-width no-wrap">
+        <div class="row items-center control-group justify-end full-width">
+          <q-btn
+            v-if="currentPosition === 0"
+            class="control-btn start-btn"
+            flat
+            label="Start"
+            @click="startSession"
+            color="grey-6"
+            text-color="#2196f3" />
+          <q-btn label="Prev" @click="goToPreviousPosition" :disable="currentPosition <= 1" class="control-btn prev-btn q-mr-sm" color="grey-6" text-color="#ffe066" flat />
+          <q-btn label="Next" @click="goToNextPosition" :disable="currentPosition === 0" class="control-btn next-btn q-mr-sm" color="grey-6" text-color="#ffd600" flat />
+          <q-btn label="End" @click="confirmEnd" class="control-btn end-btn" color="grey-6" text-color="#ff5252" flat />
         </div>
       </div>
+    </q-card>
+  </q-dialog>
+  <q-dialog v-model="confirmEndDialog" persistent>
+    <q-card class="bg-grey-10 text-white end-dialog-card">
+      <q-card-section class="row items-center q-pb-none">
+        <q-icon name="warning" color="red" size="md" class="q-mr-md" />
+        <span class="text-h6">Confirm End Live</span>
+      </q-card-section>
+      <q-card-section class="q-pt-sm q-pb-md">
+        <div>To confirm, type your login#code below:</div>
+        <q-input
+          v-model="confirmEndInput"
+          color="yellow-8"
+          bg-color="grey-9"
+          label="login#code"
+          label-color="grey-4"
+          class="q-mt-md"
+          dense
+          outlined
+          :error="confirmEndInput && !canConfirmEnd"
+          :rules="[val => !val || canConfirmEnd || 'Type your login#code to confirm']"
+          @keyup.enter="canConfirmEnd && proceedEnd()"
+        />
+        <div v-if="confirmEndInput && !canConfirmEnd" class="text-negative text-caption q-mt-xs">Type your login#code exactly to enable End.</div>
+      </q-card-section>
+      <q-card-actions align="right" class="q-px-md q-pb-md">
+        <q-btn flat label="Cancel" color="grey-6" text-color="#fff" @click="cancelEnd" class="q-mr-sm" />
+        <q-btn flat label="End" color="red-5" text-color="#fff" :disable="!canConfirmEnd" @click="proceedEnd" />
+      </q-card-actions>
     </q-card>
   </q-dialog>
 </template>
@@ -381,8 +449,91 @@ defineExpose({
   font-size: 0.95rem;
   border-radius: 6px;
   font-weight: 500;
+  background: #fffbe7 !important;
+  color: #222 !important;
+  border: 1px solid #ffe066 !important;
 }
 .pupil-remove-btn:hover {
   background: rgba(255, 0, 0, 0.12) !important;
+}
+
+.live-bar {
+  background: linear-gradient(90deg, #232526 0%, #ffe066 100%);
+  box-shadow: 0 2px 8px 0 rgba(0,0,0,0.10);
+  min-height: 48px;
+}
+.live-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #ff1744;
+  margin-right: 16px;
+  box-shadow: 0 0 8px 2px #ff174480;
+  display: inline-block;
+  animation: live-blink 1.2s infinite alternate;
+}
+@keyframes live-blink {
+  0% { opacity: 1; box-shadow: 0 0 8px 2px #ff174480; }
+  100% { opacity: 0.5; box-shadow: 0 0 2px 1px #ff174480; }
+}
+.live-key-badge {
+  font-size: 0.97rem;
+  letter-spacing: 0.5px;
+  padding: 3px 10px;
+  border-radius: 7px;
+  font-weight: 500;
+  box-shadow: none;
+  margin-left: 0;
+  margin-right: 0;
+  background: rgba(34,34,34,0.24) !important;
+  color: #fff !important;
+  border: 1px solid #ffe066 !important;
+  transition: background 0.2s, color 0.2s;
+}
+
+.control-group {
+  background: rgba(255,255,255,0.05);
+  border-radius: 14px;
+  box-shadow: 0 2px 8px 0 rgba(0,0,0,0.08);
+  padding: 6px 14px;
+  gap: 6px;
+  width: 100%;
+  justify-content: flex-end;
+}
+.control-btn {
+  min-width: 68px;
+  border-radius: 8px !important;
+  font-weight: 500;
+  font-size: 0.98rem;
+  box-shadow: none;
+  background: none !important;
+  transition: background 0.2s, color 0.2s;
+}
+.start-btn {
+  font-weight: 700;
+  color: #2196f3 !important;
+}
+.prev-btn {
+  color: #ffe066 !important;
+}
+.next-btn {
+  color: #ffd600 !important;
+}
+.end-btn {
+  color: #ff5252 !important;
+  font-weight: 700;
+}
+.control-btn:disabled {
+  opacity: 0.5;
+  background: none !important;
+  color: #aaa !important;
+}
+
+.end-dialog-card {
+  min-width: 340px;
+  border-radius: 14px;
+  box-shadow: 0 2px 16px 0 rgba(0,0,0,0.18);
+  background: #232526 !important;
+  color: #fff !important;
 }
 </style>

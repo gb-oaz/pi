@@ -16,6 +16,8 @@ import { useAuthStore } from '../../stores/authStore.ts'
 import { liveStore } from '../../stores/liveStore'
 import { LiveApi } from '../../services/live/LiveApi'
 import { useQuasar } from 'quasar'
+import type { Ref } from 'vue'
+import type { ILive } from '../../services/live/types/ILive'
 
 const router = useRouter()
 const authStore = useAuthStore()
@@ -24,13 +26,13 @@ const liveApi = new LiveApi()
 const $q = useQuasar()
 const isMobile = computed(() => windowWidth.value <= 720)
 const showSidebar = ref(false)
-const searchLive = ref('')
-const windowWidth = ref(window.innerWidth)
-const selectedButton = ref('home')
+const searchLive = ref<string>('')
+const windowWidth = ref<number>(window.innerWidth)
+const selectedButton = ref<string>('home')
 const createQuizModalRef = ref<InstanceType<typeof CreateQuizModal> | null>(null)
-const liveModalRef = ref(null)
+const liveModalRef = ref<InstanceType<typeof LiveModal> | null>(null)
 
-const hasPermission = (requiredRole: string) => {
+const hasPermission = (requiredRole: string): boolean => {
   return authStore.hasAnyRole(
     requiredRole === 'home' ? ['ANONYMOUS', 'STUDENT', 'TEACHER'] :
           requiredRole === 'profile' ? ['STUDENT', 'TEACHER'] :
@@ -39,32 +41,40 @@ const hasPermission = (requiredRole: string) => {
   )
 }
 
-const navigateTo = (routeName: string) => {
+const navigateTo = (routeName: string): void => {
   selectedButton.value = routeName
   router.push({ name: routeName })
 }
 
-const updateWidth = () => {
+const updateWidth = (): void => {
   windowWidth.value = window.innerWidth
 }
 
-const openQuizModal = () => {
+const openQuizModal = (): void => {
   createQuizModalRef.value?.open()
   showSidebar.value = false
 }
 
-async function endSession() {
+async function endSession(): Promise<void> {
   await authApi.signOut()
   authStore.updateScope()
 }
 
-async function handleSearchLive() {
+function maskLiveKey(input: string): string {
+  // Aceita login#code e retorna LIVEloginCODEcode
+  if (!input || !input.includes('#')) return input
+  const [login, code] = input.split('#')
+  return `LIVE${login}CODE${code}`
+}
+
+async function handleSearchLive(): Promise<void> {
   if (!searchLive.value) {
-    $q.notify({ message: 'Digite a chave da live!', color: 'warning' })
+    $q.notify({ message: 'Digite login#code do professor!', color: 'warning' })
     return
   }
   try {
-    const live = await liveApi.getLive(searchLive.value)
+    const liveKeyMasked = maskLiveKey(searchLive.value)
+    const live: ILive = await liveApi.getLive(liveKeyMasked)
     if (live && live.key) {
       liveStore.createLive(live)
       // Registrar entrada no lobby se não for o professor owner
@@ -74,7 +84,7 @@ async function handleSearchLive() {
         teacher &&
         !(scope && scope.includes('TEACHER') && login === teacher.login && code === teacher.code)
       ) {
-        const liveKey = `LIVE${teacher.login}CODE${teacher.code}`
+        const liveKey = maskLiveKey(`${teacher.login}#${teacher.code}`)
         await liveApi.addPupilToLobby(liveKey)
       }
       liveModalRef.value?.open(live.key)
