@@ -82,7 +82,6 @@ const isTeacher = () => {
 </template>
 
 <style scoped lang="sass">
-/* Seus estilos permanecem os mesmos */
 .quiz-listings
   margin-top: 20px
   width: 100%
@@ -116,41 +115,48 @@ const isTeacher = () => {
   transition: all 0.3s ease
   cursor: pointer
   position: relative
+  height: 250px
+  overflow: hidden
 
   @container (max-width: 400px)
     flex: 0 0 350px
     min-width: 350px
+    height: 200px
 
   &__image
-    max-height: 160px
-    max-width: 400px
-    min-width: 350px
+    height: 160px
+    width: 100%
+    object-fit: cover
 
     @container (max-width: 400px)
-      min-width: 300px
-      max-width: 350px
+      height: 120px
 
   &__content
     padding: 16px
     background: rgba(33, 33, 33, 0.9)
-    max-height: 90px
-    max-width: 400px
-    min-width: 350px
+    height: 90px
+    width: 100%
+    position: relative
 
     @container (max-width: 400px)
-      min-width: 300px
-      max-width: 350px
+      height: 80px
 
   &__name
     font-weight: 300
     font-size: 1.25rem
     color: white
+    white-space: nowrap
+    overflow: hidden
+    text-overflow: ellipsis
 
   &__categories
     font-weight: 300
     font-size: 0.75rem
     color: #bdbdbd
     margin-top: 8px
+    white-space: nowrap
+    overflow: hidden
+    text-overflow: ellipsis
 
   &__overlay
     position: absolute
@@ -163,18 +169,15 @@ const isTeacher = () => {
     justify-content: center
     align-items: center
     z-index: 1
-    max-height: 250px
-    min-height: 250px
     .q-btn
       animation: pulse 2s infinite
-
-    @container (max-width: 400px)
-      min-height: 200px
-      max-height: 200px
 
   &--empty
     @extend .quiz-card
     background-color: #424242
+    display: flex
+    justify-content: center
+    align-items: center
 
     @container (max-width: 400px)
       flex: 0 0 350px
@@ -186,12 +189,7 @@ const isTeacher = () => {
     align-items: center
     justify-content: center
     border: none
-    height: 250px
-    width: 362px
-
-    @container (max-width: 400px)
-      width: 350px
-      height: 200px
+    width: 100%
 
   &__empty-text
     font-size: 0.875rem

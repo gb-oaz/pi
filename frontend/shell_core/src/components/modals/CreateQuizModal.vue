@@ -151,12 +151,6 @@ async function clearQuiz() {
       backgroundColor: '#1e1e1e',
       color: 'white',
       border: '1px solid #ffeb3b'
-    },
-    cardStyle: {
-      minWidth: '350px',
-      maxWidth: '500px',
-      backgroundColor: '#1e1e1e',
-      border: '1px solid #ffeb3b'
     }
   }).onOk(() => {
     createQuizStore.clearStorage()
@@ -220,11 +214,7 @@ async function saveQuiz() {
       // Save quiz items
       for (let i = 0; i < quiz.quizes.length; i++) {
         const item = quiz.quizes[i]
-        if (item.id) {
-          await quizApi.updateQuizItem(result.key, i + 1, item)
-        } else {
-          await quizApi.createQuizItem(result.key, i + 1, item)
-        }
+        await quizApi.createQuizItem(result.key, i + 1, item)
       }
 
       $q.notify({
