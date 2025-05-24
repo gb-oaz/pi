@@ -2,6 +2,7 @@
 import type { IQuiz } from "../../services/quiz/types/IQuiz.ts";
 import { ref } from "vue";
 import { useAuthStore } from "../../stores/authStore.ts";
+import LiveModal from "../modals/LiveModal.vue";
 
 interface Props {
   quizzes: IQuiz[];
@@ -14,15 +15,19 @@ interface Props {
 const { quizzes, currentPage, totalPages, quizImages, quizColors } = defineProps<Props>();
 const emit = defineEmits(['update:currentPage', 'play']);
 
+const liveModal = ref<InstanceType<typeof LiveModal>>();
 const hoveredCard = ref<string | null>(null);
 const authStore = useAuthStore();
 
 const handlePageChange = (page: number) => emit('update:currentPage', page);
-const handlePlay = (quiz: IQuiz) => emit('play', quiz);
 
-const isTeacher = () => {
+function openLiveModal(quizKey: string) {
+  liveModal.value?.open(quizKey);
+}
+
+function isTeacher() {
   return authStore.hasAnyRole(['TEACHER']);
-};
+}
 </script>
 
 <template>
@@ -53,7 +58,7 @@ const isTeacher = () => {
               @mouseleave="isTeacher() ? hoveredCard = null : null"
           >
             <div v-if="hoveredCard === quiz.key && isTeacher()" class="quiz-card__overlay">
-              <q-btn color="green" label="Live" @click.stop="handlePlay(quiz)" size="45px" caps round/>
+              <q-btn color="green" label="Live" @click.stop="openLiveModal(quiz.key)" size="45px" caps round/>
             </div>
 
             <q-img
@@ -79,6 +84,7 @@ const isTeacher = () => {
       </transition-group>
     </div>
   </section>
+  <LiveModal ref="liveModal" />
 </template>
 
 <style scoped lang="sass">
