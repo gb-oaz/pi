@@ -7,42 +7,58 @@ import { computed } from 'vue'
 import { useAuthStore } from '../../stores/authStore'
 
 const $q = useQuasar()
+const liveApi = new LiveApi()
+const authStore = useAuthStore()
+
 const dialog = ref(false)
 const quizKey = ref('')
 const sidebarVisible = ref(true)
 const confirmEndDialog = ref(false)
 const confirmEndInput = ref('')
 
-const liveApi = new LiveApi()
-const authStore = useAuthStore()
 computed(() => {
   const { login, code } = authStore.scope || {}
   return !!login && !!code
 });
 
+const lobbyList = computed(() => currentLive.value?.lobby || [])
+const canConfirmEnd = computed(() => confirmEndInput.value.trim() === myLoginCode.value)
+const currentPosition = computed(() => currentLive.value?.teacher?.control?.currentPosition ?? 0)
 const currentLive = computed(() => liveStore.getLive())
 const isOwnerTeacher = computed(() => {
   const { login, code, scope } = authStore.scope || {}
   const teacher = currentLive.value?.teacher
-  return (
-      scope.includes('TEACHER') &&
-      teacher &&
-      login === teacher.login &&
-      code === teacher.code
-  )
+  return (scope.includes('TEACHER') && teacher && login === teacher.login && code === teacher.code)
 })
-
-const currentPosition = computed(() => currentLive.value?.teacher?.control?.currentPosition ?? 0)
-
+const myLoginCode = computed(() => {
+  const { login, code } = authStore.scope || {}
+  return login && code ? `${login}#${code}` : ''
+})
 const liveKeyDisplay = computed(() => {
   const teacher = currentLive.value?.teacher
   if (!teacher?.login || !teacher?.code) return ''
   return `${teacher.login}#${teacher.code}`
 })
 
-const lobbyList = computed(() => currentLive.value?.lobby || [])
-
 let lobbyTimeout: ReturnType<typeof setTimeout> | null = null
+let eventSource: EventSource | null = null
+
+async function startLiveStream() {
+  stopLiveStream()
+  // Sempre usa o teacher da live para montar a chave
+  const teacher = currentLive.value?.teacher
+  if (!teacher?.login || !teacher?.code) return
+  const liveKey = `LIVE${teacher.login}CODE${teacher.code}`
+  eventSource = await liveApi.getLiveStream(
+      liveKey,
+      (data) => {
+        liveStore.createLive(data)
+      },
+      (error) => {
+        // Opcional: notificar erro
+      }
+  )
+}
 
 async function removePupil(pupil: string) {
   const teacher = currentLive.value?.teacher
@@ -53,8 +69,6 @@ async function removePupil(pupil: string) {
   if (!login || !code) return
   await liveApi.removePupilToLobby(login, code, liveKey)
 }
-
-let eventSource: EventSource | null = null
 
 async function open(key: string) {
   quizKey.value = key
@@ -74,21 +88,36 @@ async function open(key: string) {
   await startLiveStream()
 }
 
-async function startLiveStream() {
-  stopLiveStream()
-  // Sempre usa o teacher da live para montar a chave
-  const teacher = currentLive.value?.teacher
-  if (!teacher?.login || !teacher?.code) return
-  const liveKey = `LIVE${teacher.login}CODE${teacher.code}`
-  eventSource = await liveApi.getLiveStream(
-    liveKey,
-    (data) => {
-      liveStore.createLive(data)
-    },
-    (error) => {
-      // Opcional: notificar erro
-    }
-  )
+async function endLive() {
+  const { login: loginTeacher, code: codeTeacher } = authStore.scope || {}
+  let key = ''
+  if (loginTeacher && codeTeacher) {
+    key = `LIVE${loginTeacher}CODE${codeTeacher}`
+  }
+  if (key) {
+    await liveApi.endLive(key)
+    liveStore.removeLive()
+    dialog.value = false
+    $q.notify({ message: 'Live finalizada!', color: 'positive' })
+  }
+}
+
+async function goToNextPosition() {
+  const { login, code } = authStore.scope || {}
+  if (!login || !code) return
+  const liveKey = `LIVE${login}CODE${code}`
+  await liveApi.nextPosition(liveKey)
+}
+
+async function goToPreviousPosition() {
+  const { login, code } = authStore.scope || {}
+  if (!login || !code) return
+  const liveKey = `LIVE${login}CODE${code}`
+  await liveApi.previousPosition(liveKey)
+}
+
+async function startSession() {
+  await goToNextPosition()
 }
 
 function close() {
@@ -101,20 +130,6 @@ function stopLiveStream() {
   if (eventSource) {
     eventSource.close()
     eventSource = null
-  }
-}
-
-async function endLive() {
-  const { login: loginTeacher, code: codeTeacher } = authStore.scope || {}
-  let key = ''
-  if (loginTeacher && codeTeacher) {
-    key = `LIVE${loginTeacher}CODE${codeTeacher}`
-  }
-  if (key) {
-    await liveApi.endLive(key)
-    liveStore.removeLive()
-    dialog.value = false
-    $q.notify({ message: 'Live finalizada!', color: 'positive' })
   }
 }
 
@@ -132,32 +147,6 @@ function proceedEnd() {
   confirmEndDialog.value = false
   confirmEndInput.value = ''
   endLive()
-}
-
-const myLoginCode = computed(() => {
-  const { login, code } = authStore.scope || {}
-  return login && code ? `${login}#${code}` : ''
-})
-
-const canConfirmEnd = computed(() => confirmEndInput.value.trim() === myLoginCode.value)
-
-// Funções de navegação do professor
-async function goToNextPosition() {
-  const { login, code } = authStore.scope || {}
-  if (!login || !code) return
-  const liveKey = `LIVE${login}CODE${code}`
-  await liveApi.nextPosition(liveKey)
-}
-
-async function goToPreviousPosition() {
-  const { login, code } = authStore.scope || {}
-  if (!login || !code) return
-  const liveKey = `LIVE${login}CODE${code}`
-  await liveApi.previousPosition(liveKey)
-}
-
-async function startSession() {
-  await goToNextPosition()
 }
 
 watch(lobbyList, (newLobby) => {
