@@ -1,9 +1,8 @@
 <script setup lang="ts">
-import { ref, onUnmounted, onMounted, watch } from 'vue'
+import { ref, onUnmounted, onMounted, watch, computed } from 'vue'
 import { useQuasar } from 'quasar'
 import { liveStore } from '../../stores/liveStore'
 import { LiveApi } from '../../services/live/LiveApi'
-import { computed } from 'vue'
 import { useAuthStore } from '../../stores/authStore'
 
 const $q = useQuasar()
@@ -15,11 +14,6 @@ const quizKey = ref('')
 const confirmEndDialog = ref(false)
 const confirmEndInput = ref('')
 const monitorOpen = ref(false)
-
-computed(() => {
-  const { login, code } = authStore.scope || {}
-  return !!login && !!code
-});
 
 const lobbyList = computed(() => currentLive.value?.lobby || [])
 const canConfirmEnd = computed(() => confirmEndInput.value.trim() === myLoginCode.value)
@@ -39,6 +33,35 @@ const liveKeyDisplay = computed(() => {
   if (!teacher?.login || !teacher?.code) return ''
   return `${teacher.login}#${teacher.code}`
 })
+
+// --- SIMULAÇÃO FAKES PARA VISUALIZAÇÃO ---
+// Remova este bloco quando quiser usar dados reais!
+function randomLogin() {
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+  const len = Math.floor(Math.random() * 8) + 8 // 8-15
+  let login = ''
+  for (let i = 0; i < len; i++) login += chars[Math.floor(Math.random()*chars.length)]
+  return login
+}
+function randomCode() {
+  return String(Math.floor(100000 + Math.random()*900000))
+}
+function randomFakeRow() {
+  const login = randomLogin()
+  const code = randomCode()
+  const total = Math.floor(Math.random()*10)+1
+  const score = Math.floor(Math.random()*(total+1))
+  const percent = total ? Math.round((score/total)*100) : 0
+  const lastHit = Math.random() > 0.4 ? true : false
+  return { login, code, raw: `${login}#${code}`, score, total, percent, lastHit }
+}
+const monitorRows = computed(() => {
+  const arr = []
+  for (let i=0; i<40; i++) arr.push(randomFakeRow())
+  // Ordena por score e percent
+  return arr.sort((a, b) => b.score - a.score || b.percent - a.percent)
+})
+// --- FIM SIMULAÇÃO FAKES ---
 
 let lobbyTimeout: ReturnType<typeof setTimeout> | null = null
 let eventSource: EventSource | null = null
@@ -157,6 +180,14 @@ function closeMonitor() {
   monitorOpen.value = false
 }
 
+function loginColor(login: string) {
+  // Gera cor suave baseada no hash do login
+  const colors = ['#90caf9', '#a5d6a7', '#ffe082', '#f48fb1', '#ce93d8', '#b0bec5']
+  let hash = 0
+  for (let i = 0; i < login.length; i++) hash += login.charCodeAt(i)
+  return colors[hash % colors.length]
+}
+
 watch(lobbyList, (newLobby) => {
   const { login, code, scope } = authStore.scope || {}
   // Só valida para quem NÃO é TEACHER
@@ -248,11 +279,15 @@ defineExpose({
           </div>
           <div class="monitor-table-wrap items-center full-width">
             <q-table
-              :rows="lobbyList.map(p => { const [login, code] = p.split('#'); return { login, code, raw: p } })"
+              :rows="monitorRows"
               :columns="[
-                { name: 'login', label: 'Login', align: 'left', field: 'login' },
-                { name: 'code', label: 'Code', align: 'left', field: 'code' },
-                { name: 'actions', label: '', align: 'right', field: 'raw' }
+                { name: 'idx', label: 'Ranking', align: 'left', field: row => row },
+                { name: 'login', label: 'User', align: 'left', field: 'login' },
+                { name: 'score', label: 'Score', align: 'left', field: 'score' },
+                { name: 'total', label: 'Answers', align: 'left', field: 'total' },
+                { name: 'percent', label: 'Hit %', align: 'left', field: 'percent' },
+                { name: 'last', label: 'Last', align: 'left', field: 'lastHit' },
+                { name: 'actions', label: '', align: 'left', field: 'raw' }
               ]"
               row-key="raw"
               flat
@@ -260,8 +295,43 @@ defineExpose({
               hide-pagination
               :rows-per-page-options="[0]"
               :pagination="{rowsPerPage: 9999}"
-              class="monitor-table"
+              class="monitor-table custom-monitor-table"
             >
+              <template #body-cell-idx="props">
+                <q-td class="table-idx">
+                  <span class="avatar-ranking">{{ props.pageIndex + 1 }}</span>
+                </q-td>
+              </template>
+              <template #body-cell-login="props">
+                <q-td class="q-gutter-x-sm">
+                  <span class="avatar-login-square" :style="'background:' + loginColor(props.row.login)">
+                    {{ props.row.login.slice(0, 3).toUpperCase() }}
+                  </span>
+                  <span class="login-label">{{ props.row.login }}</span>
+                  <q-badge color="grey-3" text-color="#666" class="code-badge">#{{ props.row.code }}</q-badge>
+                </q-td>
+              </template>
+              <template #body-cell-score="props">
+                <q-td class="text-bold">
+                  <q-badge :color="props.row.score > 0 ? 'green-6' : 'red-5'" text-color="white">{{ props.row.score }}</q-badge>
+                </q-td>
+              </template>
+              <template #body-cell-total="props">
+                <q-td class="table-total">
+                  <span class="answers-bold">{{ props.row.total }}</span>
+                </q-td>
+              </template>
+              <template #body-cell-percent="props">
+                <q-td>
+                  <q-badge :color="props.row.percent >= 80 ? 'green-6' : props.row.percent >= 50 ? 'yellow-8' : 'red-5'" text-color="white">{{ props.row.percent }}%</q-badge>
+                </q-td>
+              </template>
+              <template #body-cell-last="props">
+                <q-td>
+                  <q-icon v-if="props.row.lastHit === true" name="check_circle" color="green-5" size="sm" />
+                  <q-icon v-else-if="props.row.lastHit === false" name="cancel" color="red-5" size="sm" />
+                </q-td>
+              </template>
               <template #body-cell-actions="props">
                 <q-td align="right">
                   <q-btn flat dense icon="person_remove" color="negative" @click="removePupil(props.row.raw)" />
@@ -359,6 +429,8 @@ defineExpose({
   min-width: 92px;
   font-weight: 600;
   border-radius: 8px;
+  background: #232526;
+  color: #43a047;
 }
 
 .monitor-panel {
@@ -399,6 +471,22 @@ defineExpose({
   padding: 6px 14px;
   gap: 6px;
   width: 100%;
+  /* Scrollbar custom elegante */
+  scrollbar-width: thin;
+  scrollbar-color: #ffe066 #232526;
+}
+.monitor-table-wrap::-webkit-scrollbar {
+  width: 7px;
+  background: #232526;
+  border-radius: 8px;
+}
+.monitor-table-wrap::-webkit-scrollbar-thumb {
+  background: #ffe066;
+  border-radius: 8px;
+  min-height: 28px;
+}
+.monitor-table-wrap::-webkit-scrollbar-thumb:hover {
+  background: #ffd600;
 }
 
 .monitor-table {
@@ -522,5 +610,155 @@ defineExpose({
   box-shadow: 0 2px 16px 0 rgba(0,0,0,0.18);
   background: #232526 !important;
   color: #fff !important;
+}
+
+.custom-monitor-table .q-table__middle,
+.custom-monitor-table .q-table__bottom,
+.custom-monitor-table .q-table__top {
+  display: none !important;
+}
+.custom-monitor-table .q-tr {
+  border-radius: 8px;
+  background: rgba(255,255,255,0.02);
+  margin-bottom: 2px;
+}
+.custom-monitor-table .q-td {
+  font-size: 1.02rem;
+  padding-top: 6px;
+  padding-bottom: 6px;
+  vertical-align: middle;
+}
+.custom-monitor-table .q-td[data-col="login"] {
+  padding-left: 12px;
+  text-align: left;
+}
+.custom-monitor-table .q-td[data-col="score"],
+.custom-monitor-table .q-td[data-col="total"],
+.custom-monitor-table .q-td[data-col="percent"],
+.custom-monitor-table .q-td[data-col="last"] {
+  text-align: center;
+}
+.custom-monitor-table th[data-col="login"] {
+  padding-left: 12px;
+  text-align: left;
+}
+.custom-monitor-table th[data-col="score"],
+.custom-monitor-table th[data-col="total"],
+.custom-monitor-table th[data-col="percent"],
+.custom-monitor-table th[data-col="last"] {
+  text-align: center;
+}
+
+.custom-monitor-table th,
+.custom-monitor-table .table-idx {
+  font-weight: 800 !important;
+}
+.custom-monitor-table th[data-col="idx"],
+.custom-monitor-table .q-td[data-col="idx"] {
+  text-align: center;
+  font-weight: 800 !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+  width: 36px;
+}
+.custom-monitor-table th[data-col="login"],
+.custom-monitor-table .q-td[data-col="login"] {
+  text-align: left;
+  padding-left: 12px !important;
+}
+.custom-monitor-table th[data-col="score"],
+.custom-monitor-table th[data-col="total"],
+.custom-monitor-table th[data-col="percent"],
+.custom-monitor-table th[data-col="last"],
+.custom-monitor-table .q-td[data-col="score"],
+.custom-monitor-table .q-td[data-col="total"],
+.custom-monitor-table .q-td[data-col="percent"],
+.custom-monitor-table .q-td[data-col="last"] {
+  text-align: center;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+.custom-monitor-table th[data-col="actions"],
+.custom-monitor-table .q-td[data-col="actions"] {
+  text-align: right;
+  padding-right: 8px !important;
+}
+
+.avatar-login-square {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 46px;
+  height: 32px;
+  padding: 0 8px;
+  border-radius: 7px;
+  font-weight: 700;
+  font-size: 0.97rem;
+  color: #fff;
+  margin-right: 8px;
+  box-shadow: 0 1px 4px 0 rgba(0,0,0,0.09);
+  letter-spacing: 1px;
+  border: 2px solid #fffbe7;
+  background-clip: padding-box;
+  transition: background 0.2s, border 0.2s;
+  text-align: center;
+}
+
+.login-label {
+  font-weight: 600;
+  font-size: 1.05rem;
+  color: #e3f2fd;
+  margin-right: 8px;
+}
+.code-badge {
+  font-size: 0.93rem;
+  font-weight: 500;
+  border-radius: 6px;
+  padding: 2px 8px;
+  background: #ececec !important;
+  color: #666 !important;
+}
+
+.avatar-ranking {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 32px;
+  height: 32px;
+  padding: 0 6px;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 1.01rem;
+  color: #fff;
+  background: #90caf9;
+  box-shadow: 0 1px 4px 0 rgba(0,0,0,0.07);
+  letter-spacing: 1px;
+  border: 2px solid #fffbe7;
+  background-clip: padding-box;
+}
+
+.badge-total {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 32px;
+  height: 28px;
+  padding: 0 8px;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 1.01rem;
+  color: #fff;
+  background: #64b5f6;
+  box-shadow: 0 1px 4px 0 rgba(0,0,0,0.06);
+  letter-spacing: 1px;
+  border: 2px solid #fffbe7;
+  background-clip: padding-box;
+}
+
+.answers-bold {
+  font-weight: 700;
+  color: #64b5f6;
+  font-size: 1.04rem;
+  letter-spacing: 1px;
 }
 </style>
