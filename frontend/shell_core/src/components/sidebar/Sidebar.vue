@@ -2,6 +2,7 @@
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
 import { useRouter } from 'vue-router'
 import CreateQuizModal from '../modals/CreateQuizModal.vue'
+import LiveModal from '../modals/LiveModal.vue'
 import logo from '../../assets/by_gw-q.png'
 import logout from '../../assets/sidebar/logout.svg'
 import lupa from '../../assets/sidebar/lupa.svg'
@@ -12,16 +13,22 @@ import groups from '../../assets/sidebar/groups.svg'
 import dashboard from '../../assets/sidebar/dashboard.svg'
 import { AuthApi } from "../../services/auth/AuthApi.ts";
 import { useAuthStore } from '../../stores/authStore.ts'
+import { liveStore } from '../../stores/liveStore'
+import { LiveApi } from '../../services/live/LiveApi'
+import { useQuasar } from 'quasar'
 
 const router = useRouter()
 const authStore = useAuthStore()
 const authApi = new AuthApi()
+const liveApi = new LiveApi()
+const $q = useQuasar()
 const isMobile = computed(() => windowWidth.value <= 720)
 const showSidebar = ref(false)
 const searchLive = ref('')
 const windowWidth = ref(window.innerWidth)
 const selectedButton = ref('home')
 const createQuizModalRef = ref<InstanceType<typeof CreateQuizModal> | null>(null)
+const liveModalRef = ref(null)
 
 const hasPermission = (requiredRole: string) => {
   return authStore.hasAnyRole(
@@ -51,6 +58,35 @@ async function endSession() {
   authStore.updateScope()
 }
 
+async function handleSearchLive() {
+  if (!searchLive.value) {
+    $q.notify({ message: 'Digite a chave da live!', color: 'warning' })
+    return
+  }
+  try {
+    const live = await liveApi.getLive(searchLive.value)
+    if (live && live.key) {
+      liveStore.createLive(live)
+      // Registrar entrada no lobby se não for o professor owner
+      const { login, code, scope } = authStore.scope || {}
+      const teacher = live.teacher
+      if (
+        teacher &&
+        !(scope && scope.includes('TEACHER') && login === teacher.login && code === teacher.code)
+      ) {
+        const liveKey = `LIVE${teacher.login}CODE${teacher.code}`
+        await liveApi.addPupilToLobby(liveKey)
+      }
+      liveModalRef.value?.open(live.key)
+      $q.notify({ message: 'Live carregada!', color: 'positive' })
+    } else {
+      $q.notify({ message: 'Live não encontrada.', color: 'negative' })
+    }
+  } catch (e) {
+    $q.notify({ message: 'Erro ao buscar live.', color: 'negative' })
+  }
+}
+
 onMounted(() => {
   window.addEventListener('resize', updateWidth)
 })
@@ -70,12 +106,12 @@ onBeforeUnmount(() => {
     <header class="full-width">
       <q-img :src="logo" style="width: 45px; height: 45px" class="q-mb-md" contain />
 
-      <q-input v-model="searchLive" color="yellow" bg-color="grey-14" label="Live" label-color="white" class="full-width" input-class="text-white" rounded standout bottom-slots counter>
+      <q-input v-model="searchLive" color="yellow" bg-color="grey-14" label="Live" label-color="white" class="full-width" input-class="text-white" rounded standout bottom-slots counter @keyup.enter="handleSearchLive">
         <template v-slot:prepend>
           <q-img :src="sinal" style="width: 15px; height: 11px; margin: 7px" contain/>
         </template>
         <template v-slot:append>
-          <q-img :src="lupa" style="width: 20px; height: 20px; margin: 7px" @click="searchLive = ''" class="cursor-pointer" contain/>
+          <q-img :src="lupa" style="width: 20px; height: 20px; margin: 7px" @click="handleSearchLive" class="cursor-pointer" contain/>
         </template>
       </q-input>
 
@@ -238,12 +274,12 @@ onBeforeUnmount(() => {
         <header class="full-width" style="margin-bottom: 10px">
           <q-img :src="logo" style="width: 45px; height: 45px" class="q-mb-md" contain />
 
-          <q-input v-model="searchLive" color="yellow" bg-color="grey-14" label="Live" label-color="white" class="full-width" input-class="text-white" rounded standout bottom-slots counter>
+          <q-input v-model="searchLive" color="yellow" bg-color="grey-14" label="Live" label-color="white" class="full-width" input-class="text-white" rounded standout bottom-slots counter @keyup.enter="handleSearchLive">
             <template v-slot:prepend>
               <q-img :src="sinal" style="width: 15px; height: 11px; margin: 7px" contain/>
             </template>
             <template v-slot:append>
-              <q-img :src="lupa" style="width: 20px; height: 20px; margin: 7px" @click="searchLive = ''" class="cursor-pointer" contain/>
+              <q-img :src="lupa" style="width: 20px; height: 20px; margin: 7px" @click="handleSearchLive" class="cursor-pointer" contain/>
             </template>
           </q-input>
 
@@ -389,6 +425,7 @@ onBeforeUnmount(() => {
   </q-dialog>
 
   <CreateQuizModal ref="createQuizModalRef" />
+  <LiveModal ref="liveModalRef" />
 </template>
 
 <style scoped lang="sass">
