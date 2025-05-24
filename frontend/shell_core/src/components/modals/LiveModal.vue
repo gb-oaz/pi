@@ -193,7 +193,7 @@ defineExpose({
           <q-list class="pupil-list">
             <q-item v-for="pupil in lobbyList" :key="pupil" class="pupil-item q-pa-none">
               <q-item-section avatar>
-                <div class="pupil-avatar">{{ pupil.split('#')[0][0] }}</div>
+                <div class="pupil-avatar">{{ pupil.split('#')[0].slice(0,3).toUpperCase() }}</div>
               </q-item-section>
               <q-item-section>
                 <div class="row items-center">
