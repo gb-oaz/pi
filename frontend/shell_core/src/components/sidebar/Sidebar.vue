@@ -32,41 +32,6 @@ const selectedButton = ref<string>('home')
 const createQuizModalRef = ref<InstanceType<typeof CreateQuizModal> | null>(null)
 const liveModalRef = ref<InstanceType<typeof LiveModal> | null>(null)
 
-const hasPermission = (requiredRole: string): boolean => {
-  return authStore.hasAnyRole(
-    requiredRole === 'home' ? ['ANONYMOUS', 'STUDENT', 'TEACHER'] :
-          requiredRole === 'profile' ? ['STUDENT', 'TEACHER'] :
-          requiredRole === 'groups' ? ['STUDENT', 'TEACHER'] :
-          ['TEACHER'] // dashboard
-  )
-}
-
-const navigateTo = (routeName: string): void => {
-  selectedButton.value = routeName
-  router.push({ name: routeName })
-}
-
-const updateWidth = (): void => {
-  windowWidth.value = window.innerWidth
-}
-
-const openQuizModal = (): void => {
-  createQuizModalRef.value?.open()
-  showSidebar.value = false
-}
-
-async function endSession(): Promise<void> {
-  await authApi.signOut()
-  authStore.updateScope()
-}
-
-function maskLiveKey(input: string): string {
-  // Aceita login#code e retorna LIVEloginCODEcode
-  if (!input || !input.includes('#')) return input
-  const [login, code] = input.split('#')
-  return `LIVE${login}CODE${code}`
-}
-
 async function handleSearchLive(): Promise<void> {
   if (!searchLive.value) {
     $q.notify({ message: 'Digite login#code do professor!', color: 'warning' })
@@ -81,8 +46,8 @@ async function handleSearchLive(): Promise<void> {
       const { login, code, scope } = authStore.scope || {}
       const teacher = live.teacher
       if (
-        teacher &&
-        !(scope && scope.includes('TEACHER') && login === teacher.login && code === teacher.code)
+          teacher &&
+          !(scope && scope.includes('TEACHER') && login === teacher.login && code === teacher.code)
       ) {
         const liveKey = maskLiveKey(`${teacher.login}#${teacher.code}`)
         await liveApi.addPupilToLobby(liveKey)
@@ -95,6 +60,41 @@ async function handleSearchLive(): Promise<void> {
   } catch (e) {
     $q.notify({ message: 'Erro ao buscar live.', color: 'negative' })
   }
+}
+
+async function endSession(): Promise<void> {
+  await authApi.signOut()
+  authStore.updateScope()
+}
+
+function hasPermission(requiredRole: string): boolean {
+  return authStore.hasAnyRole(
+    requiredRole === 'home' ? ['ANONYMOUS', 'STUDENT', 'TEACHER'] :
+          requiredRole === 'profile' ? ['STUDENT', 'TEACHER'] :
+          requiredRole === 'groups' ? ['STUDENT', 'TEACHER'] :
+          ['TEACHER'] // dashboard
+  )
+}
+
+function navigateTo(routeName: string): void {
+  selectedButton.value = routeName
+  router.push({ name: routeName })
+}
+
+function updateWidth(): void {
+  windowWidth.value = window.innerWidth
+}
+
+function openQuizModal(): void {
+  createQuizModalRef.value?.open()
+  showSidebar.value = false
+}
+
+function maskLiveKey(input: string): string {
+  // Aceita login#code e retorna LIVEloginCODEcode
+  if (!input || !input.includes('#')) return input
+  const [login, code] = input.split('#')
+  return `LIVE${login}CODE${code}`
 }
 
 onMounted(() => {
