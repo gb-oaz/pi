@@ -53,7 +53,7 @@ const isTeacher = () => {
               @mouseleave="isTeacher() ? hoveredCard = null : null"
           >
             <div v-if="hoveredCard === quiz.key && isTeacher()" class="quiz-card__overlay">
-              <q-btn color="green" label="Play" @click.stop="handlePlay(quiz)" size="45px" caps round/>
+              <q-btn color="green" label="Live" @click.stop="handlePlay(quiz)" size="45px" caps round/>
             </div>
 
             <q-img
