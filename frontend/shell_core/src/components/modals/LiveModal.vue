@@ -12,9 +12,9 @@ const authStore = useAuthStore()
 
 const dialog = ref(false)
 const quizKey = ref('')
-const sidebarVisible = ref(true)
 const confirmEndDialog = ref(false)
 const confirmEndInput = ref('')
+const monitorOpen = ref(false)
 
 computed(() => {
   const { login, code } = authStore.scope || {}
@@ -149,6 +149,14 @@ function proceedEnd() {
   endLive()
 }
 
+function toggleMonitor() {
+  monitorOpen.value = !monitorOpen.value
+}
+
+function closeMonitor() {
+  monitorOpen.value = false
+}
+
 watch(lobbyList, (newLobby) => {
   const { login, code, scope } = authStore.scope || {}
   // Só valida para quem NÃO é TEACHER
@@ -205,56 +213,64 @@ defineExpose({
             <div class="text-h3 text-weight-bold q-mb-md">Aguardando o professor iniciar a sessão...</div>
             <div class="text-subtitle1">Assim que o professor iniciar, sua tela será atualizada automaticamente.</div>
           </div>
-          <q-btn v-if="isOwnerTeacher && !sidebarVisible" flat dense icon="chevron_right" @click="sidebarVisible = true" class="show-sidebar-btn" />
         </div>
-        <aside v-if="isOwnerTeacher && sidebarVisible" class="sidebar">
-          <div class="row items-center justify-between full-width q-mb-md">
-            <div class="text-h6">Live Monitor</div>
-            <q-btn flat dense icon="close" @click="sidebarVisible = false" class="hide-sidebar-btn" />
-          </div>
-          <div class="q-mb-md text-subtitle2 text-weight-bold">Pupils</div>
-          <q-list class="pupil-list">
-            <q-item v-for="pupil in lobbyList" :key="pupil" class="pupil-item q-pa-none">
-              <q-item-section avatar>
-                <div class="pupil-avatar">{{ pupil.split('#')[0].slice(0,3).toUpperCase() }}</div>
-              </q-item-section>
-              <q-item-section>
-                <div class="row items-center">
-                  <span class="pupil-login">{{ pupil.split('#')[0] }}</span>
-                  <q-badge class="q-ml-sm pupil-code" color="#ffe066" text-color="#222">#{{ pupil.split('#')[1] }}</q-badge>
-                </div>
-              </q-item-section>
-              <q-item-section side>
-                <q-btn flat dense icon="person_remove" color="negative" @click="removePupil(pupil)" class="pupil-remove-btn" />
-              </q-item-section>
-            </q-item>
-            <q-item v-if="lobbyList.length === 0" class="pupil-item q-pa-none">
-              <q-item-section>Nenhum aluno presente</q-item-section>
-            </q-item>
-          </q-list>
-        </aside>
-        <template v-else-if="!isOwnerTeacher">
-          <div v-if="currentPosition === 0" class="centered-message">
-            <div class="text-h3 text-weight-bold q-mb-md">Aguardando o professor iniciar a sessão...</div>
-            <div class="text-subtitle1">Assim que o professor iniciar, sua tela será atualizada automaticamente.</div>
-          </div>
-        </template>
       </div>
       <div v-if="isOwnerTeacher" class="live-controls-footer row items-center full-width no-wrap">
         <div class="row items-center control-group justify-end full-width">
           <q-btn
             v-if="currentPosition === 0"
-            class="control-btn start-btn"
+            class="control-btn start-btn q-mr-md"
             flat
             label="Start"
             @click="startSession"
             color="grey-6"
             text-color="#2196f3" />
+          <q-btn
+            dense flat
+            label="Monitor"
+            class="control-btn monitor-btn q-mr-md"
+            :color="monitorOpen ? 'green-6' : 'grey-6'"
+            :text-color="monitorOpen ? '#fff' : '#43a047'"
+            @click="toggleMonitor"
+          />
           <q-btn label="Prev" @click="goToPreviousPosition" :disable="currentPosition <= 1" class="control-btn prev-btn q-mr-sm" color="grey-6" text-color="#ffe066" flat />
           <q-btn label="Next" @click="goToNextPosition" :disable="currentPosition === 0" class="control-btn next-btn q-mr-sm" color="grey-6" text-color="#ffd600" flat />
           <q-btn label="End" @click="confirmEnd" class="control-btn end-btn" color="grey-6" text-color="#ff5252" flat />
         </div>
       </div>
+
+      <!-- Novo painel Monitor -->
+      <transition name="slide-up">
+        <div v-if="monitorOpen && isOwnerTeacher" class="monitor-panel bg-grey-10 text-white row items-center full-width no-wrap">
+          <div class="row items-center full-width no-wrap justify-between q-pa-md monitor-header">
+            <div class="text-h6">Monitor</div>
+            <q-btn flat dense icon="close" @click="closeMonitor" color="grey-4" />
+          </div>
+          <div class="monitor-table-wrap items-center full-width">
+            <q-table
+              :rows="lobbyList.map(p => { const [login, code] = p.split('#'); return { login, code, raw: p } })"
+              :columns="[
+                { name: 'login', label: 'Login', align: 'left', field: 'login' },
+                { name: 'code', label: 'Code', align: 'left', field: 'code' },
+                { name: 'actions', label: '', align: 'right', field: 'raw' }
+              ]"
+              row-key="raw"
+              flat
+              dense
+              hide-pagination
+              :rows-per-page-options="[0]"
+              :pagination="{rowsPerPage: 9999}"
+              class="monitor-table"
+            >
+              <template #body-cell-actions="props">
+                <q-td align="right">
+                  <q-btn flat dense icon="person_remove" color="negative" @click="removePupil(props.row.raw)" />
+                </q-td>
+              </template>
+            </q-table>
+          </div>
+        </div>
+      </transition>
     </q-card>
   </q-dialog>
   <q-dialog v-model="confirmEndDialog" persistent>
@@ -297,13 +313,14 @@ defineExpose({
   max-width: 100vw;
   max-height: 100vh;
   border-radius: 0;
+  overflow: hidden;
 }
 
 .live-modal-content-row {
   display: flex;
   flex-direction: row;
   width: 100vw;
-  height: calc(100vh - 80px); /* Ajuste para não cobrir o rodapé */
+  height: calc(100vh - 80px);
   position: relative;
 }
 
@@ -311,20 +328,6 @@ defineExpose({
   flex: 1 1 0;
   min-height: 60vh;
   position: relative;
-}
-
-.sidebar {
-  width: 420px;
-  background: #222;
-  color: #fff;
-  padding: 24px 16px;
-  border-left: 1px solid #444;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  align-items: flex-start;
-  min-height: 100%;
-  box-sizing: border-box;
 }
 
 .centered-message {
@@ -352,98 +355,68 @@ defineExpose({
   border-top: 1px solid #444;
 }
 
-.show-sidebar-btn {
-  position: absolute;
-  right: 0;
-  top: 16px;
-  z-index: 10;
-  background: #222;
-  color: #ffd600;
-  border-radius: 50%;
-}
-
-.hide-sidebar-btn {
-  margin-left: 8px;
-  color: #ffd600;
-}
-
-.pupil-list {
-  padding: 0 !important;
-  margin: 0 !important;
-}
-
-.sidebar .pupil-list {
-  width: 100% !important;
-  max-width: 100% !important;
-  min-width: 100% !important;
-  padding: 0 !important;
-  margin: 0 !important;
-}
-
-.sidebar .q-item,
-.sidebar .pupil-item {
-  width: 100% !important;
-  max-width: 100% !important;
-  min-width: 100% !important;
-  box-sizing: border-box;
-  margin: 0 0 12px 0 !important;
-  padding: 12px 8px !important;
-  border-radius: 10px;
-  background: rgba(255,255,255,0.04);
-  box-shadow: 0 2px 8px 0 rgba(0,0,0,0.07);
-  display: flex;
-  align-items: center;
-  transition: box-shadow 0.2s;
-  border: none !important;
-}
-
-.sidebar .q-item__section {
-  min-width: 0;
-}
-
-.pupil-item {
-  width: 100% !important;
-  margin: 0 0 12px 0;
-  padding: 12px 8px;
-  border-radius: 10px;
-  background: rgba(255,255,255,0.04);
-  box-shadow: 0 2px 8px 0 rgba(0,0,0,0.07);
-  display: flex;
-  align-items: center;
-  transition: box-shadow 0.2s;
-  border: none !important;
-}
-.pupil-item:hover {
-  box-shadow: 0 4px 16px 0 rgba(255, 214, 0, 0.13);
-}
-.pupil-avatar {
-  width: 38px;
-  height: 38px;
-  border-radius: 50%;
-  background: #ffd600;
-  color: #222;
-  font-weight: bold;
-  font-size: 1.2rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 1px 6px 0 rgba(0,0,0,0.10);
-}
-.pupil-login {
+.monitor-toggle-btn {
+  min-width: 92px;
   font-weight: 600;
-  font-size: 1.1rem;
-  color: #fff;
+  border-radius: 8px;
 }
-.pupil-code {
-  font-size: 0.95rem;
-  border-radius: 6px;
-  font-weight: 500;
-  background: #fffbe7 !important;
-  color: #222 !important;
-  border: 1px solid #ffe066 !important;
+
+.monitor-panel {
+  position: absolute;
+  bottom: 80px;
+  padding: 16px 32px;
+  z-index: 200;
+  background: #232526;
+  border-top-left-radius: 16px;
+  border-top-right-radius: 16px;
+  box-shadow: 0 -2px 16px 0 rgba(0,0,0,0.18);
+  transition: max-height 0.3s;
+  max-height: 60vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
-.pupil-remove-btn:hover {
-  background: rgba(255, 0, 0, 0.12) !important;
+
+.monitor-header {
+  border-bottom: 1px solid #333;
+  background: rgba(255,255,255,0.05);
+  border-radius: 14px;
+  box-shadow: 0 2px 8px 0 rgba(0,0,0,0.08);
+  padding: 6px 14px;
+  gap: 6px;
+  width: 100%;
+  margin-bottom: 8px;
+}
+
+.monitor-table-wrap {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  max-height: 48vh;
+  padding-bottom: 8px;
+  background: rgba(255,255,255,0.05);
+  border-radius: 14px;
+  box-shadow: 0 2px 8px 0 rgba(0,0,0,0.08);
+  padding: 6px 14px;
+  gap: 6px;
+  width: 100%;
+}
+
+.monitor-table {
+  background: transparent;
+}
+
+.slide-up-enter-active, .slide-up-leave-active {
+  transition: all 0.3s cubic-bezier(.4,0,.2,1);
+}
+
+.slide-up-enter-from, .slide-up-leave-to {
+  transform: translateY(100%);
+  opacity: 0;
+}
+
+.slide-up-enter-to, .slide-up-leave-from {
+  transform: translateY(0);
+  opacity: 1;
 }
 
 .live-bar {
@@ -451,6 +424,7 @@ defineExpose({
   box-shadow: 0 2px 8px 0 rgba(0,0,0,0.10);
   min-height: 48px;
 }
+
 .live-dot {
   width: 14px;
   height: 14px;
@@ -461,10 +435,12 @@ defineExpose({
   display: inline-block;
   animation: live-blink 1.2s infinite alternate;
 }
+
 @keyframes live-blink {
   0% { opacity: 1; box-shadow: 0 0 8px 2px #ff174480; }
   100% { opacity: 0.5; box-shadow: 0 0 2px 1px #ff174480; }
 }
+
 .live-key-badge {
   font-size: 0.97rem;
   letter-spacing: 0.5px;
@@ -489,6 +465,7 @@ defineExpose({
   width: 100%;
   justify-content: flex-end;
 }
+
 .control-btn {
   min-width: 68px;
   border-radius: 8px !important;
@@ -498,24 +475,45 @@ defineExpose({
   background: none !important;
   transition: background 0.2s, color 0.2s;
 }
+
 .start-btn {
   font-weight: 700;
   color: #2196f3 !important;
 }
+
 .prev-btn {
   color: #ffe066 !important;
 }
+
 .next-btn {
   color: #ffd600 !important;
 }
+
 .end-btn {
   color: #ff5252 !important;
   font-weight: 700;
 }
+
 .control-btn:disabled {
   opacity: 0.5;
   background: none !important;
   color: #aaa !important;
+}
+
+.monitor-btn {
+  font-weight: 700;
+  color: #43a047 !important;
+  border-radius: 8px !important;
+  min-width: 92px;
+  font-size: 0.98rem;
+  box-shadow: none;
+  background: none !important;
+  transition: color 0.2s, background 0.2s;
+}
+
+.monitor-btn:active, .monitor-btn:focus, .monitor-btn[aria-pressed="true"] {
+  color: #fff !important;
+  background: #43a047 !important;
 }
 
 .end-dialog-card {
