@@ -9,6 +9,8 @@ import QuizPreview from "../presentations/lives/QuizPreview.vue";
 import type {IQuiz} from "../../services/quiz/types/IQuiz.ts";
 import type {IQuizItem} from "../../services/quiz/types/IQuizItem.ts";
 
+type Answer = { position: number; answer: string[]; hit: boolean; };
+
 const $q = useQuasar()
 const liveApi = new LiveApi()
 const authStore = useAuthStore()
@@ -52,34 +54,40 @@ const currentItem = computed<IQuizItem | null>(() => {
 const previewType = computed<string>(() => currentItem.value?.type || "");
 const previewData = computed<any>(() => currentItem.value || {});
 
-// --- SIMULAÇÃO FAKES PARA VISUALIZAÇÃO ---
-// Remova este bloco quando quiser usar dados reais!
-function randomLogin() {
-  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
-  const len = Math.floor(Math.random() * 8) + 8 // 8-15
-  let login = ''
-  for (let i = 0; i < len; i++) login += chars[Math.floor(Math.random()*chars.length)]
-  return login
-}
-function randomCode() {
-  return String(Math.floor(100000 + Math.random()*900000))
-}
-function randomFakeRow() {
-  const login = randomLogin()
-  const code = randomCode()
-  const total = Math.floor(Math.random()*10)+1
-  const score = Math.floor(Math.random()*(total+1))
-  const percent = total ? Math.round((score/total)*100) : 0
-  const lastHit = Math.random() > 0.4 ? true : false
-  return { login, code, raw: `${login}#${code}`, score, total, percent, lastHit }
-}
-const monitorRows = computed(() => {
-  const arr = []
-  for (let i=0; i<40; i++) arr.push(randomFakeRow())
-  // Ordena por score e percent
-  return arr.sort((a, b) => b.score - a.score || b.percent - a.percent)
-})
-// --- FIM SIMULAÇÃO FAKES ---
+const evaluationRows = computed(() => {
+  const evaluationMap = liveStore.getLive()?.evaluation?.evaluation;
+  if (!evaluationMap) return [];
+  // Se for Map, tem entries(). Se for objeto, use Object.entries
+  const entries = typeof evaluationMap.entries === 'function'
+      ? Array.from(evaluationMap.entries())
+      : Object.entries(evaluationMap);
+
+  return entries.flatMap(([key, answerSet]) => {
+    const [login, code] = key.split('#');
+
+    console.log('login', login);
+    console.log('code', code);
+    console.log('answerSet', answerSet);
+
+    const { correct: acertos, wrong: erros, lastHit: hitLastAnswer } = getQuizStats(answerSet);
+
+    return {
+      aluno: login,
+      code: code,
+      acertos: acertos,
+      erros: erros,
+      ultimaResposta: hitLastAnswer
+    }
+  });
+});
+
+const monitorColumns = [
+  { name: 'aluno', label: 'Aluno', field: 'aluno', align: 'left' },
+  { name: 'code', label: 'Code', field: 'code', align: 'left' },
+  { name: 'acertos', label: 'Acertos', field: 'acertos', align: 'left', sortable: true },
+  { name: 'erros', label: 'Erros', field: 'erros', align: 'left', sortable: true },
+  { name: 'ultimaResposta', label: 'Ultima resposta', field: 'ultimaResposta', align: 'center', format: v => v ? '✅' : '❌' },
+];
 
 const liveEngagement = computed(() => {
   const participantCount = currentLive.value?.engagement?.participantCount || 0
@@ -177,6 +185,25 @@ async function goToPreviousPosition() {
 async function startSession() {
   await goToNextPosition()
 }
+
+function getQuizStats(answers: Set<Answer>) {
+  let correct = 0;
+  let wrong = 0;
+  let lastPosition = -Infinity;
+  let lastHit: boolean | null = null;
+
+  for (const ans of answers) {
+    if (ans.hit) correct++;
+    else wrong++;
+
+    if (ans.position > lastPosition) {
+      lastPosition = ans.position;
+      lastHit = ans.hit;
+    }
+  }
+  return { correct, wrong, lastHit };
+}
+
 
 function close() {
   dialog.value = false
@@ -365,65 +392,11 @@ defineExpose({
           </div>
           <div class="monitor-table-wrap items-center full-width">
             <q-table
-              :rows="monitorRows"
-              :columns="[
-                { name: 'idx', label: 'Ranking', align: 'left', field: row => row },
-                { name: 'login', label: 'User', align: 'left', field: 'login' },
-                { name: 'score', label: 'Score', align: 'left', field: 'score' },
-                { name: 'total', label: 'Answers', align: 'left', field: 'total' },
-                { name: 'percent', label: 'Hit %', align: 'left', field: 'percent' },
-                { name: 'last', label: 'Last', align: 'left', field: 'lastHit' },
-                { name: 'actions', label: '', align: 'left', field: 'raw' }
-              ]"
-              row-key="raw"
+              :rows="evaluationRows"
+              :columns="monitorColumns"
+              row-key="aluno"
               flat
-              dense
-              hide-pagination
-              :rows-per-page-options="[0]"
-              :pagination="{rowsPerPage: 9999}"
-              class="monitor-table custom-monitor-table"
-            >
-              <template #body-cell-idx="props">
-                <q-td class="table-idx">
-                  <span class="avatar-ranking">{{ props.pageIndex + 1 }}</span>
-                </q-td>
-              </template>
-              <template #body-cell-login="props">
-                <q-td class="q-gutter-x-sm">
-                  <span class="avatar-login-square" :style="'background:' + loginColor(props.row.login)">
-                    {{ props.row.login.slice(0, 3).toUpperCase() }}
-                  </span>
-                  <span class="login-label">{{ props.row.login }}</span>
-                  <q-badge color="grey-3" text-color="#666" class="code-badge">#{{ props.row.code }}</q-badge>
-                </q-td>
-              </template>
-              <template #body-cell-score="props">
-                <q-td class="text-bold">
-                  <q-badge :color="props.row.score > 0 ? 'green-6' : 'red-5'" text-color="white">{{ props.row.score }}</q-badge>
-                </q-td>
-              </template>
-              <template #body-cell-total="props">
-                <q-td class="table-total">
-                  <span class="answers-bold">{{ props.row.total }}</span>
-                </q-td>
-              </template>
-              <template #body-cell-percent="props">
-                <q-td>
-                  <q-badge :color="props.row.percent >= 80 ? 'green-6' : props.row.percent >= 50 ? 'yellow-8' : 'red-5'" text-color="white">{{ props.row.percent }}%</q-badge>
-                </q-td>
-              </template>
-              <template #body-cell-last="props">
-                <q-td>
-                  <q-icon v-if="props.row.lastHit === true" name="check_circle" color="green-5" size="sm" />
-                  <q-icon v-else-if="props.row.lastHit === false" name="cancel" color="red-5" size="sm" />
-                </q-td>
-              </template>
-              <template #body-cell-actions="props">
-                <q-td align="right">
-                  <q-btn flat dense icon="person_remove" color="negative" @click="removePupil(props.row.raw)" />
-                </q-td>
-              </template>
-            </q-table>
+            />
           </div>
         </div>
       </transition>
