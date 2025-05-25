@@ -282,8 +282,8 @@ defineExpose({
 
           <div v-else class="centered-message">
 
-            <q-card-section class="bg-grey-8 q-pa-md">
-              <div class="text-subtitle2 q-mb-sm">Live Preview</div>
+            <q-card-section>
+
               <QuizPreview
                   v-if="previewType.startsWith('QUIZ_')"
                   :type="previewType"

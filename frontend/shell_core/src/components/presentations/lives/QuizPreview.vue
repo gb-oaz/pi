@@ -1,7 +1,13 @@
 <script setup lang="ts">
-import { defineProps } from 'vue'
+import {computed, defineProps} from 'vue'
 import QRadio from "quasar";
 import QInput from "quasar";
+import MultipleChoicePreview from './MultipleChoicePreview.vue';
+import MultipleChoiceTeacherPreview from './MultipleChoiceTeacherPreview.vue';
+import { liveStore } from '../../../stores/liveStore.ts';
+import { useAuthStore } from '../../../stores/authStore.ts';
+
+const authStore = useAuthStore()
 
 const props = defineProps({
   type: {
@@ -13,18 +19,24 @@ const props = defineProps({
     required: true
   }
 })
+
+const currentLive = computed(() => liveStore.getLive())
+const scope = computed(() => authStore.scope)
+
+const isOwner = computed(() => {
+  const teacher = currentLive.value?.teacher
+  if (!teacher || !scope.value) return false
+  return (teacher.login === scope.value.login && teacher.code === scope.value.code)
+})
 </script>
 
 <template>
   <div class="quiz-preview-container">
-    <!-- Common Question -->
-    <h3 class="quiz-question">{{ props.data.contentQuestion || 'Your question will appear here' }}</h3>
 
     <!-- QUIZ_MULTIPLE_CHOICE Preview -->
-    <div v-if="props.type === 'QUIZ_MULTIPLE_CHOICE'" class="quiz-options">
-      <div v-for="(alt, index) in props.data.alternatives" :key="index" class="option">
-        <q-radio :val="alt" :label="alt || `Option ${index + 1}`" />
-      </div>
+    <div v-if="props.type === 'QUIZ_MULTIPLE_CHOICE'">
+      <MultipleChoiceTeacherPreview v-if="isOwner" :quiz="props.data" />
+      <MultipleChoicePreview v-else :data="props.data" />
     </div>
 
     <!-- QUIZ_FILL_SPACE Preview -->
