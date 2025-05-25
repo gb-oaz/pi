@@ -4,6 +4,10 @@ import { useQuasar } from 'quasar'
 import { liveStore } from '../../stores/liveStore'
 import { LiveApi } from '../../services/live/LiveApi'
 import { useAuthStore } from '../../stores/authStore'
+import SlidePreview from "../presentations/lives/SlidePreview.vue";
+import QuizPreview from "../presentations/lives/QuizPreview.vue";
+import type {IQuiz} from "../../services/quiz/types/IQuiz.ts";
+import type {IQuizItem} from "../../services/quiz/types/IQuizItem.ts";
 
 const $q = useQuasar()
 const liveApi = new LiveApi()
@@ -38,6 +42,15 @@ const liveKeyDisplay = computed(() => {
   if (!teacher?.login || !teacher?.code) return ''
   return `${teacher.login}#${teacher.code}`
 })
+
+const quiz = computed<IQuiz | undefined>(() => currentLive.value?.quiz);
+
+const currentItem = computed<IQuizItem | null>(() => {
+  if (!quiz.value || !Array.isArray(quiz.value?.quizes)) return null;
+  return quiz.value.quizes.find((item: IQuizItem) => item.position === currentPosition.value) || null;
+});
+const previewType = computed<string>(() => currentItem.value?.type || "");
+const previewData = computed<any>(() => currentItem.value || {});
 
 // --- SIMULAÇÃO FAKES PARA VISUALIZAÇÃO ---
 // Remova este bloco quando quiser usar dados reais!
@@ -266,6 +279,25 @@ defineExpose({
             <div class="text-h3 text-weight-bold q-mb-md">Aguardando o professor iniciar a sessão...</div>
             <div class="text-subtitle1">Assim que o professor iniciar, sua tela será atualizada automaticamente.</div>
           </div>
+
+          <div v-else class="centered-message">
+
+            <q-card-section class="bg-grey-8 q-pa-md">
+              <div class="text-subtitle2 q-mb-sm">Live Preview</div>
+              <QuizPreview
+                  v-if="previewType.startsWith('QUIZ_')"
+                  :type="previewType"
+                  :data="previewData"
+              />
+              <SlidePreview
+                  v-else-if="previewType.startsWith('SLIDE_')"
+                  :type="previewType"
+                  :data="previewData"
+              />
+            </q-card-section>
+
+          </div>
+
         </div>
       </div>
       <div v-if="isOwnerTeacher" class="live-controls-footer row items-center full-width no-wrap">

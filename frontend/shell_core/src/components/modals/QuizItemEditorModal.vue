@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { ref, watch, computed } from 'vue'
 import type {IQuizItem} from "../../services/quiz/types/IQuizItem.ts";
-import QuizPreview from '../previews/QuizPreview.vue'
-import SlidePreview from '../previews/SlidePreview.vue'
+import QuizPreview from '../presentations/previews/QuizPreview.vue'
+import SlidePreview from '../presentations/previews/SlidePreview.vue'
 import { useQuasar } from 'quasar'
 
 const $q = useQuasar()
