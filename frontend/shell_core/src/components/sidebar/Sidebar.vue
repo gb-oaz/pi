@@ -16,7 +16,6 @@ import { useAuthStore } from '../../stores/authStore.ts'
 import { liveStore } from '../../stores/liveStore'
 import { LiveApi } from '../../services/live/LiveApi'
 import { useQuasar } from 'quasar'
-import type { Ref } from 'vue'
 import type { ILive } from '../../services/live/types/ILive'
 
 const router = useRouter()

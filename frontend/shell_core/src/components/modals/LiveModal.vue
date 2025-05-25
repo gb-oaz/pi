@@ -22,7 +22,12 @@ const currentLive = computed(() => liveStore.getLive())
 const isOwnerTeacher = computed(() => {
   const { login, code, scope } = authStore.scope || {}
   const teacher = currentLive.value?.teacher
-  return (scope.includes('TEACHER') && teacher && login === teacher.login && code === teacher.code)
+  return (
+    Array.isArray(scope) && scope.includes('TEACHER') &&
+    teacher &&
+    login === teacher.login &&
+    code === teacher.code
+  )
 })
 const myLoginCode = computed(() => {
   const { login, code } = authStore.scope || {}
@@ -99,9 +104,6 @@ async function startLiveStream() {
       liveKey,
       (data) => {
         liveStore.createLive(data)
-      },
-      (error) => {
-        // Opcional: notificar erro
       }
   )
 }
@@ -408,7 +410,7 @@ defineExpose({
           class="q-mt-md"
           dense
           outlined
-          :error="confirmEndInput && !canConfirmEnd"
+          :error="!!confirmEndInput && !canConfirmEnd"
           :rules="[val => !val || canConfirmEnd || 'Type your login#code to confirm']"
           @keyup.enter="canConfirmEnd && proceedEnd()"
         />
