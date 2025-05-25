@@ -396,6 +396,10 @@ defineExpose({
               :columns="monitorColumns"
               row-key="aluno"
               flat
+              class="custom-monitor-table monitor-table q-mt-md"
+              hide-bottom
+              :dense="true"
+              :table-style="'background: #232526;'"
             />
           </div>
         </div>
@@ -671,10 +675,21 @@ defineExpose({
   color: #fff !important;
 }
 
-.custom-monitor-table .q-table__middle,
-.custom-monitor-table .q-table__bottom,
-.custom-monitor-table .q-table__top {
-  display: none !important;
+.custom-monitor-table {
+  background: #232526 !important;
+}
+.custom-monitor-table thead th {
+  font-weight: 900;
+  font-size: 1.09rem;
+  letter-spacing: 0.5px;
+  color: #ffe066;
+  background: #232526;
+}
+.custom-monitor-table .q-td {
+  font-size: 1.06rem;
+  font-weight: 700;
+  color: #fffbe7;
+  background: #232526;
 }
 .custom-monitor-table .q-tr {
   border-radius: 8px;
