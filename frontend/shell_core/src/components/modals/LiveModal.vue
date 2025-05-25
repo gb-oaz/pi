@@ -68,13 +68,11 @@ const monitorRows = computed(() => {
 })
 // --- FIM SIMULAÇÃO FAKES ---
 
-// --- SIMULAÇÃO FAKES DE ENGAJAMENTO (IEngagement) ---
-const fakeEngagement = computed(() => {
-  // Simula valores realistas para IEngagement
-  const participantCount = 40
-  const answersCorrect = Math.floor(70 + Math.random()*60) // 70-130
-  const answersIncorrect = Math.floor(30 + Math.random()*40) // 30-70
-  const answersUnanswered = Math.floor(5 + Math.random()*15) // 5-20
+const liveEngagement = computed(() => {
+  const participantCount = currentLive.value?.engagement?.participantCount || 0
+  const answersCorrect = currentLive.value?.engagement?.answersCorrect || 0
+  const answersIncorrect = currentLive.value?.engagement?.answersIncorrect || 0
+  const answersUnanswered = currentLive.value?.engagement?.answersUnanswered || 0
   const total = answersCorrect + answersIncorrect + answersUnanswered
   const correctPercentual = Math.round((answersCorrect/total)*100)
   const incorrectPercentual = Math.round((answersIncorrect/total)*100)
@@ -89,7 +87,6 @@ const fakeEngagement = computed(() => {
     unansweredPercentual
   }
 })
-// --- FIM SIMULAÇÃO ---
 
 let lobbyTimeout: ReturnType<typeof setTimeout> | null = null
 let eventSource: EventSource | null = null
@@ -304,23 +301,29 @@ defineExpose({
                 <div class="text-h6 text-weight-bold">Monitor</div>
                 <div class="engagement-box row items-center">
                   <span class="engagement-label">Engagement</span>
-                  <span class="engagement-detail">{{ fakeEngagement.participantCount }} participants</span>
+                  <span class="engagement-detail">{{ liveEngagement.participantCount }} participants</span>
                 </div>
 
                 <div class="engagement-box row items-center">
                   <span class="engagement-label">Correct</span>
-                  <q-linear-progress :value="fakeEngagement.correctPercentual/100" color="green-5" track-color="grey-8" rounded style="width:80px;height:12px;" />
-                  <span class="engagement-label">{{ fakeEngagement.answersCorrect }} ({{ fakeEngagement.correctPercentual }}%)</span>
+                  <q-linear-progress :value="liveEngagement.correctPercentual/100" color="green-5" track-color="grey-8" rounded style="width:80px;height:12px;" />
+                  <span class="engagement-label">{{
+                      liveEngagement.answersCorrect
+                    }} ({{ liveEngagement.correctPercentual }}%)</span>
                 </div>
                 <div class="engagement-box row items-center">
                   <span class="engagement-label">Incorrect</span>
-                  <q-linear-progress :value="fakeEngagement.incorrectPercentual/100" color="red-5" track-color="grey-8" rounded style="width:80px;height:12px;" />
-                  <span class="engagement-label">{{ fakeEngagement.answersIncorrect }} ({{ fakeEngagement.incorrectPercentual }}%)</span>
+                  <q-linear-progress :value="liveEngagement.incorrectPercentual/100" color="red-5" track-color="grey-8" rounded style="width:80px;height:12px;" />
+                  <span class="engagement-label">{{
+                      liveEngagement.answersIncorrect
+                    }} ({{ liveEngagement.incorrectPercentual }}%)</span>
                 </div>
                 <div class="engagement-box row items-center">
                   <span class="engagement-label">Unanswered</span>
-                  <q-linear-progress :value="fakeEngagement.unansweredPercentual/100" color="grey-5" track-color="grey-8" rounded style="width:80px;height:12px;" />
-                  <span class="engagement-label">{{ fakeEngagement.answersUnanswered }} ({{ fakeEngagement.unansweredPercentual }}%)</span>
+                  <q-linear-progress :value="liveEngagement.unansweredPercentual/100" color="grey-5" track-color="grey-8" rounded style="width:80px;height:12px;" />
+                  <span class="engagement-label">{{
+                      liveEngagement.answersUnanswered
+                    }} ({{ liveEngagement.unansweredPercentual }}%)</span>
                 </div>
 
               </div>
