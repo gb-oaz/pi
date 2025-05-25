@@ -316,6 +316,7 @@ defineExpose({
             class="control-btn monitor-btn q-mr-md"
             :color="monitorOpen ? 'green-6' : 'grey-6'"
             :text-color="monitorOpen ? '#fff' : '#43a047'"
+            :disable="!liveEngagement || liveEngagement.participantCount === 0"
             @click="toggleMonitor"
           />
           <q-btn label="Prev" @click="goToPreviousPosition" :disable="currentPosition <= 1" class="control-btn prev-btn q-mr-sm" color="grey-6" text-color="#ffe066" flat />
