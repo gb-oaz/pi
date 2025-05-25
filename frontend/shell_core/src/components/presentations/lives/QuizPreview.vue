@@ -80,20 +80,6 @@ const isOwner = computed(() => {
         </div>
       </div>
     </div>
-
-    <!-- Timer and Reward Info -->
-    <div class="quiz-meta q-mt-md">
-      <div class="row items-center justify-between">
-        <div class="timer">
-          <q-icon name="timer" size="sm" />
-          {{ props.data.timerSeconds || 30 }} seconds
-        </div>
-        <div class="reward">
-          <q-icon name="military_tech" size="sm" />
-          {{ props.data.reward || 50 }} points
-        </div>
-      </div>
-    </div>
   </div>
 </template>
 
@@ -130,12 +116,4 @@ const isOwner = computed(() => {
   display: flex
   flex-wrap: wrap
   gap: 8px
-
-.quiz-meta
-  padding-top: 12px
-  border-top: 1px solid #555
-  color: #bdbdbd
-  font-size: 0.9rem
-  .row
-    gap: 20px
 </style>

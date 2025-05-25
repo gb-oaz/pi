@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, defineProps } from 'vue'
+import { ref, computed, defineProps, onMounted, onUnmounted } from 'vue'
 import type { IQuizMultipleChoice } from "../../../services/quiz/types/quiz/IQuizMultipleChoice.ts";
 import { LiveApi } from "../../../services/live/LiveApi.ts";
 import { liveStore } from "../../../stores/liveStore.ts";
@@ -12,6 +12,33 @@ const selected = ref<any[]>([])
 const sending = ref(false)
 const sent = ref(false)
 
+// TIMER
+const timer = ref(props.data.timerSeconds || 0)
+let intervalId: number | undefined
+
+function startTimer() {
+  if (timer.value <= 0) return
+  intervalId = window.setInterval(() => {
+    if (timer.value > 0) {
+      timer.value--
+    }
+    if (timer.value === 0) {
+      clearInterval(intervalId)
+      if (!sent.value) {
+        sendAnswers(['NOT_ANSWERED'])
+      }
+    }
+  }, 1000)
+}
+
+onMounted(() => {
+  startTimer()
+})
+
+onUnmounted(() => {
+  if (intervalId) clearInterval(intervalId)
+})
+
 function toggleSelect(alt: any) {
   if (sent.value) return
   const idx = selected.value.indexOf(alt)
@@ -22,15 +49,17 @@ function toggleSelect(alt: any) {
   }
 }
 
-async function sendAnswers() {
-  if (!selected.value.length) return
+async function sendAnswers(customAnswers?: string[]) {
+  if (sent.value) return
   const teacher = currentLive.value?.teacher
   if (!teacher) return
   const liveKey = `LIVE${teacher.login}CODE${teacher.code}`
   sending.value = true
-  await liveApi.addAnswerPupil(liveKey, selected.value)
+  const answers = customAnswers ? customAnswers : selected.value.length ? selected.value : ['NOT_ANSWERED']
+  await liveApi.addAnswerPupil(liveKey, answers)
   sending.value = false
   sent.value = true
+  if (intervalId) clearInterval(intervalId)
 }
 </script>
 
@@ -55,7 +84,7 @@ async function sendAnswers() {
       label="Enviar resposta"
       class="mc-send-btn soft-send-btn"
       :disable="!selected.length || sending || sent"
-      @click="sendAnswers"
+      @click="sendAnswers()"
       style="margin-top: 16px; width: 100%;"
       size="lg"
       color="soft-accent"
@@ -63,6 +92,20 @@ async function sendAnswers() {
       outline
     />
     <div v-if="sent" class="mc-feedback">Resposta enviada!</div>
+
+    <!-- Timer and Reward Info -->
+    <div class="quiz-meta q-mt-md mc-timer" v-if="props.data.timerSeconds">
+      <div class="row items-center justify-between">
+        <div class="timer">
+          <q-icon name="timer" size="sm" />
+          <span :class="{ 'mc-timer-final': timer <= 5 }">{{ timer }}s</span>
+        </div>
+        <div class="reward">
+          <q-icon name="military_tech" size="sm" />
+          {{ props.data.reward || 50 }} points
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -81,6 +124,17 @@ async function sendAnswers() {
   max-width: 700px;
   margin: 0 auto;
   padding: 24px 0;
+}
+.mc-timer {
+  text-align: center;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #1976d2;
+  margin-bottom: 8px;
+}
+.mc-timer-final {
+  color: #e65100;
+  font-weight: bold;
 }
 .yellow-question {
   color: #ffe066;
@@ -159,6 +213,17 @@ async function sendAnswers() {
   margin-top: 18px;
   text-align: center;
   font-weight: 600;
+}
+
+.quiz-meta {
+  padding-top: 12px;
+  border-top: 1px solid #555;
+  color: #bdbdbd;
+  font-size: 0.9rem;
+}
+
+.quiz-meta.row {
+  gap: 20px
 }
 @media (max-width: 800px) {
   .mc-alternatives-row {
