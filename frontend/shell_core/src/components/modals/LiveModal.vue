@@ -63,6 +63,29 @@ const monitorRows = computed(() => {
 })
 // --- FIM SIMULAÇÃO FAKES ---
 
+// --- SIMULAÇÃO FAKES DE ENGAJAMENTO (IEngagement) ---
+const fakeEngagement = computed(() => {
+  // Simula valores realistas para IEngagement
+  const participantCount = 40
+  const answersCorrect = Math.floor(70 + Math.random()*60) // 70-130
+  const answersIncorrect = Math.floor(30 + Math.random()*40) // 30-70
+  const answersUnanswered = Math.floor(5 + Math.random()*15) // 5-20
+  const total = answersCorrect + answersIncorrect + answersUnanswered
+  const correctPercentual = Math.round((answersCorrect/total)*100)
+  const incorrectPercentual = Math.round((answersIncorrect/total)*100)
+  const unansweredPercentual = 100 - correctPercentual - incorrectPercentual
+  return {
+    participantCount,
+    answersCorrect,
+    answersIncorrect,
+    answersUnanswered,
+    correctPercentual,
+    incorrectPercentual,
+    unansweredPercentual
+  }
+})
+// --- FIM SIMULAÇÃO ---
+
 let lobbyTimeout: ReturnType<typeof setTimeout> | null = null
 let eventSource: EventSource | null = null
 
@@ -274,7 +297,32 @@ defineExpose({
       <transition name="slide-up">
         <div v-if="monitorOpen && isOwnerTeacher" class="monitor-panel bg-grey-10 text-white row items-center full-width no-wrap">
           <div class="row items-center full-width no-wrap justify-between q-pa-md monitor-header">
-            <div class="text-h6">Monitor</div>
+            <div class="row items-center full-width no-wrap engagement-header-row">
+              <div class="row items-center engagement-title-row">
+                <div class="text-h6 text-weight-bold">Monitor</div>
+                <div class="engagement-box row items-center">
+                  <span class="engagement-label">Engagement</span>
+                  <span class="engagement-detail">{{ fakeEngagement.participantCount }} participants</span>
+                </div>
+
+                <div class="engagement-box row items-center">
+                  <span class="engagement-label">Correct</span>
+                  <q-linear-progress :value="fakeEngagement.correctPercentual/100" color="green-5" track-color="grey-8" rounded style="width:80px;height:12px;" />
+                  <span class="engagement-label">{{ fakeEngagement.answersCorrect }} ({{ fakeEngagement.correctPercentual }}%)</span>
+                </div>
+                <div class="engagement-box row items-center">
+                  <span class="engagement-label">Incorrect</span>
+                  <q-linear-progress :value="fakeEngagement.incorrectPercentual/100" color="red-5" track-color="grey-8" rounded style="width:80px;height:12px;" />
+                  <span class="engagement-label">{{ fakeEngagement.answersIncorrect }} ({{ fakeEngagement.incorrectPercentual }}%)</span>
+                </div>
+                <div class="engagement-box row items-center">
+                  <span class="engagement-label">Unanswered</span>
+                  <q-linear-progress :value="fakeEngagement.unansweredPercentual/100" color="grey-5" track-color="grey-8" rounded style="width:80px;height:12px;" />
+                  <span class="engagement-label">{{ fakeEngagement.answersUnanswered }} ({{ fakeEngagement.unansweredPercentual }}%)</span>
+                </div>
+
+              </div>
+            </div>
             <q-btn flat dense icon="close" @click="closeMonitor" color="grey-4" />
           </div>
           <div class="monitor-table-wrap items-center full-width">
@@ -737,28 +785,49 @@ defineExpose({
   background-clip: padding-box;
 }
 
-.badge-total {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 32px;
-  height: 28px;
-  padding: 0 8px;
-  border-radius: 12px;
-  font-weight: 700;
-  font-size: 1.01rem;
-  color: #fff;
-  background: #64b5f6;
-  box-shadow: 0 1px 4px 0 rgba(0,0,0,0.06);
-  letter-spacing: 1px;
-  border: 2px solid #fffbe7;
-  background-clip: padding-box;
-}
-
 .answers-bold {
   font-weight: 700;
   color: #64b5f6;
   font-size: 1.04rem;
   letter-spacing: 1px;
+}
+
+.engagement-box.row.items-center {
+  background: rgba(255,224,102,0.08);
+  border-radius: 10px;
+  padding: 6px 16px 6px 12px;
+  align-items: center;
+  min-height: 38px;
+  font-size: 1.09rem;
+  font-weight: 600;
+  margin-right: 12px;
+  gap: 10px;
+}
+.engagement-label {
+  color: #ffe066;
+  font-weight: 800;
+  margin-right: 6px;
+  font-size: 1.09rem;
+}
+.engagement-detail {
+  color: #e0e0e0;
+  font-size: 1.09rem;
+  font-weight: 600;
+  margin-left: 6px;
+}
+
+.engagement-header-row {
+  align-items: center;
+  flex-wrap: nowrap;
+  width: 100%;
+}
+
+.engagement-title-row {
+  align-items: center;
+  gap: 18px;
+  flex-shrink: 0;
+  margin: 0 !important;
+  top: auto !important;
+  left: auto !important;
 }
 </style>
