@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { ref, computed, defineProps, onMounted, onUnmounted } from 'vue'
+import { ref, computed, defineProps, onMounted, onUnmounted, watch } from 'vue'
 import type { IQuizMultipleChoice } from "../../../services/quiz/types/quiz/IQuizMultipleChoice.ts";
 import { LiveApi } from "../../../services/live/LiveApi.ts";
 import { liveStore } from "../../../stores/liveStore.ts";
 
 const liveApi = new LiveApi()
-const props = defineProps<{ data: IQuizMultipleChoice }>()
+const props = defineProps<{ data: IQuizMultipleChoice, position: number }>()
 
 const currentLive = computed(() => liveStore.getLive())
 const selected = ref<any[]>([])
@@ -37,6 +37,15 @@ onMounted(() => {
 
 onUnmounted(() => {
   if (intervalId) clearInterval(intervalId)
+})
+
+// Resetar estado quando a posição do quiz mudar
+watch(() => props.position, () => {
+  sent.value = false
+  selected.value = []
+  timer.value = props.data.timerSeconds || 0
+  if (intervalId) clearInterval(intervalId)
+  startTimer()
 })
 
 function toggleSelect(alt: any) {

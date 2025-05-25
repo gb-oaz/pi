@@ -36,7 +36,11 @@ const isOwner = computed(() => {
     <!-- QUIZ_MULTIPLE_CHOICE Preview -->
     <div v-if="props.type === 'QUIZ_MULTIPLE_CHOICE'">
       <MultipleChoiceTeacherPreview v-if="isOwner" :quiz="props.data" />
-      <MultipleChoicePreview v-else :data="props.data" />
+      <MultipleChoicePreview 
+        v-else 
+        :data="props.data" 
+        :position="currentLive?.teacher?.control?.currentPosition"
+      />
     </div>
 
     <!-- QUIZ_FILL_SPACE Preview -->
