@@ -1,0 +1,22 @@
+name: Action Core Pipeline
+on: [ push, pull_request ]
+
+jobs:
+  local-action-test:
+    name: Local Action Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Run tests
+        run: |
+          echo "Running local action tests..."
+          echo $test_var_a
+          echo $test_var_b
+          echo $test_sec_a
+          echo $test_sec_b
+        env:
+          test_var_a: ${{ vars.VAR_A }}
+          test_var_b: ${{ vars.VAR_B }}
+          test_sec_a: ${{ secrets.SEC_A }}
+          test_sec_b: ${{ secrets.SEC_B }}

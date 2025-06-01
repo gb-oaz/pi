@@ -70,3 +70,9 @@ docker-compose.override.yml
 **/pnpm-debug.log*
 **/.log/
 
+# === Secrets ===
+*.secrets
+
+# === Variables ===
+*.variables
+
