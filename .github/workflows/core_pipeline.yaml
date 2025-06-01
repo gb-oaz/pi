@@ -33,7 +33,6 @@ jobs:
 
   IntegrationTests:
     runs-on: ubuntu-latest
-    needs: UnitaryTests
     steps:
       - uses: actions/checkout@v4
       - name: Set up JDK 21
@@ -53,7 +52,6 @@ jobs:
 
   AcceptanceTests:
     runs-on: ubuntu-latest
-    needs: IntegrationTests
     steps:
       - uses: actions/checkout@v4
       - name: Set up JDK 21
